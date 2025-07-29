@@ -1,0 +1,49 @@
+@use 'sass:map';
+
+$font-weights: (
+        'medium': 500,
+        'bold': 700
+);
+
+// PC 타이포그래피 크기
+$pc-sizes: (
+        'display': 64pt,
+        'headline': 40pt,
+        'title': 32pt,
+        'label': 24pt,
+        'body': 20pt,
+        'caption': 16pt
+);
+
+// 모바일 타이포그래피 크기
+$mobile-sizes: (
+        'display': 32pt,
+        'headline': 24pt,
+        'title': 20pt,
+        'label': 14pt,
+        'body': 16pt,
+        'caption': 12pt
+);
+
+$breakpoint-mobile: 768px;
+
+// 미디어 쿼리 믹스인
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+// 타이포그래피 믹스인
+@mixin typography($type) {
+  font-size: map.get($pc-sizes, $type);
+
+  @include mobile {
+    font-size: map.get($mobile-sizes, $type);
+  }
+}
+
+// 폰트 두께 믹스인
+@mixin font-weight($weight) {
+  font-weight: map.get($font-weights, $weight);
+}
