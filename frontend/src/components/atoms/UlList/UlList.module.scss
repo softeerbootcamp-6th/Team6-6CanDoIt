@@ -1,0 +1,15 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: 100%;
+  gap: 0.5rem;
+}
+
+.item{
+  cursor: pointer;
+  color: var(--grey-opacity-50);
+  &:hover {
+    color: var(--grey-100);
+  }
+}
