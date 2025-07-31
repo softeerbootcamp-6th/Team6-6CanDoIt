@@ -1,0 +1,9 @@
+.iconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.circle {
+        border-radius: 50%;
+    }
+}
