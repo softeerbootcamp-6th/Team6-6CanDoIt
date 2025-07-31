@@ -124,3 +124,62 @@ $accent-colors: (
     }
   }
 }
+
+// Grey 색상 클래스
+@each $key, $value in $grey-colors {
+  .text-grey-#{$key} {
+    color: var(--grey-#{$key});
+  }
+
+  .bg-grey-#{$key} {
+    background-color: var(--grey-#{$key});
+  }
+}
+
+// Grey Opacity 색상 클래스
+@each $key, $value in $grey-opacity-colors {
+  .text-grey-opacity-#{$key} {
+    color: var(--grey-opacity-#{$key});
+  }
+
+  .bg-grey-opacity-#{$key} {
+    background-color: var(--grey-opacity-#{$key});
+  }
+}
+
+// Primary 색상 클래스
+@each $variant, $color in $primary-colors {
+  .text-primary-#{$variant} {
+    color: var(--primary-#{$variant});
+  }
+
+  .bg-primary-#{$variant} {
+    background-color: var(--primary-#{$variant});
+  }
+}
+
+// Status 색상 클래스
+@each $variant, $statuses in $status-colors {
+  @each $status, $color in $statuses {
+    .text-status-#{$variant}-#{$status} {
+      color: var(--status-#{$variant}-#{$status});
+    }
+
+    .bg-status-#{$variant}-#{$status} {
+      background-color: var(--status-#{$variant}-#{$status});
+    }
+  }
+}
+
+// Accent 날씨 색상 클래스
+@each $category, $items in $accent-colors {
+  @each $name, $color in $items {
+    .text-accent-#{$category}-#{$name} {
+      color: var(--accent-#{$category}-#{$name});
+    }
+
+    .bg-accent-#{$category}-#{$name} {
+      background-color: var(--accent-#{$category}-#{$name});
+    }
+  }
+}
