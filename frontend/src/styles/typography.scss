@@ -1,6 +1,7 @@
 @use 'sass:map';
 
 $font-weights: (
+        'regular': 400,
         'medium': 500,
         'bold': 700
 );
@@ -46,4 +47,18 @@ $breakpoint-mobile: 768px;
 // 폰트 두께 믹스인
 @mixin font-weight($weight) {
   font-weight: map.get($font-weights, $weight);
+}
+
+// 타이포그래피 타입별 클래스
+@each $type in map.keys($pc-sizes) {
+  .fontSize-#{$type} {
+    @include typography($type);
+  }
+}
+
+// 폰트 두께별 클래스
+@each $weight in map.keys($font-weights) {
+  .fontWeight-#{$weight} {
+    @include font-weight($weight);
+  }
 }
