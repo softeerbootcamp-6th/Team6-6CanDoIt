@@ -1,0 +1,42 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+    width: 15rem;
+    height: 10.5rem;
+
+    padding: 0.75rem 0;
+
+    border-radius: 1.9rem;
+
+    background-color: #fff35b;
+
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.title {
+    color: var(--Grey-0, #000);
+    font-size: 0.95rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 150%;
+    letter-spacing: -0.15px;
+}
+
+.iconWrapper {
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0.85rem 0 1rem;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0.75rem 0 1rem;
+}
