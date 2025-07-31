@@ -6,24 +6,28 @@ $font-weights: (
         'bold': 700
 );
 
+// pt → rem 변환 함수
+@function pt-to-rem($pt) {
+  @return $pt / 16 * 1rem;
+}
+
 // PC 타이포그래피 크기
 $pc-sizes: (
-        'display': 64pt,
-        'headline': 40pt,
-        'title': 32pt,
-        'label': 24pt,
-        'body': 20pt,
-        'caption': 16pt
+        'display': pt-to-rem(64),
+        'headline': pt-to-rem(40),
+        'title': pt-to-rem(32),
+        'label': pt-to-rem(24),
+        'body': pt-to-rem(20),
+        'caption': pt-to-rem(15)
 );
 
 // 모바일 타이포그래피 크기
 $mobile-sizes: (
-        'display': 32pt,
-        'headline': 24pt,
-        'title': 20pt,
-        'label': 14pt,
-        'body': 16pt,
-        'caption': 12pt
+        'display': pt-to-rem(32),
+        'title': pt-to-rem(20),
+        'body': pt-to-rem(16),
+        'label': pt-to-rem(14),
+        'caption': pt-to-rem(12)
 );
 
 $breakpoint-mobile: 768px;
