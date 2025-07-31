@@ -68,7 +68,7 @@ export default function Icon(props: PropsState) {
             <svg
                 width={width}
                 height={height}
-                viewBox='0 0 30 30'
+                viewBox='0 0 24 24'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
             >
