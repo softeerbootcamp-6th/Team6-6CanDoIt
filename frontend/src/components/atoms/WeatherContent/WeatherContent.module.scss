@@ -1,0 +1,12 @@
+@use '../../../styles/typography' as typo;
+
+span{
+  @include typo.typography('caption');
+  @include typo.font-weight('regular');
+  color: var(--grey-opacity-50);
+}
+
+.temperature{
+  @include typo.font-weight('bold');
+  color: var(--grey-100);
+}
