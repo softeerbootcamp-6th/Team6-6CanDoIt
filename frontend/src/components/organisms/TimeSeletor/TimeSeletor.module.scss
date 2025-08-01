@@ -1,0 +1,31 @@
+.tiemSeletor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    width: 87rem;
+    padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+
+    border-radius: 26px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(50px);
+}
+
+.header {
+    margin: auto;
+    height: 2.2rem;
+    width: 100%;
+    border-bottom: 1px solid #fff;
+    z-index: 100;
+}
+
+.scrollbarWrapper {
+    width: 100%;
+    height: 2.1rem;
+}
+
+.weatherCell {
+    display: flex;
+}
