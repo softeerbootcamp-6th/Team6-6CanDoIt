@@ -1,1 +1,21 @@
-rootProject.name = 'team_6th'
+rootProject.name = 'backend'
+//application-layer
+include ':application-modules:batch-server'
+include ':application-modules:api-server'
+
+//domain-layer
+include ':domain-modules:image-domain'
+include ':domain-modules:grid-domain'
+include ':domain-modules:user-domain'
+include ':domain-modules:forecast-domain'
+include ':domain-modules:mountain-domain'
+include ':domain-modules:report-domain'
+include ':domain-modules:safeinfo-domain'
+include ':domain-modules:alarm-domain'
+
+//common-layer
+include ':common-modules:calculator'
+include ':common-modules:exception'
+
+//external-layer
+//include 'external-modules:module-name'

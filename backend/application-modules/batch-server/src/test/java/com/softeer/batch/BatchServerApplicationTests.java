@@ -1,13 +1,13 @@
-package com.softeer.team_6th;
+package com.softeer.batch;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class Team6thApplicationTests {
+class BatchServerApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

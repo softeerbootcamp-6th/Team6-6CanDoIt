@@ -1,13 +1,11 @@
-package com.softeer.team_6th;
+package com.softeer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Team6thApplication {
-
+public class ApiServerApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(Team6thApplication.class, args);
+		SpringApplication.run(ApiServerApplication.class, args);
 	}
-
 }
