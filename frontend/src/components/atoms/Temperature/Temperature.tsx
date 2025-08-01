@@ -12,10 +12,10 @@ export default function Temperature({
     fontWeight = '700',
 }: PropsState) {
     return (
-        <div
+        <span
             className={`${color} fontSize-${fontSize} fontWeight-${fontWeight}`}
         >
-            {temperature}°
-        </div>
+            {temperature}°C
+        </span>
     );
 }
