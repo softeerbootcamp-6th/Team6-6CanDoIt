@@ -1,0 +1,17 @@
+.mountainCardContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto; /*가로 스크롤*/
+  padding: 1.5rem 2rem;
+  width: 100%;
+
+  box-sizing: border-box; /* 패딩을 너비에 포함시킴 */
+
+  /* 스크롤바 숨기기 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE, Edge */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
