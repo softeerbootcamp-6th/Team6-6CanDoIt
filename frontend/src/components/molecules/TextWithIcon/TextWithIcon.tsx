@@ -13,8 +13,8 @@ export default function TextWithIcon(props: PropsState) {
         <div className={styles.wrapper}>
             <Icon
                 name={iconName}
-                width='1.5rem'
-                height='1.5rem'
+                width={1.5}
+                height={1.5}
                 color='black'
                 opacity={0.4}
                 WrapperHeight='1.5rem'

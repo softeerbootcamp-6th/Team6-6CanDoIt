@@ -16,8 +16,8 @@ export default function WeatherCard() {
                     WrapperWidth='3rem'
                     backgroundColor='bg-grey-100'
                     color='black'
-                    width='1.8rem'
-                    height='1.8rem'
+                    width={2}
+                    height={2}
                     opacity={0.8}
                 />
             </div>
