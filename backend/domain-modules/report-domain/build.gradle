@@ -1,0 +1,13 @@
+dependencies {
+    implementation project(':domain-modules:mountain-domain')
+    implementation project(':domain-modules:user-domain')
+    implementation project(':domain-modules:image-domain')
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
