@@ -1,68 +1,70 @@
-@use 'sass:map';
-
-$font-weights: (
-        'regular': 400,
-        'medium': 500,
-        'bold': 700
-);
+@use 'sass:math';
 
 // pt → rem 변환 함수
 @function pt-to-rem($pt) {
-  @return $pt / 16 * 1rem;
+  @return math.div($pt, 16) * 1rem;
 }
 
-// PC 타이포그래피 크기
-$pc-sizes: (
-        'display': pt-to-rem(64),
-        'headline': pt-to-rem(40),
-        'title': pt-to-rem(32),
-        'label': pt-to-rem(24),
-        'body': pt-to-rem(20),
-        'caption': pt-to-rem(15)
-);
+:root {
+  // 폰트 두께 변수
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
 
-// 모바일 타이포그래피 크기
-$mobile-sizes: (
-        'display': pt-to-rem(32),
-        'title': pt-to-rem(20),
-        'body': pt-to-rem(16),
-        'label': pt-to-rem(14),
-        'caption': pt-to-rem(12)
-);
+  // PC 타이포그래피 크기
+  --font-size-display: #{pt-to-rem(64)};
+  --font-size-headline: #{pt-to-rem(40)};
+  --font-size-title: #{pt-to-rem(32)};
+  --font-size-label: #{pt-to-rem(24)};
+  --font-size-body: #{pt-to-rem(20)};
+  --font-size-caption: #{pt-to-rem(15)};
+}
 
-$breakpoint-mobile: 768px;
-
-// 미디어 쿼리 믹스인
-@mixin mobile {
-  @media (max-width: $breakpoint-mobile) {
-    @content;
+@media (max-width: 768px) {
+  :root {
+    // 모바일 타이포그래피 크기
+    --font-size-display: #{pt-to-rem(32)};
+    --font-size-title: #{pt-to-rem(20)};
+    --font-size-body: #{pt-to-rem(16)};
+    --font-size-label: #{pt-to-rem(14)};
+    --font-size-caption: #{pt-to-rem(12)};
   }
 }
 
-// 타이포그래피 믹스인
-@mixin typography($type) {
-  font-size: map.get($pc-sizes, $type);
-
-  @include mobile {
-    font-size: map.get($mobile-sizes, $type);
-  }
+// 타이포그래피 클래스
+.fontSize-display {
+  font-size: var(--font-size-display);
 }
 
-// 폰트 두께 믹스인
-@mixin font-weight($weight) {
-  font-weight: map.get($font-weights, $weight);
+.fontSize-headline {
+  font-size: var(--font-size-headline);
 }
 
-// 타이포그래피 타입별 클래스
-@each $type in map.keys($pc-sizes) {
-  .fontSize-#{$type} {
-    @include typography($type);
-  }
+.fontSize-title {
+  font-size: var(--font-size-title);
 }
 
-// 폰트 두께별 클래스
-@each $weight in map.keys($font-weights) {
-  .fontWeight-#{$weight} {
-    @include font-weight($weight);
-  }
+.fontSize-label {
+  font-size: var(--font-size-label);
+}
+
+.fontSize-body {
+  font-size: var(--font-size-body);
+}
+
+.fontSize-caption {
+  font-size: var(--font-size-caption);
+}
+
+// 폰트 두께 클래스
+.fontWeight-regular {
+  font-weight: var(--font-weight-regular);
+}
+
+.fontWeight-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.fontWeight-bold {
+  font-weight: var(--font-weight-bold);
 }
