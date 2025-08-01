@@ -1,0 +1,14 @@
+dependencies {
+	implementation project(':domain-modules:grid-domain')
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework:spring-tx'
+}
+
+bootJar {
+	enabled = true
+}
+
+jar {
+	enabled = false
+}
