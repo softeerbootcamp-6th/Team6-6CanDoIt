@@ -1,0 +1,33 @@
+name: BE-CI.yml
+
+on:
+  pull_request:
+    branches:
+      - be-dev
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+        # ---------- 백엔드(Java + Gradle) ----------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x backend/gradlew
+
+      - name: Build with Gradle
+        run: |
+          cd backend
+          ./gradlew build
