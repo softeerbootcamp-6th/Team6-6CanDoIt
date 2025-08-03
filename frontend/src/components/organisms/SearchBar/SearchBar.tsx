@@ -2,6 +2,22 @@
 import Dropdown from '../../molecules/Dropdown/Dropdown.tsx';
 import styles from './SearchBar.module.scss';
 
+const mountainCourseData = [
+    {
+        title: '산',
+        options: ['설악산', '한라산', '지리산'],
+    },
+    {
+        title: '코스',
+        options: ['코스1', '코스2', '코스3'],
+    },
+];
+
+const weekdayData = {
+    title: '요일은?',
+    options: ['월', '화', '수', '목', '금', '토', '일'],
+};
+
 export default function SearchBar() {
     const searchBarTitle = '어디 날씨를 확인해볼까요?';
     const searchBarMessage = '를 오르는';
@@ -13,13 +29,20 @@ export default function SearchBar() {
                 {searchBarTitle}
             </h2>
             <div className={styles.searchBarWrapper}>
-                <Dropdown title='산' options={['설악산', '한라산', '지리산']} />
-                <Dropdown title='코스' options={['코스1', '코스2', '코스3']} />
+                {mountainCourseData.map((data) => {
+                    return (
+                        <Dropdown
+                            key={data.title}
+                            title={data.title}
+                            options={data.options}
+                        />
+                    );
+                })}
                 {searchBarMessage}
                 {isHomaPage && (
                     <Dropdown
-                        title='요일은?'
-                        options={['월', '화', '수', '목', '금']}
+                        title={weekdayData.title}
+                        options={weekdayData.options}
                     />
                 )}
             </div>
