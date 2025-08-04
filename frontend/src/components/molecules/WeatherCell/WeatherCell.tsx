@@ -10,9 +10,9 @@ export default function WeatherCell() {
                 name='clear-day'
                 WrapperHeight='1.5rem'
                 WrapperWidth='1.5rem'
-                width='1.5rem'
-                height='1.5rem'
-                color='black'
+                width={1.5}
+                height={1.5}
+                color='#CACACA'
                 opacity={0.8}
             />
             <Temperature temperature={12} fontSize='body' />
