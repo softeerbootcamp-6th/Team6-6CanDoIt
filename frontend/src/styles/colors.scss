@@ -147,6 +147,17 @@ $accent-colors: (
   }
 }
 
+// Grey Opacity White 색상 클래스
+@each $key, $value in $grey-opacity-white-colors {
+  .text-grey-opacity-white-#{$key} {
+    color: var(--grey-opacity-white-#{$key});
+  }
+
+  .bg-grey-opacity-white-#{$key} {
+    background-color: var(--grey-opacity-white-#{$key});
+  }
+}
+
 // Primary 색상 클래스
 @each $variant, $color in $primary-colors {
   .text-primary-#{$variant} {
