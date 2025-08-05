@@ -22,4 +22,22 @@ public class CustomException extends RuntimeException {
         this.message = message;
         this.errorLog = errorLog;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorLog() {
+        return errorLog;
+    }
+
+    @Override
+    public String toString() {
+        String logPrefix = "[" + this.errorCode + "]";
+        return Objects.isNull(errorLog) ? logPrefix : logPrefix + ": " + errorLog;
+    }
 }
