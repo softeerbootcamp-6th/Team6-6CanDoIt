@@ -11,18 +11,18 @@ class DailyTemperatureTest {
     @DisplayName("dailyTemperatureRange 메서드는 최고 기온과 최저 기온의 차이를 올바르게 계산해야 한다.")
     @ParameterizedTest(name = "최고 기온 {0}°C, 최저 기온 {1}°C 일 때 일교차는 {2}°C 여야 한다.")
     @CsvSource({
-            "25, 5, 20",   // 일반적인 양수 일교차
-            "18, 12, 6",   // 중간 정도의 양수 일교차
-            "10, 8, 2",    // 낮은 양수 일교차
-            "15, 15, 0",   // 일교차가 0인 경우
-            "5, 15, -10"   // 최고 기온이 최저 기온보다 낮은 비정상적인 경우
+            "25.0, 5.0, 20.0",   // 일반적인 양수 일교차
+            "18.0, 12.0, 6.0",   // 중간 정도의 양수 일교차
+            "10.0, 8.0, 2.0",    // 낮은 양수 일교차
+            "15.0, 15.0, 0.0",   // 일교차가 0인 경우
+            "5.0, 15.0, -10.0"   // 최고 기온이 최저 기온보다 낮은 비정상적인 경우
     })
-    void dailyTemperatureRangeTest(int highestTemperature, int lowestTemperature, int expectedRange) {
+    void dailyTemperatureRangeTest(double highestTemperature, double lowestTemperature, double expectedRange) {
         // Given
         DailyTemperature dailyTemperature = new DailyTemperature(highestTemperature, lowestTemperature);
 
         // When
-        int actualRange = dailyTemperature.dailyTemperatureRange();
+        double actualRange = dailyTemperature.dailyTemperatureRange();
 
         // Then
         assertEquals(expectedRange, actualRange);
