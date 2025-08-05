@@ -1,5 +1,6 @@
 package com.softeer.domain;
 
+import com.softeer.domain.condition.*;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
 import com.softeer.entity.enums.Sky;
@@ -30,6 +31,7 @@ public class ForecastFixture {
         private int precipitation = 0;
         private double precipitationProbability = 10;
         private double snowAccumulation = 2.0;
+        private DailyTemperature dailyTemperature = DailyTemperatureFixture.createDefault();
 
         public ForecastBuilder id(long id) {
             this.id = id;
@@ -86,25 +88,23 @@ public class ForecastFixture {
             return this;
         }
 
-        public ForecastBuilder snowAccumulation(double snowAccumulation) {
-            this.snowAccumulation = snowAccumulation;
+        public ForecastBuilder dailyTemperature(DailyTemperature dailyTemperature) {
+            this.dailyTemperature = dailyTemperature;
             return this;
         }
+
 
         public Forecast build() {
             return new Forecast(
                     id,
                     dateTime,
                     forecastType,
-                    sky,
-                    temperature,
-                    humidity,
-                    windDir,
-                    windSpeed,
-                    precipitationType,
-                    precipitation,
-                    precipitationProbability,
-                    snowAccumulation
+                    new SkyCondition(sky),
+                    new TemperatureCondition(temperature),
+                    new HumidityCondition(humidity),
+                    new WindCondition(windDir, windSpeed),
+                    new PrecipitationCondition(precipitationType, precipitation, precipitationProbability, snowAccumulation),
+                    dailyTemperature
             );
         }
     }
