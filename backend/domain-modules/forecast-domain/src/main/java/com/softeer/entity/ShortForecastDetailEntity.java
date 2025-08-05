@@ -37,5 +37,7 @@ public class ShortForecastDetailEntity {
         this.forecast = forecast;
         this.precipitationProbability = precipitationProbability;
         this.snowAccumulation = snowAccumulation;
+        this.highestTemperature = highestTemperature;
+        this.lowestTemperature = lowestTemperature;
     }
 }
