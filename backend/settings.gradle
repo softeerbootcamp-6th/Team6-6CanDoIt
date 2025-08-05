@@ -14,7 +14,7 @@ include ':domain-modules:safeinfo-domain'
 include ':domain-modules:alarm-domain'
 
 ////common-layer
-//include ':common-modules:calculator'
+include ':common-modules:util'
 //include ':common-modules:exception'
 
 //external-layer
