@@ -22,7 +22,7 @@ public record Forecast(
     public Forecast(long id, LocalDateTime dateTime, ForecastType forecastType, Sky sky, double temperature,
                     double humidity, WindDirection windDir, double windSpeed, PrecipitationType precipitationType,
                     int precipitation, double precipitationProbability, double snowAccumulation,
-                    int highestTemperature, int lowestTemperature
+                    double highestTemperature, double lowestTemperature
     ) {
         this(id, dateTime, forecastType,
                 new SkyCondition(sky),
