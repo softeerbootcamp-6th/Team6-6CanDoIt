@@ -9,6 +9,6 @@ public final class ExceptionCreator {
     }
 
     public static CustomException create(ExceptionInterface e, String errorLog) {
-        return new CustomException(e.getHttpStatus(), e.getErrorCode(), e.getMessage(), e.getErrorCode());
+        return new CustomException(e.getHttpStatus(), e.getErrorCode(), e.getMessage(), errorLog);
     }
 }
