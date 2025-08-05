@@ -1,4 +1,5 @@
-<img width="100%" height="auto" alt="image" src="https://github.com/user-attachments/assets/3198b385-6e7c-49ec-a18f-b0059963ff9c" />
+<img width="100%" height="auto" alt="image" src="https://github.com/user-attachments/assets/c0bbeb2f-1b4c-43fc-8e73-c04a6f2cd1a4" />
+
 
 # 서비스 소개
 
