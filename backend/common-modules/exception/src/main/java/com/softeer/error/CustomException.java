@@ -1,5 +1,7 @@
 package com.softeer.error;
 
+import java.util.Objects;
+
 public class CustomException extends RuntimeException {
 
     private final int status;
