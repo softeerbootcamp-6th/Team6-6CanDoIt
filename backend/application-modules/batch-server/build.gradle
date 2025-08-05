@@ -7,7 +7,7 @@ dependencies {
 }
 
 bootJar {
-    true
+    enabled = true
 }
 
 jar {
