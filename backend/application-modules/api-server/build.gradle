@@ -1,0 +1,16 @@
+dependencies {
+	implementation project(':domain-modules:grid-domain')
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework:spring-tx'
+
+	testImplementation 'com.h2database:h2'
+}
+
+bootJar {
+	enabled = true
+}
+
+jar {
+	enabled = false
+}

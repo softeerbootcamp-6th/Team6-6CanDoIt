@@ -1,36 +1,67 @@
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.4'
-	id 'io.spring.dependency-management' version '1.1.7'
+	id 'io.spring.dependency-management' version '1.1.0'
+
+	id 'java-library'
+	id 'java-test-fixtures'
+	id 'maven-publish'
+
 }
 
-group = 'com.softeer'
-version = '0.0.1-SNAPSHOT'
+bootJar {
+	enabled = false
+}
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+jar {
+	enabled = false
+}
+
+allprojects {
+	group = 'com.softeer'
+	version = '0.0.1-SNAPSHOT'
+	sourceCompatibility = '17'
+
+	repositories {
+		mavenCentral()
+
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'java-library'
+	apply plugin: 'java-test-fixtures'
+	apply plugin: 'maven-publish'
+
+
+	// lombok 컴파일 설정
+	configurations {
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
 	}
-}
 
-repositories {
-	mavenCentral()
-}
+	// common-modules 그룹인지를 체크
+	def isCommonModule = project.path.startsWith(':common-modules')
 
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+	dependencies {
+		if (!isCommonModule) {
+			implementation 'org.springframework.boot:spring-boot-starter'
+			compileOnly 'org.projectlombok:lombok'
+			annotationProcessor 'org.projectlombok:lombok'
+			testImplementation 'com.h2database:h2'
 
-tasks.named('test') {
-	useJUnitPlatform()
+		}
+
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'org.junit.jupiter:junit-jupiter-api'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	}
+
+	tasks.named('test') {
+		useJUnitPlatform()
+	}
 }

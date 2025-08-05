@@ -1,0 +1,12 @@
+dependencies {
+    implementation project(':domain-modules:grid-domain')
+    implementation project(':domain-modules:image-domain')
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
