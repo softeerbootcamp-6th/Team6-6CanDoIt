@@ -32,7 +32,7 @@ public class ShortForecastDetailEntity {
     private double lowestTemperature;
 
     public ShortForecastDetailEntity(ForecastEntity forecast, double precipitationProbability,  double snowAccumulation,
-                                     int highestTemperature, int lowestTemperature
+                                     double highestTemperature, double lowestTemperature
                                      ) {
         this.forecast = forecast;
         this.precipitationProbability = precipitationProbability;
