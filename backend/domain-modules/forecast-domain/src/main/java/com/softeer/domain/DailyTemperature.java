@@ -1,8 +1,8 @@
 package com.softeer.domain;
 
-public record DailyTemperature(int highestTemperature,  int lowestTemperature) {
+public record DailyTemperature(double highestTemperature,  double lowestTemperature) {
 
-    public int dailyTemperatureRange() {
+    public double dailyTemperatureRange() {
         return highestTemperature - lowestTemperature;
     }
 
