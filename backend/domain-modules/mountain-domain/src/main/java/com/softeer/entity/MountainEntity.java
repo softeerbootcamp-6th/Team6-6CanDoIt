@@ -1,4 +1,4 @@
-package com.softeer.domain.entity;
+package com.softeer.entity;
 
 import com.softeer.entity.GridEntity;
 import com.softeer.entity.ImageEntity;

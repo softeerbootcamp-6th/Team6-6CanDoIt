@@ -1,6 +1,5 @@
-package com.softeer.domain.entity;
+package com.softeer.entity;
 
-import com.softeer.entity.ImageEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
