@@ -1,4 +1,5 @@
 dependencies {
+    testImplementation(testFixtures(project(':domain-modules:grid-domain')))
 }
 
 bootJar {
