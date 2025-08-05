@@ -1,5 +1,7 @@
 package com.softeer.activity;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +34,12 @@ public final class HikingActivityCalculator {
             double humidity
     ) {
         double calculatedValue = calculate(temperature, dailyTemperatureRange, precipitation, windSpeed, humidity);
-        return HikingActivityStatus.description(calculatedValue);
+
+        BigDecimal bd = new BigDecimal(calculatedValue);
+        BigDecimal roundedValue = bd.setScale(4, RoundingMode.HALF_UP);
+        double finalValue = roundedValue.doubleValue();
+
+        return HikingActivityStatus.description(finalValue);
     }
 
     /**
