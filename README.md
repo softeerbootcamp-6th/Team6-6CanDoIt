@@ -25,7 +25,7 @@
     </td>
   </tr>
   <tr>
-    <th><a href="https://github.com/ParkJongSeong93">박종성</a> (리드)</th>
+    <th><a href="https://github.com/ParkJongSeong93">박종성</a></th>
     <th><a href="https://github.com/bobob0311">시보성</a></th>
     <th><a href="https://github.com/Haemulramen">김명규</a></th>
     <th><a href="https://github.com/naver0504">백승진</a></th>
