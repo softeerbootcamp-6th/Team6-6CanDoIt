@@ -1,5 +1,6 @@
 dependencies {
     implementation project(':domain-modules:grid-domain')
+    implementation project(':domain-modules:image-domain')
 }
 
 bootJar {
