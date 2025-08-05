@@ -18,7 +18,7 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int total_distance;
+    private int totalDistance;
 
     private int altitude;
 
