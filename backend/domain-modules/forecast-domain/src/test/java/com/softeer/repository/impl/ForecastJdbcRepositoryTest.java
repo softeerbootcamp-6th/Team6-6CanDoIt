@@ -200,7 +200,7 @@ class ForecastJdbcRepositoryTest {
     }
 
     private Long persistShortForecast(ForecastEntity forecastEntity, double precipitationProbability, double snowAccumulation,
-                                      int highestTemperature, int lowestTemperature
+                                      double highestTemperature, double lowestTemperature
                                       ) {
         ForecastEntity forecast = forecastJpaRepository.saveAndFlush(forecastEntity);
 
