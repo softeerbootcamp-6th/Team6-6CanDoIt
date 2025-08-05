@@ -11,8 +11,8 @@ public class DailyTemperatureFixture {
     }
 
     public static class DailyTemperatureBuilder {
-        private int highestTemperature = 20;
-        private int lowestTemperature = 10;
+        private double highestTemperature = 20.0;
+        private double lowestTemperature = 10.0;
 
         public DailyTemperatureBuilder highestTemperature(int highestTemperature) {
             this.highestTemperature = highestTemperature;
