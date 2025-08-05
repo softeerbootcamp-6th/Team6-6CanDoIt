@@ -29,7 +29,7 @@ public class CourseEntity {
     @JoinColumn(name = "mountain_id")
     private MountainEntity mountainEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private ImageEntity imageEntity;
 }
