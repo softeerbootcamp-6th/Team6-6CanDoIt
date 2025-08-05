@@ -1,0 +1,94 @@
+:root {
+    /* Grey */
+    --grey-0: #000000;
+    --grey-10: #1E1E1E;
+    --grey-20: #333333;
+    --grey-30: #4A4A4A;
+    --grey-40: #626262;
+    --grey-50: #7A7A7A;
+    --grey-60: #949494;
+    --grey-70: #AEAEAE;
+    --grey-80: #CACACA;
+    --grey-90: #E6E6E6;
+    --grey-98: #F7F7F7;
+    --grey-100: #FFFFFF;
+
+    /* Grey Opacity (Black + α) */
+    --grey-opacity-0: rgba(0, 0, 0, 1);
+    --grey-opacity-10: rgba(0, 0, 0, 0.88);
+    --grey-opacity-20: rgba(0, 0, 0, 0.8);
+    --grey-opacity-30: rgba(0, 0, 0, 0.71);
+    --grey-opacity-40: rgba(0, 0, 0, 0.62);
+    --grey-opacity-50: rgba(0, 0, 0, 0.52);
+    --grey-opacity-60: rgba(0, 0, 0, 0.42);
+    --grey-opacity-70: rgba(0, 0, 0, 0.32);
+    --grey-opacity-80: rgba(0, 0, 0, 0.21);
+    --grey-opacity-90: rgba(0, 0, 0, 0.1);
+    --grey-opacity-98: rgba(0, 0, 0, 0.03);
+    --grey-opacity-100: rgba(0, 0, 0, 0);
+
+    /* Grey Opacity White (White + α) */
+    --grey-opacity-white-0: rgba(255, 255, 255, 1);
+    --grey-opacity-white-10: rgba(255, 255, 255, 0.88);
+    --grey-opacity-white-20: rgba(255, 255, 255, 0.8);
+    --grey-opacity-white-30: rgba(255, 255, 255, 0.71);
+    --grey-opacity-white-40: rgba(255, 255, 255, 0.62);
+    --grey-opacity-white-50: rgba(255, 255, 255, 0.52);
+    --grey-opacity-white-60: rgba(255, 255, 255, 0.42);
+    --grey-opacity-white-70: rgba(255, 255, 255, 0.32);
+    --grey-opacity-white-80: rgba(255, 255, 255, 0.21);
+    --grey-opacity-white-90: rgba(255, 255, 255, 0.1);
+    --grey-opacity-white-98: rgba(255, 255, 255, 0.03);
+    --grey-opacity-white-100: rgba(255, 255, 255, 0);
+
+    /* Primary */
+    --primary-normal: #FFF35B;
+
+    /* Status */
+    --status-normal-excellent: #2693FF;
+    --status-normal-good: #1DC06E;
+    --status-normal-average: #FFBF66;
+    --status-normal-bad: #E54545;
+
+    --status-regular-excellent: #CCE7FF;
+    --status-regular-good: #CCFFE7;
+    --status-regular-average: #FFEBCC;
+    --status-regular-bad: #FFCCCC;
+
+    --status-light-excellent: #F2F9FF;
+    --status-light-good: #F2FFF9;
+    --status-light-average: #FFFAF2;
+    --status-light-bad: #FFE5E5;
+
+    /* Accent – Weather */
+    --accent-weather-sunny: #FFF35B;
+    --accent-weather-heatwave: #FF945B;
+    --accent-weather-dust: #BAA151;
+    --accent-weather-snow: #E8E8E8;
+    --accent-weather-cloudy: #D7EAFF;
+    --accent-weather-rain: #7EADE7;
+    --accent-weather-windy: #509EB0;
+
+    /* font-weight */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-bold: 700;
+
+    --font-size-display: 4rem;
+    --font-size-headline: 2.5rem;
+    --font-size-title: 2rem;
+    --font-size-label: 1.5rem;
+    --font-size-body: 1.25rem;
+    --font-size-caption: 0.9375rem;
+}
+
+@media (max-width: 768px) {
+    :root {
+        /* Mobile font-size */
+        --font-size-display: 2rem;
+        --font-size-title: 1.25rem;
+        --font-size-body: 1rem;
+        --font-size-label: 0.875rem;
+        --font-size-caption: 0.75rem;
+    }
+}
