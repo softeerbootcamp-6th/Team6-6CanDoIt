@@ -11,6 +11,8 @@ public final class HikingActivityCalculator {
     private static final double A4 = 0.1589;
     private static final double A5 = 0.1297;
 
+    private HikingActivityCalculator() {
+    }
 
     /**
      * 산악활동지수 값을 계산 후 값에 따라 카테고리를 반환합니다.
