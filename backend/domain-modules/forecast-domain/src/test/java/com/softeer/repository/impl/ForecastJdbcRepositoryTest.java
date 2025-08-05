@@ -61,29 +61,30 @@ class ForecastJdbcRepositoryTest {
         for (int i = 0; i < 24; i++) {
             LocalDateTime dateTime   = baseTime.plusHours(i);
             double precipitationProbability = i * 2;
-            double snowAccumulation = i * 2;
 
             if (i < ultraCount) {
                 Forecast ultraForecast = ForecastFixture.builder().dateTime(dateTime).forecastType(ForecastType.ULTRA).build();
-                Forecast shortForecast = ForecastFixture.builder().dateTime(dateTime).forecastType(ForecastType.SHORT).precipitationProbability(precipitationProbability).build();
+                Forecast shortForecast = ForecastFixture.builder()
+                        .dateTime(dateTime)
+                        .forecastType(ForecastType.SHORT)
+                        .precipitationProbability(precipitationProbability)
+                        .build();
 
                 long id = persistUltraForecast(ForecastEntity.from(ultraForecast, grid));
-                persistShortForecast(ForecastEntity.from(shortForecast, grid), precipitationProbability, snowAccumulation);
+                getShortForecastId(shortForecast, grid);
 
                 expected.add(ForecastFixture.builder().id(id)
                         .dateTime(dateTime).forecastType(ForecastType.ULTRA)
                         .precipitationProbability(precipitationProbability)
-                        .snowAccumulation(snowAccumulation)
                         .build());
             } else {
                 Forecast shortForecast = ForecastFixture.builder().dateTime(dateTime).forecastType(ForecastType.SHORT).precipitationProbability(precipitationProbability).build();
 
-                long id = persistShortForecast(ForecastEntity.from(shortForecast, grid), precipitationProbability, snowAccumulation);
+                long id = getShortForecastId(shortForecast, grid);
 
                 expected.add(ForecastFixture.builder().id(id)
                         .dateTime(dateTime).forecastType(ForecastType.SHORT)
                         .precipitationProbability(precipitationProbability)
-                        .snowAccumulation(snowAccumulation)
                         .build());
             }
         }
@@ -113,7 +114,6 @@ class ForecastJdbcRepositoryTest {
             LocalDateTime dateTime = baseTime.plusHours(i);
             int temperature = i * 2;
             double precipitationProbability = i * 2;
-            double snowAccumulation = i * 2;
 
             Forecast ultraForecast = ForecastFixture.builder()
                     .dateTime(dateTime)
@@ -128,13 +128,13 @@ class ForecastJdbcRepositoryTest {
                     .build();
 
             Long id = persistUltraForecast(ForecastEntity.from(ultraForecast, expectGrid));
-            persistShortForecast(ForecastEntity.from(shortForecast, expectGrid), precipitationProbability, snowAccumulation);
+
+            getShortForecastId(shortForecast, expectGrid);
 
             expected.add(ForecastFixture.builder().id(id).forecastType(ForecastType.ULTRA)
                     .dateTime(dateTime)
                     .temperature(temperature)
                     .precipitationProbability(precipitationProbability)
-                    .snowAccumulation(snowAccumulation)
                     .build());
         }
 
@@ -151,7 +151,6 @@ class ForecastJdbcRepositoryTest {
             LocalDateTime dateTime = baseTime.plusHours(i);
             int temperature = i * 3;
             double precipitationProbability = i * 3;
-            double snowAccumulation = i * 3;
 
             Forecast shortForecast = ForecastFixture.builder()
                     .dateTime(baseTime.plusHours(i))
@@ -160,12 +159,12 @@ class ForecastJdbcRepositoryTest {
                     .precipitationProbability(precipitationProbability)
                     .build();
 
-            Long id = persistShortForecast(ForecastEntity.from(shortForecast, expectGrid), precipitationProbability, snowAccumulation);
+            Long id = getShortForecastId(shortForecast, expectGrid);
+
             expected.add(ForecastFixture.builder().id(id).forecastType(ForecastType.SHORT)
                     .dateTime(dateTime)
                     .temperature(temperature)
                     .precipitationProbability(precipitationProbability)
-                    .snowAccumulation(snowAccumulation)
                     .build());
         }
 
@@ -175,7 +174,7 @@ class ForecastJdbcRepositoryTest {
                     .forecastType(ForecastType.SHORT)
                     .build();
 
-            persistShortForecast(ForecastEntity.from(shortForecast, mockGrid), 10.0, 10.0);
+            getShortForecastId(shortForecast, mockGrid);
         }
 
         //When
@@ -186,14 +185,34 @@ class ForecastJdbcRepositoryTest {
         Assertions.assertEquals(expected, result, "데이터 내용 동일");
     }
 
+    private Long getShortForecastId(Forecast shortForecast, Grid expectGrid) {
+        return persistShortForecast(ForecastEntity.from(shortForecast, expectGrid),
+                shortForecast.precipitationCondition().precipitationProbability(),
+                shortForecast.precipitationCondition().snowAccumulation(),
+                shortForecast.dailyTemperature().highestTemperature(),
+                shortForecast.dailyTemperature().lowestTemperature()
+        );
+    }
+
 
     private Long persistUltraForecast(ForecastEntity forecastEntity) {
         return forecastJpaRepository.saveAndFlush(forecastEntity).getId();
     }
 
-    private Long persistShortForecast(ForecastEntity forecastEntity, double precipitationProbability, double snowAccumulation) {
+    private Long persistShortForecast(ForecastEntity forecastEntity, double precipitationProbability, double snowAccumulation,
+                                      int highestTemperature, int lowestTemperature
+                                      ) {
         ForecastEntity forecast = forecastJpaRepository.saveAndFlush(forecastEntity);
-        shortForecastDetailJpaRepository.saveAndFlush(new ShortForecastDetailEntity(forecast, precipitationProbability, snowAccumulation));
+
+        shortForecastDetailJpaRepository.saveAndFlush(
+                new ShortForecastDetailEntity(
+                        forecast,
+                        precipitationProbability,
+                        snowAccumulation,
+                        highestTemperature,
+                        lowestTemperature
+                ));
+
         return forecast.getId();
     }
 }
