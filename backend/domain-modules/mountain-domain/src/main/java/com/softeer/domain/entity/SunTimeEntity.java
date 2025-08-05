@@ -18,7 +18,7 @@ public class SunTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(nullable = false)
     private LocalTime sunrise;
