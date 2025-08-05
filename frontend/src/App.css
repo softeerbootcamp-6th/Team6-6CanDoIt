@@ -1,0 +1,4 @@
+body {
+    background-color: var(--grey-0);
+    overscroll-behavior-y: none;
+}
