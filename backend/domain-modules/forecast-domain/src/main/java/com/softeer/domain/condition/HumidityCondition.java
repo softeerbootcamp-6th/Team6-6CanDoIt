@@ -14,10 +14,10 @@ public record HumidityCondition(double humidity) implements Displayable {
 
     private enum HumidityStatus {
 
-        DRY("건조해요", 0.0, 39.9),
-        PLEASANT("쾌적해요", 40.0, 59.9),
-        HUMID("습해요", 60.0, 79.9),
-        VERY_HUMID("매우 습해요", 80.0, 100.0);
+        DRY("건조해요", 0.0, 40.0),
+        PLEASANT("쾌적해요", 40.1, 60.0),
+        HUMID("습해요", 60.1, 80.0),
+        VERY_HUMID("매우 습해요", 80.1, 100.0);
 
         private static final List<HumidityStatus> humidityStatuses = Arrays.asList(HumidityStatus.values());
 
