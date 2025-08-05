@@ -1,5 +1,6 @@
 package com.softeer.entity;
 
+import com.softeer.entity.enums.Level;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,12 +18,18 @@ public class CourseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private int totalDistance;
+    private double totalDistance;
 
     private int altitude;
 
     @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Level level;
+
+    private int totalDuration;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mountain_id")

@@ -24,6 +24,9 @@ public class MountainEntity {
 
     private int altitude;
 
+    @Column(nullable = false, length = 1000)
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grid_id")
     private GridEntity gridEntity;
