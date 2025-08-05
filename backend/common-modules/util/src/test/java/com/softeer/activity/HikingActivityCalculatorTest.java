@@ -39,7 +39,7 @@ class HikingActivityCalculatorTest {
 
         Assertions.assertThatThrownBy(() -> 
                 HikingActivityCalculator.calculateHikingActivity(temperature, dailyTemperatureRange, precipitation, windSpeed, humidity
-        )).isEqualTo(RuntimeException.class);
+        )).isInstanceOf(RuntimeException.class);
     }
 
     private static Stream<Arguments> provideInvalidHikingActivityInputs() {
