@@ -3,9 +3,9 @@ plugins {
 	id 'org.springframework.boot' version '3.5.4'
 	id 'io.spring.dependency-management' version '1.1.0'
 
-//	id 'java-library'
-//	id 'java-test-fixtures'
-//	id 'maven-publish'
+	id 'java-library'
+	id 'java-test-fixtures'
+	id 'maven-publish'
 
 }
 
@@ -32,9 +32,9 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
-//	apply plugin: 'java-library'
-//	apply plugin: 'java-test-fixtures'
-//	apply plugin: 'maven-publish'
+	apply plugin: 'java-library'
+	apply plugin: 'java-test-fixtures'
+	apply plugin: 'maven-publish'
 
 
 	// lombok 컴파일 설정
@@ -43,6 +43,7 @@ subprojects {
 			extendsFrom annotationProcessor
 		}
 	}
+
 	// common-modules 그룹인지를 체크
 	def isCommonModule = project.path.startsWith(':common-modules')
 
@@ -51,6 +52,8 @@ subprojects {
 			implementation 'org.springframework.boot:spring-boot-starter'
 			compileOnly 'org.projectlombok:lombok'
 			annotationProcessor 'org.projectlombok:lombok'
+			testImplementation 'com.h2database:h2'
+
 		}
 
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
