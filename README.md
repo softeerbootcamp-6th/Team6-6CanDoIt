@@ -32,7 +32,7 @@
   </tr>
   <tr>
     <td colspan="2" align="center">🖥 Frontend Developer</td>
-    <td colspan="2" align="center">🌐 Backend Engineer</td>
+    <td colspan="2" align="center">🌐 Backend Developer</td>
   </tr>
 </table>
 
