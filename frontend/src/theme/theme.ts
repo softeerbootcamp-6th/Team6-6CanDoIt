@@ -83,66 +83,18 @@ export const theme = {
     },
 
     typography: {
-        displayBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-display)',
-            lineHeight: 'auto',
+        fontWeight: {
+            bold: 'var(--font-weight-bold)',
+            medium: 'var(--font-weight-medium)',
+            regular: 'var(--font-weight-regular)',
         },
-        headlineBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-headline)',
-            lineHeight: 'auto',
-        },
-        titleBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-title)',
-            lineHeight: 'auto',
-        },
-        labelBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-label)',
-            lineHeight: 'auto',
-        },
-        bodyBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-body)',
-            lineHeight: 'auto',
-        },
-        captionBold: {
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: 'var(--font-size-caption)',
-            lineHeight: 'auto',
-        },
-
-        displayMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-display)',
-            lineHeight: 'auto',
-        },
-        headlineMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-headline)',
-            lineHeight: 'auto',
-        },
-        titleMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-title)',
-            lineHeight: 'auto',
-        },
-        labelMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-label)',
-            lineHeight: 'auto',
-        },
-        bodyMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-body)',
-            lineHeight: 'auto',
-        },
-        captionMedium: {
-            fontWeight: 'var(--font-weight-medium)',
-            fontSize: 'var(--font-size-caption)',
-            lineHeight: 'auto',
+        fontSize: {
+            display: 'var(--font-size-display)',
+            headline: 'var(--font-size-headline)',
+            title: 'var(--font-size-title)',
+            label: 'var(--font-size-label)',
+            body: 'var(--font-size-body)',
+            caption: 'var(--font-size-caption)',
         },
     },
 } as const;
