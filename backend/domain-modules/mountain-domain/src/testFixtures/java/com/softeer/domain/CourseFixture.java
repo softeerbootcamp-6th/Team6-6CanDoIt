@@ -2,8 +2,6 @@ package com.softeer.domain;
 
 import com.softeer.entity.enums.Level;
 
-import java.time.LocalTime;
-
 public class CourseFixture {
 
     public static CourseBuilder builder() {
@@ -21,8 +19,6 @@ public class CourseFixture {
         private double totalDistance = 9.9;
         private int totalDuration = 123;
         private Level level = Level.EASY;
-        private LocalTime sunrise = LocalTime.of(7, 0);
-        private LocalTime sunset = LocalTime.of(19, 0);
         private String mountainName = "test mountain name";
 
         public CourseBuilder id(long id) {
@@ -50,16 +46,6 @@ public class CourseFixture {
             return this;
         }
 
-        public CourseBuilder sunrise(LocalTime sunrise) {
-            this.sunrise = sunrise;
-            return this;
-        }
-
-        public CourseBuilder sunset(LocalTime sunset) {
-            this.sunset = sunset;
-            return this;
-        }
-
         public CourseBuilder mountainName(String mountainName) {
             this.mountainName = mountainName;
             return this;
@@ -72,8 +58,6 @@ public class CourseFixture {
                     totalDistance,
                     totalDuration,
                     level,
-                    sunrise,
-                    sunset,
                     mountainName
             );
         }
