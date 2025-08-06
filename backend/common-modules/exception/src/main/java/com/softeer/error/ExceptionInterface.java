@@ -1,7 +1,7 @@
 package com.softeer.error;
 
 public interface ExceptionInterface {
-    int getHttpStatus();
+    HttpStatus getHttpStatus();
     String getErrorCode();
     String getMessage();
 }

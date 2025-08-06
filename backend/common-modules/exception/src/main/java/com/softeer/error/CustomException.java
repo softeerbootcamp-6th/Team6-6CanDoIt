@@ -4,25 +4,25 @@ import java.util.Objects;
 
 public class CustomException extends RuntimeException {
 
-    private final int status;
+    private final HttpStatus status;
     private final String errorCode;
     private final String errorLog;
 
-    public CustomException(String message, int status, String errorCode) {
+    public CustomException(String message, HttpStatus status, String errorCode) {
         super(message);
         this.status = status;
         this.errorCode = errorCode;
         this.errorLog = null;
     }
 
-    public CustomException(String message, int status, String errorCode, String errorLog) {
+    public CustomException(String message, HttpStatus status, String errorCode, String errorLog) {
         super(message);
         this.status = status;
         this.errorCode = errorCode;
         this.errorLog = errorLog;
     }
 
-    public int getStatus() {
+    public HttpStatus getStatus() {
         return status;
     }
 
