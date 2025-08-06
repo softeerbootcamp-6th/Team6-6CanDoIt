@@ -24,18 +24,11 @@ public class ForecastJdbcRepository {
     private static final String SELECT_FORECAST = """
             (
                 SELECT
-                    f.id,
-                    f.temperature,
-                    f.type,
-                    f.humidity,
-                    f.precipitation,
-                    f.sky,
-                    f.precipitation_type,
-                    f.wind_dir,
-                    f.wind_speed,
-                    f.date_time,
-                    sfd.precipitation_probability,
-                    sfd.snow_accumulation
+                    f.id, f.temperature, f.type, f.humidity,
+                    f.precipitation, f.sky, f.precipitation_type,
+                    f.wind_dir, f.wind_speed, f.date_time,
+                    sfd.precipitation_probability, sfd.snow_accumulation,
+                    sfd.highest_temperature, sfd.lowest_temperature
                 FROM forecast f
                 INNER JOIN forecast f_short ON (
                     f_short.grid_id = f.grid_id
@@ -51,9 +44,11 @@ public class ForecastJdbcRepository {
             (
                 -- 해당 시간에 ULTRA 예보가 없는 SHORT 예보
                 SELECT
-                    f.id, f.temperature, f.type, f.humidity, f.precipitation, f.sky, f.precipitation_type,
+                    f.id, f.temperature, f.type, f.humidity,
+                    f.precipitation, f.sky, f.precipitation_type,
                     f.wind_dir, f.wind_speed, f.date_time,
-                    sfd.precipitation_probability, sfd.snow_accumulation
+                    sfd.precipitation_probability, sfd.snow_accumulation,
+                    sfd.highest_temperature, sfd.lowest_temperature
                 FROM forecast f
                 LEFT JOIN short_forecast_detail sfd ON f.id = sfd.forecast_id
                 WHERE f.type = 'SHORT'
@@ -95,8 +90,15 @@ public class ForecastJdbcRepository {
             int precipitation = rs.getInt("precipitation");
             double precipitationProbability = rs.getDouble("precipitation_probability");
             double snowAccumulation = rs.getDouble("snow_accumulation");
+            int highestTemperature = rs.getInt("highest_temperature");
+            int lowestTemperature = rs.getInt("lowest_temperature");
 
-            return new Forecast(id, dateTime, forecastType, sky, temperature, humidity, windDir, windSpeed, precipitationType, precipitation, precipitationProbability, snowAccumulation);
+            return new Forecast(
+                    id, dateTime, forecastType,
+                    sky, temperature, humidity,
+                    windDir, windSpeed, precipitationType,
+                    precipitation, precipitationProbability,
+                    snowAccumulation, highestTemperature, lowestTemperature);
         }
     }
 }

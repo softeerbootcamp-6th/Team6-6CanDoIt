@@ -25,9 +25,19 @@ public class ShortForecastDetailEntity {
     @Column(name = "snow_accumulation")
     private double snowAccumulation;
 
-    public ShortForecastDetailEntity(ForecastEntity forecast, double precipitationProbability,  double snowAccumulation) {
+    @Column(name = "highest_temperature")
+    private double highestTemperature;
+
+    @Column(name = "lowest_temperature")
+    private double lowestTemperature;
+
+    public ShortForecastDetailEntity(ForecastEntity forecast, double precipitationProbability,  double snowAccumulation,
+                                     double highestTemperature, double lowestTemperature
+                                     ) {
         this.forecast = forecast;
         this.precipitationProbability = precipitationProbability;
         this.snowAccumulation = snowAccumulation;
+        this.highestTemperature = highestTemperature;
+        this.lowestTemperature = lowestTemperature;
     }
 }
