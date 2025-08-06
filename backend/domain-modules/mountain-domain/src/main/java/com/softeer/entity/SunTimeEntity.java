@@ -1,4 +1,4 @@
-package com.softeer.domain.entity;
+package com.softeer.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

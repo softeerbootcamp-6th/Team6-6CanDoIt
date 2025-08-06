@@ -1,6 +1,10 @@
 dependencies {
+    // domain modules
     implementation project(':domain-modules:grid-domain')
     implementation project(':domain-modules:image-domain')
+
+    // common modules
+    implementation project(':common-modules:exception')
 }
 
 bootJar {

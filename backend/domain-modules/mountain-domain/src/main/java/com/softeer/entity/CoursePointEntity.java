@@ -1,36 +1,31 @@
-package com.softeer.domain.entity;
+package com.softeer.entity;
 
-import com.softeer.entity.GridEntity;
-import com.softeer.entity.ImageEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "mountain")
+@Table(name = "course_point")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MountainEntity {
+public class CoursePointEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private int code;
+    private double latitude;
 
-    @Column(nullable = false)
-    private String name;
+    private double longitude;
 
-    private int altitude;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    private CourseEntity courseEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grid_id")
     private GridEntity gridEntity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
-    private ImageEntity imageEntity;
 }
