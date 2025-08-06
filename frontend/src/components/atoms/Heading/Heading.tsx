@@ -1,29 +1,56 @@
 import type { ReactNode } from 'react';
+import { css } from '@emotion/react';
+import { theme } from '../../../theme/theme.ts';
 
 interface PropsState {
-    headingTag: HeadingTag;
-    fontSize?: string;
-    fontWeight?: string;
-    color?: string;
-    children?: string | ReactNode;
+    HeadingTag: HeadingTagType;
+    fontSize?: FontSizeType;
+    children: string | ReactNode;
 }
 
-type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+type FontSizeType = keyof typeof theme.typography.fontSize;
+type HeadingTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
-export default function Heading({
-    headingTag,
-    color = 'grey-100',
-    fontSize = 'display',
-    fontWeight = 'bold',
-    children,
-}: PropsState) {
-    const Tag = headingTag;
+const { typography, colors } = theme;
 
+const createHeadingStyle = (fontSize: FontSizeType) => css`
+    color: ${colors.grey[100]};
+    font-weight: ${typography.fontWeight.bold};
+    font-size: ${typography.fontSize[fontSize]};
+`;
+
+function Heading(props: PropsState) {
+    const { HeadingTag, fontSize, children } = props;
     return (
-        <Tag
-            className={`text-${color} fontSize-${fontSize} fontWeight-${fontWeight}`}
-        >
-            {children}
-        </Tag>
+        <HeadingTag css={createHeadingStyle(fontSize!)}>{children}</HeadingTag>
+    );
+}
+
+export function DisplayHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
+    return (
+        <Heading
+            HeadingTag={HeadingTag}
+            fontSize='display'
+            children={children}
+        />
+    );
+}
+
+export function HeadlineHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
+    return (
+        <Heading
+            HeadingTag={HeadingTag}
+            fontSize='headline'
+            children={children}
+        />
+    );
+}
+
+export function LabelHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
+    return (
+        <Heading HeadingTag={HeadingTag} fontSize='label' children={children} />
     );
 }
