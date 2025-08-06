@@ -31,7 +31,7 @@ public class MountainEntity {
     @JoinColumn(name = "grid_id")
     private GridEntity gridEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private ImageEntity imageEntity;
 }
