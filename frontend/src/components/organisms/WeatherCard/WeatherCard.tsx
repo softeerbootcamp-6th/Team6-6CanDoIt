@@ -27,7 +27,7 @@ export default function WeatherCard({ title, weatherInfo }: PropsState) {
         <div css={[cardStyles, dynamicBackgoundStyle]}>
             <div css={headerStyles}>
                 <CommonText {...titleTextProps}>{title}</CommonText>
-                <button>
+                <button css={buttonStyles}>
                     <Icon {...iconProps} />
                 </button>
             </div>
@@ -73,6 +73,21 @@ const cardStyles = css`
 
     border-radius: 1.9rem;
     border: 2px solid ${colors.greyOpacityWhite[80]};
+`;
+
+const buttonStyles = css`
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+    background-color: ${colors.grey[100]};
+
+    &:hover {
+        cursor: pointer;
+    }
 `;
 
 const headerStyles = css`
