@@ -6,7 +6,7 @@ import type {
     FontWeightType,
 } from '../types/themeTypes.d.ts';
 
-function getColor({
+export function getColor({
     colors,
     colorString,
 }: {
