@@ -37,12 +37,14 @@ public class CoursePlanJdbcRepository {
                 s.sunset,
                 s.date,
             
-                i.image_url
+                mi.image_url AS mountain_image_url,
+                ci.image_url AS course_image_url
             FROM course c
             INNER JOIN mountain m ON m.id = c.mountain_id
             INNER JOIN sun_time s ON s.mountain_id = m.id 
                                    AND s.date = :date
-            INNER JOIN image i ON i.id = m.image_id
+            INNER JOIN image mi ON mi.id = m.image_id
+            INNER JOIN image ci ON ci.id = c.image_id
             WHERE c.id = :courseId
             """;
 
@@ -59,7 +61,7 @@ public class CoursePlanJdbcRepository {
                 rs.getLong("mountain_id"),
                 rs.getString("mountain_name"),
                 rs.getInt("mountain_altitude"),
-                rs.getString("image_url"),
+                rs.getString("mountain_image_url"),
                 rs.getString("description")
         );
 
@@ -73,7 +75,8 @@ public class CoursePlanJdbcRepository {
                 rs.getString("course_name"),
                 rs.getDouble("total_distance"),
                 rs.getInt("total_duration"),
-                Level.valueOf(rs.getString("level"))
+                Level.valueOf(rs.getString("level")),
+                rs.getString("course_image_url")
         );
 
         var date = rs.getDate("date").toLocalDate();

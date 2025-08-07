@@ -19,6 +19,7 @@ public class CourseFixture {
         private double totalDistance = 9.9;
         private int totalDuration = 123;
         private Level level = Level.EASY;
+        private String imageUrl = "imageUrl";
 
         public CourseBuilder id(long id) {
             this.id = id;
@@ -45,13 +46,19 @@ public class CourseFixture {
             return this;
         }
 
+        public CourseBuilder imageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+            return this;
+        }
+
         public Course build() {
             return new Course(
                     id,
                     name,
                     totalDistance,
                     totalDuration,
-                    level
+                    level,
+                    imageUrl
             );
         }
     }
