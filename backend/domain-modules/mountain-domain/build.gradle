@@ -5,6 +5,10 @@ dependencies {
 
     // common modules
     implementation project(':common-modules:exception')
+
+    // spring-web
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 bootJar {
