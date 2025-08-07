@@ -1,4 +1,4 @@
-CREATE TABLE grid
+CREATE TABLE IF NOT EXISTS grid
 (
     id BIGINT NOT NULL AUTO_INCREMENT,
     x  INT    NOT NULL,
@@ -6,14 +6,14 @@ CREATE TABLE grid
     PRIMARY KEY (id)
 );
 
-CREATE TABLE image
+CREATE TABLE IF NOT EXISTS image
 (
     id         BIGINT PRIMARY KEY AUTO_INCREMENT,
     image_url  VARCHAR(255) NOT NULL,
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE mountain
+CREATE TABLE IF NOT EXISTS mountain
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     code        INT           NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE mountain
             ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE sun_time
+CREATE TABLE IF NOT EXISTS sun_time
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     sunrise     TIME   NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE sun_time
     CONSTRAINT uq_sun_time_mountain_date UNIQUE (mountain_id, date)
 );
 
-CREATE TABLE course
+CREATE TABLE IF NOT EXISTS course
 (
     id             BIGINT PRIMARY KEY AUTO_INCREMENT,
     total_distance DOUBLE NOT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE course
             ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE course_point
+CREATE TABLE IF NOT EXISTS course_point
 (
     id        BIGINT PRIMARY KEY AUTO_INCREMENT,
     longitude DOUBLE NOT NULL,
