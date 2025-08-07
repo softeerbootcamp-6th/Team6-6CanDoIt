@@ -31,11 +31,12 @@ class CoursePlanJdbcRepositoryTest {
         int duration = 480;
         String courseName = "공룡능선";
         Level level = Level.HARD;
+        String courseImageUrl = "https://cdn/course-img.jpg";
 
         long mountainId = 7L;
         String mountainName = "설악산";
         int mountainAlt = 1708;
-        String imageUrl = "https://cdn/img.jpg";
+        String mountainImageUrl = "https://cdn/mountain-img.jpg";
         String description = "한국의 대표 명산";
 
         LocalTime sunrise = LocalTime.of(5, 30);
@@ -50,12 +51,13 @@ class CoursePlanJdbcRepositoryTest {
         when(rs.getDouble("total_distance")).thenReturn(distance);
         when(rs.getInt("total_duration")).thenReturn(duration);
         when(rs.getString("level")).thenReturn(level.name());
+        when(rs.getString("course_image_url")).thenReturn(courseImageUrl);
 
         // mountain
         when(rs.getLong("mountain_id")).thenReturn(mountainId);
         when(rs.getString("mountain_name")).thenReturn(mountainName);
         when(rs.getInt("mountain_altitude")).thenReturn(mountainAlt);
-        when(rs.getString("image_url")).thenReturn(imageUrl);
+        when(rs.getString("mountain_image_url")).thenReturn(mountainImageUrl);
         when(rs.getString("description")).thenReturn(description);
 
         // sun-time
@@ -74,7 +76,7 @@ class CoursePlanJdbcRepositoryTest {
                 () -> assertEquals(mountainId, m.id()),
                 () -> assertEquals(mountainName, m.name()),
                 () -> assertEquals(mountainAlt, m.altitude()),
-                () -> assertEquals(imageUrl, m.imageUrl()),
+                () -> assertEquals(mountainImageUrl, m.imageUrl()),
                 () -> assertEquals(description, m.description())
         );
 
@@ -90,7 +92,8 @@ class CoursePlanJdbcRepositoryTest {
                 () -> assertEquals(courseName, c.name()),
                 () -> assertEquals(distance, c.totalDistance()),
                 () -> assertEquals(duration, c.totalDuration()),
-                () -> assertEquals(level, c.level())
+                () -> assertEquals(level, c.level()),
+                () -> assertEquals(courseImageUrl, c.imageUrl())
         );
 
         assertEquals(planDate, actual.date());
