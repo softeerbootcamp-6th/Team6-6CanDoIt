@@ -52,8 +52,7 @@ subprojects {
 			implementation 'org.springframework.boot:spring-boot-starter'
 			compileOnly 'org.projectlombok:lombok'
 			annotationProcessor 'org.projectlombok:lombok'
-			testImplementation 'com.h2database:h2'
-
+			testImplementation(testFixtures(project(':infrastructure-modules:testcontainers-module')))
 		}
 
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
