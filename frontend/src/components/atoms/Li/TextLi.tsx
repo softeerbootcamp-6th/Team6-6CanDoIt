@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 
 interface PropsState {
-    children?: string;
+    children: string;
 }
 export default function TextLi({ children }: PropsState) {
     return <li css={textStyles}>{children}</li>;
