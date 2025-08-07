@@ -6,7 +6,8 @@ VALUES (1, 60, 120),
 /* 2. image ---------------------------------------------------------------- */
 INSERT INTO image (id, image_url, created_at)
 VALUES (10, 'https://cdn.example.com/img/mountain_seorak.jpg', NOW()),
-       (11, 'https://cdn.example.com/img/course_dinosaur.jpg', NOW());
+       (11, 'https://cdn.example.com/img/course_dinosaur.jpg', NOW()),
+       (12, 'https://cdn.example.com/img/course_bisandae.jpg', NOW());
 
 /* 3. mountain ------------------------------------------------------------- */
 INSERT INTO mountain (id, code, name, altitude, description, grid_id, image_id)
@@ -23,7 +24,7 @@ VALUES (100, '05:30:00', '19:30:00', '2025-08-15', 7),
 INSERT INTO course (id, total_distance, altitude, name, level, total_duration,
                     mountain_id, image_id)
 VALUES (1, 12.3, 480, '공룡능선', 'HARD', 480, 7, 11),
-       (2, 8.2, 300, '비선대 코스', 'MEDIUM', 300, 7, 11);
+       (2, 8.2, 300, '비선대 코스', 'MEDIUM', 300, 7, 12);
 
 /* 6. course_point --------------------------------------------------------- */
 INSERT INTO course_point (id, longitude, latitude, course_id, grid_id)
