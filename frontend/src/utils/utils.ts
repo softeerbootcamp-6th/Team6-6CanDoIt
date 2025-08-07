@@ -1,12 +1,12 @@
-import { theme } from '../../../theme/theme.ts';
-import { css } from '@emotion/react';
+import { theme } from '../theme/theme.ts';
+import type {
+    ColorCategoryType,
+    ColorValueType,
+    FontSizeType,
+    FontWeightType,
+} from '../types/themeTypes.d.ts';
 
-type ColorCategoryType = keyof typeof theme.colors;
-type ColorValueType = keyof (typeof theme.colors)[ColorCategoryType];
-type FontSizeType = keyof typeof theme.typography.fontSize;
-type FontWeightType = keyof typeof theme.typography.fontWeight;
-
-function parseColor({
+function getColor({
     colors,
     colorString,
 }: {
@@ -26,8 +26,8 @@ export function createTextStyle({
     fontWeight?: FontWeightType;
     color?: string;
 }) {
-    return css`
-        color: ${parseColor({ colors: theme.colors, colorString: color })};
+    return `
+        color: ${getColor({ colors: theme.colors, colorString: color })};
         font-size: ${theme.typography.fontSize[fontSize]};
         font-weight: ${theme.typography.fontWeight[fontWeight]};
     `;
