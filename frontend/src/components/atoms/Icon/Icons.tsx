@@ -1,4 +1,6 @@
 import PATH from '../../../assets/iconPath.ts';
+import { theme } from '../../../theme/theme.ts';
+import { getColor } from '../../../utils/utils.ts';
 
 interface PropsState {
     name: string;
@@ -7,6 +9,8 @@ interface PropsState {
     color: string;
     opacity?: number;
 }
+
+const { colors } = theme;
 
 export default function Icon(props: PropsState) {
     const { name, opacity, color, width, height } = props;
@@ -23,7 +27,7 @@ export default function Icon(props: PropsState) {
             xmlns='http://www.w3.org/2000/svg'
         >
             <path
-                stroke={`var(--${color})`}
+                stroke={getColor({ colors, colorString: color })}
                 d={pathData}
                 strokeOpacity={opacity || 1}
                 strokeWidth='2'

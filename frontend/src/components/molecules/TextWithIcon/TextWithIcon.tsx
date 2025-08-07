@@ -15,10 +15,8 @@ export default function TextWithIcon(props: PropsState) {
                 name={iconName}
                 width={1.5}
                 height={1.5}
-                color='black'
+                color='grey-0'
                 opacity={0.4}
-                WrapperHeight='1.5rem'
-                WrapperWidth='1.5rem'
             />
             <span className={styles.text}>{text}</span>
         </div>
