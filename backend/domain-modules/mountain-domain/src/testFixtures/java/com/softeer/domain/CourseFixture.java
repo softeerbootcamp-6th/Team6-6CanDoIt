@@ -19,7 +19,6 @@ public class CourseFixture {
         private double totalDistance = 9.9;
         private int totalDuration = 123;
         private Level level = Level.EASY;
-        private String mountainName = "test mountain name";
 
         public CourseBuilder id(long id) {
             this.id = id;
@@ -46,19 +45,13 @@ public class CourseFixture {
             return this;
         }
 
-        public CourseBuilder mountainName(String mountainName) {
-            this.mountainName = mountainName;
-            return this;
-        }
-
         public Course build() {
             return new Course(
                     id,
                     name,
                     totalDistance,
                     totalDuration,
-                    level,
-                    mountainName
+                    level
             );
         }
     }
