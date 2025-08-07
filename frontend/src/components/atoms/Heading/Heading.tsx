@@ -1,29 +1,51 @@
 import type { ReactNode } from 'react';
+import { css } from '@emotion/react';
+import type { FontSizeType } from '../../../types/themeTypes';
+import { createTextStyle } from '../../../utils/utils.ts';
+
+type HeadingTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 interface PropsState {
-    headingTag: HeadingTag;
-    fontSize?: string;
-    fontWeight?: string;
-    color?: string;
-    children?: string | ReactNode;
+    HeadingTag: HeadingTagType;
+    fontSize?: FontSizeType;
+    children: string | ReactNode;
 }
 
-type HeadingTag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+function Heading(props: PropsState) {
+    const { HeadingTag, fontSize, children } = props;
 
-export default function Heading({
-    headingTag,
-    color = 'grey-100',
-    fontSize = 'display',
-    fontWeight = 'bold',
-    children,
-}: PropsState) {
-    const Tag = headingTag;
+    const headingStyle = css`
+        ${createTextStyle({ fontSize, fontWeight: 'bold', color: 'grey-100' })}
+    `;
 
+    return <HeadingTag css={headingStyle}>{children}</HeadingTag>;
+}
+
+export function DisplayHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
     return (
-        <Tag
-            className={`text-${color} fontSize-${fontSize} fontWeight-${fontWeight}`}
-        >
-            {children}
-        </Tag>
+        <Heading
+            HeadingTag={HeadingTag}
+            fontSize='display'
+            children={children}
+        />
+    );
+}
+
+export function HeadlineHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
+    return (
+        <Heading
+            HeadingTag={HeadingTag}
+            fontSize='headline'
+            children={children}
+        />
+    );
+}
+
+export function LabelHeading(props: PropsState) {
+    const { HeadingTag, children } = props;
+    return (
+        <Heading HeadingTag={HeadingTag} fontSize='label' children={children} />
     );
 }
