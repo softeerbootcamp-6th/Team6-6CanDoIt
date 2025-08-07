@@ -5,14 +5,19 @@ import SelectorText from '../../atoms/Text/SelectorText';
 interface PropsState {
     time: string;
     temperature: number;
+    iconName: string;
 }
 
-export default function WeatherCell({ time, temperature }: PropsState) {
+export default function WeatherCell({
+    time,
+    temperature,
+    iconName,
+}: PropsState) {
     return (
         <div css={wrapperStyles}>
             <SelectorText>{time}</SelectorText>
             <Icon
-                name='clear-day'
+                name={iconName}
                 width={1.5}
                 height={1.5}
                 color='grey-80'
