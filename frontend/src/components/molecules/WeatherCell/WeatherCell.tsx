@@ -1,5 +1,5 @@
 import Icon from '../../atoms/Icon/Icons';
-import Temperature from '../../atoms/Temperature/Temperature';
+import CommonText from '../../atoms/Text/CommonText';
 import styles from './WeatherCell.module.scss';
 
 export default function WeatherCell() {
@@ -8,14 +8,14 @@ export default function WeatherCell() {
             <span>{'123'}</span>
             <Icon
                 name='clear-day'
-                WrapperHeight='1.5rem'
-                WrapperWidth='1.5rem'
                 width={1.5}
                 height={1.5}
-                color='#CACACA'
+                color='grey-60'
                 opacity={0.8}
             />
-            <Temperature temperature={12} fontSize='body' />
+            <CommonText TextTag='span' fontSize='body' fontWeight='bold'>
+                20°C
+            </CommonText>
         </div>
     );
 }

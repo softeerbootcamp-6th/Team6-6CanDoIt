@@ -1,7 +1,7 @@
 import styles from './WeatherCard.module.scss';
-import Temperature from '../../atoms/Temperature/Temperature';
 import TextWithIcon from '../../molecules/TextWithIcon/TextWithIcon';
 import Icon from '../../atoms/Icon/Icons';
+import CommonText from '../../atoms/Text/CommonText';
 
 export default function WeatherCard() {
     return (
@@ -10,12 +10,8 @@ export default function WeatherCard() {
                 <span className={styles.title}>시작 지점</span>
 
                 <Icon
-                    shape='circle'
                     name='narrow-right'
-                    WrapperHeight='3rem'
-                    WrapperWidth='3rem'
-                    backgroundColor='bg-grey-100'
-                    color='black'
+                    color='grey-0'
                     width={2}
                     height={2}
                     opacity={0.8}
@@ -26,7 +22,14 @@ export default function WeatherCard() {
                     <TextWithIcon iconName='rain' text='비옴' />
                     <TextWithIcon iconName='rain' text='2m/s' />
                 </span>
-                <Temperature temperature={20} />
+                <CommonText
+                    TextTag='span'
+                    fontSize='display'
+                    fontWeight='medium'
+                    color='grey-0'
+                >
+                    20°C
+                </CommonText>
             </div>
         </div>
     );
