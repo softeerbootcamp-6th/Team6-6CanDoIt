@@ -1,0 +1,13 @@
+dependencies {
+    api "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+    // (필요 시) APT 없이 단순 레퍼런스용 JPA API
+    compileOnly "jakarta.persistence:jakarta.persistence-api"
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
