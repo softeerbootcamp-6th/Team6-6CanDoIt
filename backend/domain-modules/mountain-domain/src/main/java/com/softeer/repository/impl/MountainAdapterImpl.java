@@ -20,17 +20,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MountainAdapterImpl implements MountainAdapter {
 
-    private final CoursePlanJdbcRepository coursePlanJdbcRepository;
     private final MountainJpaRepository mountainJpaRepository;
-    private final CourseJpaRepository courseJpaRepository;
 
     private final MountainMapper mountainMapper;
-    private final CourseMapper courseMapper;
-
-    @Override
-    public CoursePlan findCoursePlanByIdAndDate(long courseId, LocalDate date) {
-        return coursePlanJdbcRepository.findCoursePlan(courseId, date);
-    }
 
     @Override
     public List<Mountain> findAllMountains() {
@@ -45,12 +37,5 @@ public class MountainAdapterImpl implements MountainAdapter {
                 .orElseThrow(() -> ExceptionCreator.create(MountainException.NOT_FOUND));
 
         return mountainMapper.toDomain(mountainEntity);
-    }
-
-    @Override
-    public List<Course> findCoursesByMountainId(long id) {
-        List<CourseEntity> courseEntities = courseJpaRepository.findEntitiesByMountainId(id);
-
-        return courseMapper.toDomainList(courseEntities);
     }
 }
