@@ -24,7 +24,7 @@ public class ForecastEntity {
 
     private double temperature;
 
-    private int precipitation;
+    private String precipitation;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

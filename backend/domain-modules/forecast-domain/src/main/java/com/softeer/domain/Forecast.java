@@ -17,11 +17,11 @@ public record Forecast(
         WindCondition windCondition,
         PrecipitationCondition precipitationCondition,
         DailyTemperature dailyTemperature
-        ) {
+) {
 
     public Forecast(long id, LocalDateTime dateTime, ForecastType forecastType, Sky sky, double temperature,
                     double humidity, WindDirection windDir, double windSpeed, PrecipitationType precipitationType,
-                    int precipitation, double precipitationProbability, double snowAccumulation,
+                    String precipitation, double precipitationProbability, double snowAccumulation,
                     double highestTemperature, double lowestTemperature
     ) {
         this(id, dateTime, forecastType,
@@ -43,7 +43,4 @@ public record Forecast(
                 humidityCondition.humidity()
         );
     }
-
 }
-
-

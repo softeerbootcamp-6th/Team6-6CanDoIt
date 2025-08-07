@@ -15,8 +15,8 @@ class PrecipitationConditionTest {
     @DisplayName("모든 PrecipitationType에 대해 올바른 형식의 설명 문자열을 반환해야 한다.")
     void displayDescription_shouldReturnCorrectStringForAllTypes(PrecipitationType type) {
         // Given
-        int testPrecipitation = 1; // 이 값은 description에 영향을 주지 않으므로 임의로 설정
-        int testProbability = 50;
+        String testPrecipitation = "30.0~50.0mm"; // 이 값은 description에 영향을 주지 않으므로 임의로 설정
+        int testProbability = 10;
         int testSnowAccumulation = 1;
 
         PrecipitationCondition condition = new PrecipitationCondition(type, testPrecipitation, testProbability, testSnowAccumulation);

@@ -87,7 +87,7 @@ public class ForecastJdbcRepository {
             WindDirection windDir = WindDirection.valueOf(rs.getString("wind_dir"));
             double windSpeed = rs.getDouble("wind_speed");
             PrecipitationType precipitationType = PrecipitationType.valueOf(rs.getString("precipitation_type"));
-            int precipitation = rs.getInt("precipitation");
+            String precipitation = rs.getString("precipitation");
             double precipitationProbability = rs.getDouble("precipitation_probability");
             double snowAccumulation = rs.getDouble("snow_accumulation");
             int highestTemperature = rs.getInt("highest_temperature");
