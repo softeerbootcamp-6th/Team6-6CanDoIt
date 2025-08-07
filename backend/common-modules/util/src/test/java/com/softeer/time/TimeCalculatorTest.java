@@ -1,116 +1,133 @@
 package com.softeer.time;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimeCalculatorTest {
 
-    private static final String BASE_DATE = "baseDate";
-    private static final String BASE_TIME = "baseTime";
+    @Nested
+    @DisplayName("getUltraBaseTime() 검증")
+    class UltraBaseTime {
 
-    @Test
-    @DisplayName("ultraBaseTime() : 분(minute) ≥ 45 ➞ 같은 시(hour) HH30, 같은 날짜")
-    void ultraBaseTime_after45() {
-        // given
-        LocalDateTime given = LocalDateTime.of(2025, 8, 7, 14, 45);
+        @Test
+        @DisplayName("분 < 45 ➞ 1 시간 전 HH:30")
+        void minuteBelowReference() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 14, 30);
 
-        // when
-        Map<String, String> result = TimeCalculator.getUltraBaseTime(given);
+            // when
+            LocalDateTime base = TimeCalculator.getUltraBaseTime(start);
 
-        // then
-        assertEquals("0807", result.get(BASE_DATE));
-        assertEquals("1430", result.get(BASE_TIME));
+            // then
+            assertEquals(LocalDate.of(2025, 8, 7), base.toLocalDate());
+            assertEquals(LocalTime.of(13, 30), base.toLocalTime());
+        }
+
+        @Test
+        @DisplayName("분 < 45 ➞ 하루 전 23:30")
+        void minuteBelowReference_returnPreviousDay() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 00, 30);
+
+            // when
+            LocalDateTime base = TimeCalculator.getUltraBaseTime(start);
+
+            // then
+            assertEquals(LocalDate.of(2025, 8, 6), base.toLocalDate());
+            assertEquals(LocalTime.of(23, 30), base.toLocalTime());
+        }
+
+        @Test
+        @DisplayName("분 ≥ 45 ➞ 같은 시(HH) 30분")
+        void minuteAboveOrEqualReference() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 14, 46);
+
+            // when
+            LocalDateTime base = TimeCalculator.getUltraBaseTime(start);
+
+            // then
+            assertEquals(LocalDate.of(2025, 8, 7), base.toLocalDate());
+            assertEquals(LocalTime.of(14, 30), base.toLocalTime());
+        }
     }
 
-    @Test
-    @DisplayName("ultraBaseTime() : 분(minute) < 45  ➞ 1 시간 이전 HH30, 같은 날짜")
-    void ultraBaseTime_before45() {
-        // given
-        LocalDateTime given = LocalDateTime.of(2025, 8, 7, 14, 30);
+    @Nested
+    @DisplayName("getShortBaseTime() 검증")
+    class ShortBaseTime {
 
-        // when
-        Map<String, String> result = TimeCalculator.getUltraBaseTime(given);
+        @Test
+        @DisplayName("BEFORE_TWO 구간 ➞ 하루 전 & 23:00")
+        void beforeTwoPeriod() {
+            // given 2025-08-07 01:30
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 1, 30);
 
-        // then
-        assertEquals("0807", result.get(BASE_DATE));
-        assertEquals("1330", result.get(BASE_TIME));
+            // when
+            LocalDateTime base = TimeCalculator.getShortBaseTime(start);
+
+            // then (전날 02:00)
+            assertEquals(LocalDate.of(2025, 8, 6), base.toLocalDate());
+            assertEquals(LocalTime.of(23, 0), base.toLocalTime());
+        }
+
+        @Test
+        @DisplayName("다른 구간 ➞ 같은 날 & 구간 baseTime")
+        void otherPeriod() {
+            // given 2025-08-07 06:15  → 예: MORNING(06) 구간
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 6, 15);
+
+            ShortTimePeriod period = ShortTimePeriod.get(start.toLocalTime());
+
+            // when
+            LocalDateTime base = TimeCalculator.getShortBaseTime(start);
+
+            // then (같은 날, period의 baseTime:00)
+            assertEquals(LocalDate.of(2025, 8, 7), base.toLocalDate());
+            assertEquals(LocalTime.of(period.getBaseHour(), 0), base.toLocalTime());
+        }
     }
 
-    @Test
-    @DisplayName("ultraBaseTime() : 00시 분(minute) < 45 ➞ 이전 날짜 2330")
-    void ultraBaseTime_after2330() {
-        LocalDateTime given = LocalDateTime.of(2025, 8, 7, 0, 30);
-        Map<String, String> result = TimeCalculator.getUltraBaseTime(given);
-        assertEquals("0806", result.get(BASE_DATE));
-        assertEquals("2330", result.get(BASE_TIME));
-    }
+    @Nested
+    @DisplayName("getHikingTime() 검증")
+    class TimeCalculatorHikingTimeTest {
 
-    @Test
-    @DisplayName("shortBaseTime() : BEFORE_TWO 구간 ➞ 전날 날짜 & enum baseTime")
-    void shortBaseTime_beforeTwo() {
-        // given
-        LocalDateTime given = LocalDateTime.of(2025, 8, 7, 1, 30);
-        Map<String, String> result = TimeCalculator.getShortBaseTime(given);
+        @Test
+        @DisplayName("2 시간 30 분 코스 → 같은 날 도착·하산 시각")
+        void getHikingTime_sameDay() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 6, 15);
+            LocalTime duration = LocalTime.of(2, 30);
 
-        // when, then
-        assertEquals("0806", result.get(BASE_DATE));
-        assertEquals(ShortTimePeriod.BEFORE_TWO.getBaseTime(),
-                result.get(BASE_TIME));
-    }
+            // when
+            HikingTime result = TimeCalculator.getHikingTime(start, duration);
 
-    @Test
-    @DisplayName("shortBaseTime() : 다른 구간 ➞ 날짜 유지 & enum baseTime")
-    void shortBaseTime_other() {
-        // given
-        LocalDateTime given = LocalDateTime.of(2025, 8, 7, 6, 15);
-        ShortTimePeriod period = ShortTimePeriod.get(given.toLocalTime());
+            // then
+            assertEquals(start, result.startTime());
+            assertEquals(LocalDateTime.of(2025, 8, 7, 8, 45), result.arrivalTime());
+            assertEquals(LocalDateTime.of(2025, 8, 7, 11, 15), result.descentTime());
+        }
 
-        // when
-        Map<String, String> result = TimeCalculator.getShortBaseTime(given);
+        @Test
+        @DisplayName("3 시간 코스 → 자정 넘어 다음 날 도착·하산")
+        void getClimbTime_crossMidnight() {
+            // given
+            LocalDateTime start = LocalDateTime.of(2025, 8, 7, 22, 45);
+            LocalTime duration = LocalTime.of(3, 0);
 
-        // then
-        assertEquals("0807", result.get(BASE_DATE));
-        assertEquals(period.getBaseTime(), result.get(BASE_TIME));
-    }
+            // when
+            HikingTime result = TimeCalculator.getHikingTime(start, duration);
 
-    @Test
-    @DisplayName("getClimbTime : 2.5h 코스 → 같은 날 예상·하산 시각")
-    void climbTime_sameDay() {
-        // given
-        LocalDateTime start = LocalDateTime.of(2025, 8, 7, 6, 15);
-        double hours = 2.5;
-
-        // when
-        Map<String, String> result = TimeCalculator.getClimbTime(start, hours);
-
-        // then
-        assertEquals("0807", result.get("expectedDate"));
-        assertEquals("08:45", result.get("expectedTime"));
-
-        assertEquals("0807", result.get("returnDate"));
-        assertEquals("11:15", result.get("returnTime"));
-    }
-
-    @Test
-    @DisplayName("getClimbTime : 3h 코스 → 자정 넘어 다음 날 도착")
-    void climbTime_crossMidnight() {
-        // given
-        LocalDateTime start = LocalDateTime.of(2025, 8, 7, 22, 45);
-        double hours = 3.0;     // 3h 00m
-
-        // when
-        Map<String, String> result = TimeCalculator.getClimbTime(start, hours);
-
-        // then
-        assertEquals("0808", result.get("expectedDate"));
-        assertEquals("01:45", result.get("expectedTime"));
-
-        assertEquals("0808", result.get("returnDate"));
-        assertEquals("04:45", result.get("returnTime"));
+            // then
+            assertEquals(start, result.startTime());
+            assertEquals(LocalDateTime.of(2025, 8, 8, 1, 45), result.arrivalTime());
+            assertEquals(LocalDateTime.of(2025, 8, 8, 4, 45), result.descentTime());
+        }
     }
 }
