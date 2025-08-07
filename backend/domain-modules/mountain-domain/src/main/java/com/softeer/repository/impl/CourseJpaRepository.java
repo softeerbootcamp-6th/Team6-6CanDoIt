@@ -8,9 +8,8 @@ import java.util.List;
 
 public interface CourseJpaRepository extends JpaRepository<CourseEntity, Long> {
 
-    @Query(value = "SELECT * " +
-            "FROM course c " +
-            "WHERE c.mountain_id = :id",
-            nativeQuery = true)
+    @Query("SELECT c " +
+            "FROM CourseEntity c " +
+            "WHERE c.mountainEntity.id = :id")
     List<CourseEntity> findEntitiesByMountainId(long id);
 }
