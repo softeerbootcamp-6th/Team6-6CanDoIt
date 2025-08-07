@@ -8,12 +8,12 @@ public enum CoursePlanException implements ExceptionInterface {
 
     private final HttpStatus httpStatus;
     private final String errorCode;
-    private final String errorLog;
+    private final String message;
 
-    CoursePlanException(HttpStatus httpStatus, String errorCode, String errorLog) {
+    CoursePlanException(HttpStatus httpStatus, String errorCode, String message) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
-        this.errorLog = errorLog;
+        this.message = message;
     }
 
     @Override
@@ -28,6 +28,6 @@ public enum CoursePlanException implements ExceptionInterface {
 
     @Override
     public String getMessage() {
-        return errorLog;
+        return message;
     }
 }
