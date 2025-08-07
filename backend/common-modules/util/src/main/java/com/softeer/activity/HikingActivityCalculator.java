@@ -1,5 +1,7 @@
 package com.softeer.activity;
 
+import com.softeer.activity.factor.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -29,14 +31,26 @@ public final class HikingActivityCalculator {
     public static String calculateHikingActivity(
             double temperature,
             double dailyTemperatureRange,
-            double precipitation,
+            String precipitation,
             double windSpeed,
             double humidity
     ) {
-        double calculatedValue = calculate(temperature, dailyTemperatureRange, precipitation, windSpeed, humidity);
+        int temperatureFactor = TemperatureFactor.calculateFactor(temperature);
+        int dailyTemperatureRangeFactor = DailyTemperatureRangeFactor.calculateFactor(dailyTemperatureRange);
+        int precipitationFactor = PrecipitationFactor.calculateFactor(precipitation);
+        int windSpeedFactor = WindSpeedFactor.calculateFactor(windSpeed);
+        int humidityFactor = HumidityFactor.calculateFactor(humidity);
 
-        BigDecimal bd = new BigDecimal(calculatedValue);
-        BigDecimal roundedValue = bd.setScale(4, RoundingMode.HALF_UP);
+        System.out.println("temperatureFactor: " + temperatureFactor);
+        System.out.println("dailyTemperatureRangeFactor: " + dailyTemperatureRangeFactor);
+        System.out.println("precipitationFactor: " + precipitationFactor);
+        System.out.println("windSpeedFactor: " + windSpeedFactor);
+        System.out.println("humidityFactor: " + humidityFactor);
+
+        double calculatedValue = calculate(temperatureFactor, dailyTemperatureRangeFactor, precipitationFactor, windSpeedFactor, humidityFactor);
+
+        BigDecimal bigDecimal = new BigDecimal(calculatedValue);
+        BigDecimal roundedValue = bigDecimal.setScale(4, RoundingMode.HALF_UP);
         double finalValue = roundedValue.doubleValue();
 
         return HikingActivityStatus.description(finalValue);
@@ -46,21 +60,21 @@ public final class HikingActivityCalculator {
      * 산악활동지수 (C.I)를 계산합니다.
      * C.I = (a1 * T) + (a2 * DTR) + (a3 * P) + (a4 * W) + (a5 * Q)
      *
-     * @param temperature               온도 [°C]
-     * @param dailyTemperatureRange   일교차 [°C]
-     * @param precipitation             강수량 [mm]
-     * @param windSpeed                 풍속 [m/s]
-     * @param humidity                  습도 [%]
+     * @param temperatureFactor               온도 [°C]
+     * @param dailyTemperatureFactor   일교차 [°C]
+     * @param precipitationFactor             강수량 [mm]
+     * @param windSpeedFactor                 풍속 [m/s]
+     * @param humidityFactor                  습도 [%]
      * @return 계산된 산악활동지수 값
      */
     private static double calculate(
-            double temperature,
-            double dailyTemperatureRange,
-            double precipitation,
-            double windSpeed,
-            double humidity
+            int temperatureFactor,
+            int dailyTemperatureFactor,
+            int precipitationFactor,
+            int windSpeedFactor,
+            int humidityFactor
     ) {
-        return (A1 * temperature) + (A2 * dailyTemperatureRange) + (A3 * precipitation) + (A4 * windSpeed) + (A5 * humidity);
+        return (A1 * temperatureFactor) + (A2 * dailyTemperatureFactor) + (A3 * precipitationFactor) + (A4 * windSpeedFactor) + (A5 * humidityFactor);
     }
 
     private enum HikingActivityStatus {
