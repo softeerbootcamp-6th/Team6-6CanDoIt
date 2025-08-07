@@ -122,15 +122,15 @@ const weatherCardWrapperStyles = css`
     width: 100%;
     justify-content: space-evenly;
 
-    & > :nth-child(1) {
+    & > :nth-of-type(1) {
         transform: translateY(5rem);
     }
 
-    & > :nth-child(2) {
+    & > :nth-of-type(2) {
         transform: translateY(-5rem);
     }
 
-    & > :nth-child(3) {
+    & > :nth-of-type(3) {
         transform: translateY(5rem);
     }
 `;
