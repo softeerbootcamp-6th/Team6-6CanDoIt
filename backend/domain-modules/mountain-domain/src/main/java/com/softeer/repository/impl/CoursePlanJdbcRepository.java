@@ -6,8 +6,9 @@ import com.softeer.domain.Mountain;
 import com.softeer.domain.SunTime;
 import com.softeer.entity.enums.Level;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class CoursePlanJdbcRepository {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     private static final String SELECT_COURSE_PLAN = """
             SELECT
@@ -38,20 +39,19 @@ public class CoursePlanJdbcRepository {
             
                 i.image_url
             FROM course c
-            JOIN mountain m ON m.id = c.mountain_id
-            JOIN sun_time s ON s.mountain_id = m.id 
-                                   AND s.date = ?
-            JOIN image i ON i.id = m.image_id
-            WHERE c.id = ?
+            INNER JOIN mountain m ON m.id = c.mountain_id
+            INNER JOIN sun_time s ON s.mountain_id = m.id 
+                                   AND s.date = :date
+            INNER JOIN image i ON i.id = m.image_id
+            WHERE c.id = :courseId
             """;
 
     public CoursePlan findCoursePlan(long courseId, LocalDate date) {
-        return jdbcTemplate.queryForObject(
-                SELECT_COURSE_PLAN,
-                ROW_MAPPER,
-                java.sql.Date.valueOf(date),
-                courseId
-        );
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("date", java.sql.Date.valueOf(date))
+                .addValue("courseId", courseId);
+
+        return jdbcTemplate.queryForObject(SELECT_COURSE_PLAN, params, ROW_MAPPER);
     }
 
     protected static final RowMapper<CoursePlan> ROW_MAPPER = (rs, rowNum) -> {
