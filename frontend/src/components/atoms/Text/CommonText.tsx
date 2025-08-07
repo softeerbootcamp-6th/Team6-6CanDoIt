@@ -1,14 +1,13 @@
-import { theme } from '../../../theme/theme.ts';
-import { createTextStyle } from './utils.ts';
+import { createTextStyle } from '../../../utils/utils.ts';
+import { css } from '@emotion/react';
+import type { FontSizeType, FontWeightType } from '../../../types/themeTypes';
 
 type TextTagType = 'span' | 'p';
-type FontSizeType = keyof typeof theme.typography.fontSize;
-type FontWeightType = keyof typeof theme.typography.fontWeight;
 
 interface PropsState {
     TextTag: TextTagType;
-    fontSize?: string;
-    fontWeight?: string;
+    fontSize?: FontSizeType;
+    fontWeight?: FontWeightType;
     color?: string;
     children: React.ReactNode;
 }
@@ -16,11 +15,13 @@ interface PropsState {
 export default function CommonText(props: PropsState) {
     const { TextTag, color, fontSize, fontWeight, children } = props;
 
-    const textStyle = createTextStyle({
-        fontSize: fontSize as FontSizeType,
-        fontWeight: fontWeight as FontWeightType,
-        color,
-    });
+    const textStyle = css`
+        ${createTextStyle({
+            fontSize,
+            fontWeight,
+            color,
+        })}
+    `;
 
     return <TextTag css={textStyle}>{children}</TextTag>;
 }
