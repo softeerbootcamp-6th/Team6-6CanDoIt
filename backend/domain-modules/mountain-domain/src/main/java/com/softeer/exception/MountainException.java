@@ -3,14 +3,14 @@ package com.softeer.exception;
 import com.softeer.error.ExceptionInterface;
 import com.softeer.error.HttpStatus;
 
-public enum CoursePlanException implements ExceptionInterface {
-    COURSE_PLAN_INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "CPN-001", "Course-plan internal error occurred");
+public enum MountainException implements ExceptionInterface {
+    NOT_FOUND(HttpStatus.NOT_FOUND, "MTN-001", "Mountain not found");
 
-    private final HttpStatus httpStatus;
-    private final String errorCode;
-    private final String message;
+    private HttpStatus httpStatus;
+    private String errorCode;
+    private String message;
 
-    CoursePlanException(HttpStatus httpStatus, String errorCode, String message) {
+    MountainException(HttpStatus httpStatus, String errorCode, String message) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
         this.message = message;

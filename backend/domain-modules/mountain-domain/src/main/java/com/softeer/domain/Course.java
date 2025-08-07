@@ -7,7 +7,6 @@ public record Course(
         String name,
         double totalDistance,
         int totalDuration,
-        Level level,
-        String mountainName
+        Level level
 ) {
 }
