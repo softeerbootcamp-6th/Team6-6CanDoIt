@@ -11,7 +11,6 @@ export default function TextLi({ children }: PropsState) {
 const { colors, typography } = theme;
 
 const textStyles = css`
-    font-family: Pretendard;
     color: ${colors.greyOpacityWhite[50]};
     font-size: ${typography.fontSize.label};
     font-weight: ${typography.fontWeight.bold};

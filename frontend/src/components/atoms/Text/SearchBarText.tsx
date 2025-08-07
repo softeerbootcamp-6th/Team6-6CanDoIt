@@ -12,7 +12,6 @@ export default function SearchBarText({ children }: PropsState) {
 const { colors, typography } = theme;
 
 const textStyles = css`
-    font-family: Pretendard;
     color: ${colors.grey[100]};
     font-size: ${typography.fontSize.label};
     font-weight: ${typography.fontWeight.bold};

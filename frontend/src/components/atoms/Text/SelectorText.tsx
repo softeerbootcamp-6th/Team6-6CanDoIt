@@ -12,7 +12,6 @@ export default function SelectorText({ children }: PropsState) {
 const { colors, typography } = theme;
 
 const textStyles = css`
-    font-family: Pretendard;
     color: ${colors.grey[80]};
     font-size: ${typography.fontSize.body};
     font-weight: ${typography.fontWeight.medium};
