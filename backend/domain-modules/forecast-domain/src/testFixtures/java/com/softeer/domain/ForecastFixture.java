@@ -28,7 +28,7 @@ public class ForecastFixture {
         private WindDirection windDir = WindDirection.N;
         private double windSpeed = 3.5;
         private PrecipitationType precipitationType = PrecipitationType.NONE;
-        private int precipitation = 0;
+        private String precipitation = "1.5mm";
         private double precipitationProbability = 10;
         private double snowAccumulation = 2.0;
         private DailyTemperature dailyTemperature = DailyTemperatureFixture.createDefault();
@@ -78,7 +78,7 @@ public class ForecastFixture {
             return this;
         }
 
-        public ForecastBuilder precipitation(int precipitation) {
+        public ForecastBuilder precipitation(String precipitation) {
             this.precipitation = precipitation;
             return this;
         }
