@@ -1,51 +1,104 @@
 // URL을 보고 홈, 제보에 맞게 검색바를 다르게 렌더링
 import Dropdown from '../../molecules/Dropdown/Dropdown.tsx';
-import styles from './SearchBar.module.scss';
+import { css } from '@emotion/react';
+import { LabelHeading } from '../../atoms/Heading/Heading.tsx';
+import { getColor } from '../../../utils/utils.ts';
+import { theme } from '../../../theme/theme.ts';
+import Icon from '../../atoms/Icon/Icons.tsx';
+import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
 
-const mountainCourseData = [
-    {
-        title: '산',
-        options: ['설악산', '한라산', '지리산'],
-    },
-    {
-        title: '코스',
-        options: ['코스1', '코스2', '코스3'],
-    },
-];
+interface propsState {
+    searchBarTitle: string;
+    searchBarMessage: string;
+    isHomePage: boolean;
+    mountainCourseData: { title: string; options: string[] }[];
+}
 
-const weekdayData = {
-    title: '요일은?',
-    options: ['월', '화', '수', '목', '금', '토', '일'],
-};
-
-export default function SearchBar() {
-    const searchBarTitle = '어디 날씨를 확인해볼까요?';
-    const searchBarMessage = '를 오르는';
-    let isHomaPage = true;
+export default function SearchBar(props: propsState) {
+    const { searchBarTitle, searchBarMessage, isHomePage, mountainCourseData } =
+        props;
 
     return (
-        <div className={styles.search}>
-            <h2 className={`text-grey-100 fontSize-label fontWeight-bold`}>
-                {searchBarTitle}
-            </h2>
-            <div className={styles.searchBarWrapper}>
+        <div css={searchBarContainerStyle}>
+            <LabelHeading HeadingTag='h2'>{searchBarTitle}</LabelHeading>
+            <div css={searchBarStyle}>
                 {mountainCourseData.map((data) => {
                     return (
-                        <Dropdown
-                            key={data.title}
-                            title={data.title}
-                            options={data.options}
-                        />
+                        <Dropdown title={data.title} options={data.options} />
                     );
                 })}
-                {searchBarMessage}
-                {isHomaPage && (
+                <SearchBarText>{searchBarMessage}</SearchBarText>
+                {isHomePage && (
                     <Dropdown
                         title={weekdayData.title}
                         options={weekdayData.options}
                     />
                 )}
+                <button css={searchButtonStyle}>
+                    <Icon {...searchButtonIconProps} />
+                </button>
             </div>
         </div>
     );
 }
+
+const searchButtonIconProps = {
+    name: 'search-sm',
+    width: 1.875,
+    height: 1.875,
+    color: 'grey-100',
+};
+
+const { colors } = theme;
+
+const searchBarContainerStyle = css`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+`;
+
+const searchBarStyle = css`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: ${getColor({ colors, colorString: 'grey-100' })};
+    border-radius: 6.25rem;
+    background-color: ${getColor({
+        colors,
+        colorString: 'greyOpacityWhite-70',
+    })};
+    backdrop-filter: blur(50px);
+    width: max-content;
+    padding: 0.75rem;
+`;
+
+const searchButtonStyle = css`
+    width: 3rem;
+    height: 3rem;
+
+    background-color: ${getColor({
+        colors,
+        colorString: 'greyOpacityWhite-70',
+    })};
+    backdrop-filter: blur(50px);
+
+    margin-left: auto;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+`;
+
+const weekdayData = {
+    title: '요일은?',
+    options: [
+        '월요일',
+        '화요일',
+        '수요일',
+        '목요일',
+        '금요일',
+        '토요일',
+        '일요일',
+    ],
+};
