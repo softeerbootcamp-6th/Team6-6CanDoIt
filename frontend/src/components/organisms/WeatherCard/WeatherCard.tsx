@@ -19,8 +19,16 @@ export default function WeatherCard() {
             </div>
             <div className={styles.footer}>
                 <span className={styles.iconWrapper}>
-                    <TextWithIcon iconName='rain' text='비옴' />
-                    <TextWithIcon iconName='rain' text='2m/s' />
+                    <TextWithIcon
+                        iconName='rain'
+                        text='비옴'
+                        color='greyOpacity-60'
+                    />
+                    <TextWithIcon
+                        iconName='rain'
+                        text='2m/s'
+                        color='greyOpacity-60'
+                    />
                 </span>
                 <CommonText
                     TextTag='span'
