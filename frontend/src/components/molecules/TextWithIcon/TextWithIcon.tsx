@@ -10,22 +10,25 @@ interface PropsState {
 
 export default function TextWithIcon({ text, iconName, color }: PropsState) {
     return (
-        <div
-            css={css`
-                display: flex;
-                align-items: center;
-                gap: 0.2rem;
-            `}
-        >
+        <div css={wrapperStyles}>
             <Icon name={iconName} width={1.5} height={1.5} color={color} />
-            <CommonText
-                TextTag='span'
-                fontWeight='bold'
-                fontSize='body'
-                color={color}
-            >
-                {text}
-            </CommonText>
+            <CommonText {...createTextProps(color)}>{text}</CommonText>
         </div>
     );
 }
+
+const wrapperStyles = css`
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+`;
+
+const createTextProps = (color: string) => {
+    const textProps = {
+        TextTag: 'span',
+        fontWeight: 'bold',
+        fontSize: 'body',
+        color,
+    } as const;
+    return textProps;
+};
