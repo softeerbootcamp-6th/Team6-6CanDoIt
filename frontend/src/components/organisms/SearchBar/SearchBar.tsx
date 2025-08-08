@@ -22,11 +22,9 @@ export default function SearchBar(props: propsState) {
         <div css={searchBarContainerStyle}>
             <LabelHeading HeadingTag='h2'>{searchBarTitle}</LabelHeading>
             <div css={searchBarStyle}>
-                {mountainCourseData.map((data) => {
-                    return (
-                        <Dropdown title={data.title} options={data.options} />
-                    );
-                })}
+                {mountainCourseData.map((data) => (
+                    <Dropdown title={data.title} options={data.options} />
+                ))}
                 <SearchBarText>{searchBarMessage}</SearchBarText>
                 {isHomePage && (
                     <Dropdown
