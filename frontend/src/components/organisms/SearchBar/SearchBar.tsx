@@ -8,7 +8,7 @@ import Icon from '../../atoms/Icon/Icons.tsx';
 import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
 
 interface propsState {
-    searchBarTitle: string;
+    searchBarTitle?: string;
     searchBarMessage: string;
     isHomePage: boolean;
     mountainCourseData: { title: string; options: string[] }[];
@@ -67,7 +67,6 @@ const searchBarStyle = css`
         colors,
         colorString: 'greyOpacityWhite-70',
     })};
-    backdrop-filter: blur(50px);
     width: max-content;
     padding: 0.75rem;
 `;
@@ -80,7 +79,6 @@ const searchButtonStyle = css`
         colors,
         colorString: 'greyOpacityWhite-70',
     })};
-    backdrop-filter: blur(50px);
 
     margin-left: auto;
     border-radius: 50%;
