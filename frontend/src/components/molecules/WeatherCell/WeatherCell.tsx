@@ -1,21 +1,39 @@
+import { css } from '@emotion/react';
 import Icon from '../../atoms/Icon/Icons';
-import Temperature from '../../atoms/Temperature/Temperature';
-import styles from './WeatherCell.module.scss';
+import SelectorText from '../../atoms/Text/SelectorText';
 
-export default function WeatherCell() {
+interface PropsState {
+    time: string;
+    temperature: number;
+    iconName: string;
+}
+
+export default function WeatherCell({
+    time,
+    temperature,
+    iconName,
+}: PropsState) {
     return (
-        <div className={styles.cellWrapper}>
-            <span>{'123'}</span>
+        <div css={wrapperStyles}>
+            <SelectorText>{time}</SelectorText>
             <Icon
-                name='clear-day'
-                WrapperHeight='1.5rem'
-                WrapperWidth='1.5rem'
+                name={iconName}
                 width={1.5}
                 height={1.5}
-                color='#CACACA'
+                color='grey-80'
                 opacity={0.8}
             />
-            <Temperature temperature={12} fontSize='body' />
+            <SelectorText>{`${temperature}°C`}</SelectorText>
         </div>
     );
 }
+
+const wrapperStyles = css`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 5rem;
+    height: 7.875rem;
+`;

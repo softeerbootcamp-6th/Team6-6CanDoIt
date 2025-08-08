@@ -1,33 +1,108 @@
-import styles from './WeatherCard.module.scss';
-import Temperature from '../../atoms/Temperature/Temperature';
-import TextWithIcon from '../../molecules/TextWithIcon/TextWithIcon';
 import Icon from '../../atoms/Icon/Icons';
+import CommonText from '../../atoms/Text/CommonText';
+import TextWithIconContainer from '../../molecules/TextWithIconContainer/TextWithIconContainer';
+import { css } from '@emotion/react';
+import { theme } from '../../../theme/theme';
 
-export default function WeatherCard() {
+interface PropsState {
+    title: string;
+    weatherInfo: WeatherInfo;
+}
+
+interface WeatherInfo {
+    weatherIconName: string;
+    weatherIconText: string;
+    windSpeed: number;
+}
+
+const { colors } = theme;
+
+// 배경색을 동적으로 입혀주고 이름 등은 백엔드와 협의 후 로직짜서 수정해야할듯.
+export default function WeatherCard({ title, weatherInfo }: PropsState) {
+    const dynamicBackgoundStyle = css`
+        background-color: ${colors.accentWeather.sunny};
+    `;
+
     return (
-        <div className={`${styles.card}`}>
-            <div className={styles.header}>
-                <span className={styles.title}>시작 지점</span>
-
-                <Icon
-                    shape='circle'
-                    name='narrow-right'
-                    WrapperHeight='3rem'
-                    WrapperWidth='3rem'
-                    backgroundColor='bg-grey-100'
-                    color='black'
-                    width={2}
-                    height={2}
-                    opacity={0.8}
-                />
+        <div css={[cardStyles, dynamicBackgoundStyle]}>
+            <div css={headerStyles}>
+                <CommonText {...titleTextProps}>{title}</CommonText>
+                <button css={buttonStyles}>
+                    <Icon {...iconProps} />
+                </button>
             </div>
-            <div className={styles.footer}>
-                <span className={styles.iconWrapper}>
-                    <TextWithIcon iconName='rain' text='비옴' />
-                    <TextWithIcon iconName='rain' text='2m/s' />
-                </span>
-                <Temperature temperature={20} />
+            <div css={footerStyles}>
+                <TextWithIconContainer {...weatherInfo} />
+                <CommonText {...temperatureTextProps}>20°C</CommonText>
             </div>
         </div>
     );
 }
+
+const titleTextProps = {
+    TextTag: 'span',
+    fontSize: 'caption',
+    fontWeight: 'bold',
+    color: 'greyOpacity-20',
+} as const;
+
+const iconProps = {
+    name: 'narrow-right',
+    color: 'greyOpacity-20',
+    width: 2,
+    height: 2,
+} as const;
+
+const temperatureTextProps = {
+    TextTag: 'span',
+    fontSize: 'headline',
+    fontWeight: 'medium',
+    color: 'grey-0',
+} as const;
+
+const cardStyles = css`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    box-sizing: border-box;
+    width: 15rem;
+    height: 10.5rem;
+
+    padding: 0.75rem 0;
+
+    border-radius: 1.9rem;
+    border: 2px solid ${colors.greyOpacityWhite[80]};
+`;
+
+const buttonStyles = css`
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+    background-color: ${colors.grey[100]};
+
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
+const headerStyles = css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0.85rem 0 1rem;
+`;
+
+const footerStyles = css`
+    display: flex;
+    justify-content: space-between;
+    margin: 0 0.75rem 0 1rem;
+
+    & > span {
+        line-height: 150%;
+    }
+`;
