@@ -2,6 +2,7 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
+import { HeadlineHeading } from '../../atoms/Heading/Heading.tsx';
 
 export default function MountainCardFooter({
     mountainName,
@@ -10,7 +11,7 @@ export default function MountainCardFooter({
 }) {
     return (
         <div>
-            <CommonText {...mountainNameProps}>{mountainName}</CommonText>
+            <HeadlineHeading HeadingTag='h3'>{mountainName}</HeadlineHeading>
             <button css={textButtonStyle}>
                 <CommonText {...textButtonProps}>날씨 보러가기</CommonText>
             </button>
@@ -18,15 +19,8 @@ export default function MountainCardFooter({
     );
 }
 
-const mountainNameProps = {
-    TextTag: 'p',
-    fontSize: 'headline',
-    fontWeight: 'bold',
-    color: 'grey-100',
-} as const;
-
 const textButtonProps = {
-    TextTag: 'p',
+    TextTag: 'span',
     fontSize: 'caption',
     fontWeight: 'bold',
     color: 'grey-20',
