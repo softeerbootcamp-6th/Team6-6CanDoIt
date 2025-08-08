@@ -107,7 +107,7 @@ const headerStyles = css`
     height: 3.2rem;
     width: 100%;
     border-bottom: 1px solid ${colors.greyOpacityWhite[80]};
-    z-index: 100;
+    z-index: 20;
 
     & > div {
         display: flex;
@@ -135,7 +135,6 @@ const scrollStyles = css`
     justify-content: space-between;
     align-items: center;
     background-color: ${colors.greyOpacityWhite[80]};
-    z-index: 0;
     border-radius: 2rem;
 
     & span {
