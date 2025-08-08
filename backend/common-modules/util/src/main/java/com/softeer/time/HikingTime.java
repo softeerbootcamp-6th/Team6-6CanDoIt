@@ -7,4 +7,10 @@ public record HikingTime(
         LocalDateTime arrivalTime,
         LocalDateTime descentTime
 ) {
+
+    public HikingTime {
+        startTime = TimeUtil.getBaseTime(startTime);
+        arrivalTime = TimeUtil.getBaseTime(arrivalTime);
+        descentTime = TimeUtil.getBaseTime(descentTime);
+    }
 }
