@@ -21,7 +21,7 @@ export default function MountainInfoPreview({ time, dist }: PropsState) {
             <p css={textWrapperStyles}>
                 <CommonText {...WhiteTextProps}>{`${time}`}</CommonText>
                 <CommonText {...TextProps}>동안</CommonText>
-                <CommonText {...WhiteTextProps}>{`${dist}Km`}</CommonText>
+                <CommonText {...WhiteTextProps}>{`${dist}km`}</CommonText>
                 <CommonText {...TextProps}>를 올라야해요</CommonText>
             </p>
             <div css={lineStyles}>
