@@ -6,7 +6,7 @@ import static com.softeer.time.TimeUtil.getBaseTime;
 
 public class ApiTimeUtil {
 
-    private static final int referenceMinute = 45;
+    private static final int REFERENCE_MINUTE = 45;
 
     public static LocalDateTime getBatchAlignedUltraBaseTime(LocalDateTime dateTime) {
         int minute = dateTime.getMinute();
@@ -16,7 +16,7 @@ public class ApiTimeUtil {
     }
 
     public static ApiTime getUltraBaseTime(LocalDateTime dateTime) {
-        if (dateTime.getMinute() < referenceMinute) {
+        if (dateTime.getMinute() < REFERENCE_MINUTE) {
             dateTime = dateTime.minusHours(1);
         }
 
