@@ -41,12 +41,6 @@ public final class HikingActivityCalculator {
         int windSpeedFactor = WindSpeedFactor.calculateFactor(windSpeed);
         int humidityFactor = HumidityFactor.calculateFactor(humidity);
 
-        System.out.println("temperatureFactor: " + temperatureFactor);
-        System.out.println("dailyTemperatureRangeFactor: " + dailyTemperatureRangeFactor);
-        System.out.println("precipitationFactor: " + precipitationFactor);
-        System.out.println("windSpeedFactor: " + windSpeedFactor);
-        System.out.println("humidityFactor: " + humidityFactor);
-
         double calculatedValue = calculate(temperatureFactor, dailyTemperatureRangeFactor, precipitationFactor, windSpeedFactor, humidityFactor);
 
         BigDecimal bigDecimal = new BigDecimal(calculatedValue);

@@ -17,7 +17,7 @@ public class CourseFixture {
         private long id = 1L;
         private String name = "test course name";
         private double totalDistance = 9.9;
-        private int totalDuration = 123;
+        private double totalDuration = 123;
         private Level level = Level.EASY;
         private String imageUrl = "imageUrl";
 
@@ -36,8 +36,8 @@ public class CourseFixture {
             return this;
         }
 
-        public CourseBuilder totalDuration(int minutes) {
-            this.totalDuration = minutes;
+        public CourseBuilder totalDuration(double duration) {
+            this.totalDuration = duration;
             return this;
         }
 

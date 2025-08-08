@@ -74,7 +74,7 @@ public class CoursePlanJdbcRepository {
                 rs.getLong("course_id"),
                 rs.getString("course_name"),
                 rs.getDouble("total_distance"),
-                rs.getInt("total_duration"),
+                rs.getDouble("total_duration"),
                 Level.valueOf(rs.getString("level")),
                 rs.getString("course_image_url")
         );
