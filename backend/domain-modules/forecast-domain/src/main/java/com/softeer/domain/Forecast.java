@@ -21,7 +21,7 @@ public record Forecast(
 
     public Forecast(long id, LocalDateTime dateTime, ForecastType forecastType, Sky sky, double temperature,
                     double humidity, WindDirection windDir, double windSpeed, PrecipitationType precipitationType,
-                    String precipitation, double precipitationProbability, double snowAccumulation,
+                    String precipitation, double precipitationProbability, String snowAccumulation,
                     double highestTemperature, double lowestTemperature
     ) {
         this(id, dateTime, forecastType,
