@@ -1,0 +1,20 @@
+dependencies {
+    // domain modules
+    implementation project(':domain-modules:grid-domain')
+    implementation project(':domain-modules:image-domain')
+
+    // common modules
+    implementation project(':common-modules:exception')
+
+    // spring-web
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}

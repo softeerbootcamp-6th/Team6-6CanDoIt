@@ -1,0 +1,16 @@
+dependencies {
+    implementation project(':domain-modules:grid-domain')
+    implementation project(':common-modules:util')
+
+    testImplementation(testFixtures(project(':domain-modules:grid-domain')))
+    testImplementation(testFixtures(project(':domain-modules:forecast-domain')))
+
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}

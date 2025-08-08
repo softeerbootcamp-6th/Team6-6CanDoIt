@@ -1,0 +1,7 @@
+package com.softeer;
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class MountainTestApplication {
+}
