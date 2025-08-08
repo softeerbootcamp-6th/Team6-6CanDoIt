@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class ForecastEntity {
 
     @Id
@@ -24,6 +23,7 @@ public class ForecastEntity {
 
     private double temperature;
 
+    @Column(nullable = false)
     private String precipitation;
 
     @Enumerated(EnumType.STRING)
@@ -40,6 +40,7 @@ public class ForecastEntity {
     @Column(name = "wind_dir", nullable = false)
     private WindDirection windDir;
 
+    @Column(name = "wind_speed")
     private double windSpeed;
 
     @Column(nullable = false)
@@ -49,9 +50,19 @@ public class ForecastEntity {
     @Column(nullable = false)
     private ForecastType type;
 
+    @Column(name = "precipitation_probability")
+    private double precipitationProbability;
+
+    @Column(name = "snow_accumulation", nullable = false)
+    private String snowAccumulation;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grid_id")
     private GridEntity gridEntity;
+
+    public long getId() {
+        return id;
+    }
 
     public static ForecastEntity from(Forecast forecast, Grid grid) {
         return new ForecastEntity(
@@ -65,6 +76,8 @@ public class ForecastEntity {
                 forecast.windCondition().windSpeed(),
                 forecast.dateTime(),
                 forecast.forecastType(),
+                forecast.precipitationCondition().precipitationProbability(),
+                forecast.precipitationCondition().snowAccumulation(),
                 GridEntity.from(grid)
         );
     }
