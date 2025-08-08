@@ -1,12 +1,13 @@
-import styles from './WeatherIndex.module.scss';
-import Text from '../../atoms/Text/Text';
+import type { FontSizeType } from '../../../types/themeTypes';
+import { css } from '@emotion/react';
+import { theme } from '../../../theme/theme';
 
 interface WeatherIdx {
     color: string;
-    backGroundColor: String;
+    backGroundColor: string;
     height: string;
     padding: string;
-    fontSize: string;
+    fontSize: FontSizeType;
     text: string;
 }
 
@@ -14,25 +15,55 @@ interface PropsState {
     type: WeatherType;
 }
 type WeatherType = '매우좋음' | '좋음' | '보통' | '나쁨';
+const { colors, typography } = theme;
 
 function WeatherIndex(props: WeatherIdx) {
     const { color, backGroundColor, height, padding, fontSize, text } = props;
+
     return (
         <div
-            className={`bg-${backGroundColor} ${styles['text-wrapper']}`}
-            style={{ padding: padding, height: height }}
+            css={[
+                wrapperStyles,
+                createDynamicStyles(
+                    backGroundColor,
+                    padding,
+                    height,
+                    color,
+                    fontSize,
+                ),
+            ]}
         >
-            <Text
-                textTag='span'
-                fontSize={fontSize}
-                fontWeight='bold'
-                color={color}
-            >
-                {`등산지수 ${text}`}
-            </Text>
+            {`등산지수 ${text}`}
         </div>
     );
 }
+
+const wrapperStyles = css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: max-content;
+    box-sizing: border-box;
+    border-radius: 6.25rem;
+`;
+
+const createDynamicStyles = (
+    backGroundColor: string,
+    padding: string,
+    height: string,
+    color: string,
+    fontSize: FontSizeType,
+) => {
+    return css`
+        font-size: ${typography.fontSize[fontSize]};
+        font-weight: ${typography.fontWeight.bold};
+        background-color: ${backGroundColor};
+        padding: ${padding};
+        height: ${height};
+        color: ${color};
+    `;
+};
 
 function WeatherIndexVivid(props: PropsState) {
     const { type } = props;
@@ -41,20 +72,20 @@ function WeatherIndexVivid(props: PropsState) {
 
     switch (type) {
         case '매우좋음':
-            color = 'status-light-excellent';
-            backGroundColor = 'status-normal-excellent';
+            color = colors.status.light.excellent;
+            backGroundColor = colors.status.normal.excellent;
             break;
         case '좋음':
-            color = 'status-light-good';
-            backGroundColor = 'status-normal-good';
+            color = colors.status.light.good;
+            backGroundColor = colors.status.normal.good;
             break;
         case '보통':
-            color = 'status-light-average';
-            backGroundColor = 'status-normal-average';
+            color = colors.status.light.average;
+            backGroundColor = colors.status.normal.average;
             break;
         case '나쁨':
-            color = 'status-light-bad';
-            backGroundColor = 'status-normal-bad';
+            color = colors.status.light.bad;
+            backGroundColor = colors.status.normal.bad;
             break;
     }
 
@@ -77,20 +108,20 @@ function WeatherIndexLight(props: PropsState) {
 
     switch (type) {
         case '매우좋음':
-            color = 'status-normal-excellent';
-            backGroundColor = 'status-regular-excellent';
+            color = colors.status.normal.excellent;
+            backGroundColor = colors.status.regular.excellent;
             break;
         case '좋음':
-            color = 'status-normal-good';
-            backGroundColor = 'status-regular-good';
+            color = colors.status.normal.good;
+            backGroundColor = colors.status.regular.good;
             break;
         case '보통':
-            color = 'status-normal-average';
-            backGroundColor = 'status-regular-average';
+            color = colors.status.normal.average;
+            backGroundColor = colors.status.regular.average;
             break;
         case '나쁨':
-            color = 'status-normal-bad';
-            backGroundColor = 'status-regular-bad';
+            color = colors.status.normal.bad;
+            backGroundColor = colors.status.regular.bad;
             break;
     }
 
