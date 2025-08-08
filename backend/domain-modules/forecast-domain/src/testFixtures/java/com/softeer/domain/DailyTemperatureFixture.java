@@ -2,6 +2,8 @@ package com.softeer.domain;
 
 public class DailyTemperatureFixture {
 
+    public static final long DEFAULT_ID = 0;
+
     public static DailyTemperatureBuilder builder() {
         return new DailyTemperatureBuilder();
     }
