@@ -1,6 +1,7 @@
 package com.softeer.domain;
 
 import com.softeer.activity.HikingActivityCalculator;
+import com.softeer.altitude.AltitudeAdjuster;
 import com.softeer.domain.condition.*;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
@@ -41,6 +42,26 @@ public record Forecast(
                 precipitationCondition.precipitation(),
                 windCondition.windSpeed(),
                 humidityCondition.humidity()
+        );
+    }
+
+    public Forecast withAltitudeAdjustment(double courseAltitude, double mountainAltitude) {
+        double adjustedTemperature = AltitudeAdjuster.adjustTemperature(temperatureCondition.temperature(), courseAltitude, mountainAltitude);
+        double adjustedWindSpeed = AltitudeAdjuster.adjustWindSpeed(windCondition.windSpeed(), courseAltitude, mountainAltitude);
+
+        TemperatureCondition adjustedTemperatureCondition = new TemperatureCondition(adjustedTemperature);
+        WindCondition adjustedWindCondition = new WindCondition(windCondition.direction(), adjustedWindSpeed);
+
+        return new Forecast(
+                id,
+                dateTime,
+                forecastType,
+                skyCondition,
+                adjustedTemperatureCondition,
+                humidityCondition,
+                adjustedWindCondition,
+                precipitationCondition,
+                dailyTemperature
         );
     }
 }
