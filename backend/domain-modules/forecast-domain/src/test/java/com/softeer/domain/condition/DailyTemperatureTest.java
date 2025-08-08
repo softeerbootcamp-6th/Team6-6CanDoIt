@@ -1,5 +1,7 @@
-package com.softeer.domain;
+package com.softeer.domain.condition;
 
+import com.softeer.domain.DailyTemperature;
+import com.softeer.domain.DailyTemperatureFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

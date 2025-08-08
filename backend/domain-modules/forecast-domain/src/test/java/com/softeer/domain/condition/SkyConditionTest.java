@@ -1,6 +1,5 @@
-package com.softeer.domain;
+package com.softeer.domain.condition;
 
-import com.softeer.domain.condition.SkyCondition;
 import com.softeer.entity.enums.Sky;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
