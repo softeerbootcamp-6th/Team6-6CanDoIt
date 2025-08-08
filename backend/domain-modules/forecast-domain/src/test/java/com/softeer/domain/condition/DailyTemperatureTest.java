@@ -21,7 +21,10 @@ class DailyTemperatureTest {
     })
     void dailyTemperatureRangeTest(double highestTemperature, double lowestTemperature, double expectedRange) {
         // Given
-        DailyTemperature dailyTemperature = new DailyTemperature(highestTemperature, lowestTemperature);
+        DailyTemperature dailyTemperature = DailyTemperatureFixture.builder()
+                .highestTemperature(highestTemperature)
+                .lowestTemperature(lowestTemperature)
+                .build();
 
         // When
         double actualRange = dailyTemperature.dailyTemperatureRange();
