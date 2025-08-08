@@ -2,7 +2,7 @@ name: Front Build & Deploy
 
 on:
   push:
-    branches: [ main, dev, fe-dev, fe/setting/\#93 ]
+    branches: [ main, dev, fe-dev ]
 
 permissions:
   id-token: write
