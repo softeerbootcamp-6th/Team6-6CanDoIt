@@ -33,7 +33,7 @@ export default function WeatherCard({ title, weatherInfo }: PropsState) {
             </div>
             <div css={footerStyles}>
                 <TextWithIconContainer {...weatherInfo} />
-                <CommonText {...temperatureTextProps}>20°</CommonText>
+                <CommonText {...temperatureTextProps}>20°C</CommonText>
             </div>
         </div>
     );
@@ -55,7 +55,7 @@ const iconProps = {
 
 const temperatureTextProps = {
     TextTag: 'span',
-    fontSize: 'display',
+    fontSize: 'headline',
     fontWeight: 'medium',
     color: 'grey-0',
 } as const;
@@ -101,4 +101,8 @@ const footerStyles = css`
     display: flex;
     justify-content: space-between;
     margin: 0 0.75rem 0 1rem;
+
+    & > span {
+        line-height: 150%;
+    }
 `;
