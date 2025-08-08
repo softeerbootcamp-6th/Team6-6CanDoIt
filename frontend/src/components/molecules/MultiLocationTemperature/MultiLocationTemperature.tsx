@@ -15,7 +15,7 @@ export default function MultiLocationTemperature({
     separator = ' | ',
 }: MultiLocationProps) {
     return (
-        <>
+        <div>
             {data.map(({ location, temperature }, idx) => (
                 <LocationTemperatureItem
                     location={location}
@@ -24,7 +24,7 @@ export default function MultiLocationTemperature({
                     separator={separator}
                 />
             ))}
-        </>
+        </div>
     );
 }
 
