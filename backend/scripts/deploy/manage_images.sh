@@ -24,17 +24,17 @@ download_and_load_images() {
 
     # Download images
     echo "Downloading images for tag: $image_tag"
-    aws s3 cp s3://${s3_bucket}/docker-images/${image_tag}/api-server.tar.gz . || {
+    aws s3 cp s3://${S3_BUCKET}/docker-images/${IMAGE_TAG}/api-server.tar.gz . || {
         echo "Failed to download api-server image"
         return 1
     }
 
-    aws s3 cp s3://${s3_bucket}/docker-images/${image_tag}/batch-server.tar.gz . || {
+    aws s3 cp s3://${S3_BUCKET}/docker-images/${image_tag}/batch-server.tar.gz . || {
         echo "Failed to download batch-server image"
         return 1
     }
 
-    aws s3 cp s3://${s3_bucket}/docker-images/${image_tag}/test-server.tar.gz . || {
+    aws s3 cp s3://${S3_BUCKET}/docker-images/${image_tag}/test-server.tar.gz . || {
         echo "Failed to download test-server image"
         return 1
     }
@@ -76,9 +76,9 @@ save_and_upload_images() {
 
     # Upload to S3
     echo "Uploading images to S3..."
-    aws s3 cp api-server.tar.gz s3://${s3_bucket}/docker-images/${image_tag}/
-    aws s3 cp batch-server.tar.gz s3://${s3_bucket}/docker-images/${image_tag}/
-    aws s3 cp test-server.tar.gz s3://${s3_bucket}/docker-images/${image_tag}/
+    aws s3 cp api-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
+    aws s3 cp batch-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
+    aws s3 cp test-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
 
     # Clean up
     cd /
@@ -107,7 +107,7 @@ cleanup_old_images() {
         --output text | while read -r key; do
         if [ -n "$key" ] && [ "$key" != "None" ]; then
             echo "Deleting old image: $key"
-            aws s3 rm "s3://${s3_bucket}/${key}"
+            aws s3 rm "s3://${S3_BUCKET}/${key}"
         fi
     done
 
@@ -125,7 +125,7 @@ list_s3_images() {
         return 1
     fi
 
-    aws s3 ls s3://${s3_bucket}/docker-images/ --recursive --human-readable
+    aws s3 ls s3://${S3_BUCKET}/docker-images/ --recursive --human-readable
 }
 
 # Main execution
