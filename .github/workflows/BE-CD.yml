@@ -62,7 +62,7 @@ jobs:
       working-directory: ./backend
       run: |
         echo "Uploading Docker images to S3..."
-        aws s3 sync docker-images/ s3://$S3_BUCKET/docker-images/$GITHUB_SHA/ \
+        aws s3 sync docker-images/ s3://${{secrets.AWS_BE_BUCKET_NAME}}/docker-images/$GITHUB_SHA/ \
           --delete \
           --storage-class STANDARD_IA
 
