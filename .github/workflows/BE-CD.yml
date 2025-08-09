@@ -31,23 +31,25 @@ jobs:
         run: mkdir -p backend/docker-images
 
       # ARM64로 캐시 사용해서 빌드 → tar로 저장
-      - name: Build ${{ matrix.svc }} (ARM64) -> tar
+      - name: Build ${{ matrix.svc }} (ARM64)
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: backend/application-modules/${{ matrix.svc }}/Dockerfile
           platforms: linux/arm64
-          tags: |
-            ${{ matrix.svc }}:${{ github.sha }}
-            ${{ matrix.svc }}:latest
+          tags: ${{ matrix.svc }}:${{ github.sha }}
           cache-from: type=gha,scope=${{ matrix.svc }}-arm64
           cache-to:   type=gha,mode=max,scope=${{ matrix.svc }}-arm64
-          outputs: type=tar,dest=backend/docker-images/${{ matrix.svc }}.tar
+          load: true  # 빌드한 이미지를 runner의 Docker daemon으로 로드
+          push: false # ECR로 푸시하지 않음 (outputs 옵션 제거)
 
-      - name: Compress image tar
-        run: gzip -f backend/docker-images/${{ matrix.svc }}.tar
+      # 로드된 이미지를 'docker save' 명령어로 직접 .tar.gz 파일로 저장
+      - name: Save Docker image to .tar.gz
+        run: |
+          mkdir -p backend/docker-images
+          docker save ${{ matrix.svc }}:${{ github.sha }} | gzip > backend/docker-images/${{ matrix.svc }}.tar.gz
 
-      # 빌드 직후 S3에 바로 업로드 (Artifacts 제거)
+      # 위에서 생성된 .tar.gz 파일을 S3에 업로드
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
