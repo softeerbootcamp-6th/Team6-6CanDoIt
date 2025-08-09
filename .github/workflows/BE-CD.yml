@@ -4,119 +4,110 @@ on:
   push:
     branches:
       - "be/feature/#33"
-  
+
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        svc: [api-server, batch-server, test-server]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: ${{secrets.AWS_BUCKET_REGION}}
-        role-to-assume: ${{secrets.OIDC_ROLE}}
+      # ARM64 빌드를 위한 QEMU + buildx
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build and save Docker images
-      working-directory: ./backend
-      run: |
-        # API Server
-        docker buildx build --platform linux/arm64 \
-          --cache-from type=gha \
-          --cache-to type=gha,mode=max \
-          -t api-server:${GITHUB_SHA} \
-          -t api-server:latest \
-          -f application-modules/api-server/Dockerfile \
-          --load .
-        
-        # Batch Server  
-        docker buildx build --platform linux/arm64 \
-          --cache-from type=gha \
-          --cache-to type=gha,mode=max \
-          -t batch-server:${GITHUB_SHA} \
-          -t batch-server:latest \
-          -f application-modules/batch-server/Dockerfile \
-          --load .
-        
-        # Test Server
-        docker buildx build --platform linux/arm64 \
-          --cache-from type=gha \
-          --cache-to type=gha,mode=max \
-          -t test-server:${GITHUB_SHA} \
-          -t test-server:latest \
-          -f application-modules/test-server/Dockerfile \
-          --load .
+      - name: Prepare output dir
+        run: mkdir -p backend/docker-images
 
-        
-        # Save Docker images to tar files
-        echo "Saving Docker images..."
-        mkdir -p docker-images
-        docker save api-server:${GITHUB_SHA} | gzip > docker-images/api-server.tar.gz
-        docker save batch-server:${GITHUB_SHA} | gzip > docker-images/batch-server.tar.gz
-        docker save test-server:${GITHUB_SHA} | gzip > docker-images/test-server.tar.gz
+      # ARM64로 캐시 사용해서 빌드 → tar로 저장
+      - name: Build ${{ matrix.svc }} (ARM64) -> tar
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: backend/application-modules/${{ matrix.svc }}/Dockerfile
+          platforms: linux/arm64
+          tags: |
+            ${{ matrix.svc }}:${{ github.sha }}
+            ${{ matrix.svc }}:latest
+          cache-from: type=gha,scope=${{ matrix.svc }}-arm64
+          cache-to:   type=gha,mode=max,scope=${{ matrix.svc }}-arm64
+          outputs: type=tar,dest=backend/docker-images/${{ matrix.svc }}.tar
 
-    - name: Upload Docker images to S3
-      working-directory: ./backend
-      run: |
-        echo "Uploading Docker images to S3..."
-        aws s3 sync docker-images/ s3://${{secrets.AWS_BE_BUCKET_NAME}}/docker-images/${GITHUB_SHA}/ \
-          --delete \
-          --storage-class STANDARD_IA
+      - name: Compress image tar
+        run: gzip -f backend/docker-images/${{ matrix.svc }}.tar
 
-    - name: Create deployment package
-      working-directory: ./backend
-      run: |
-        mkdir -p deploy
-        
-        # Copy deployment scripts
-        cp -r scripts/deploy/* deploy/
-        cp appspec.yml deploy/
-        chmod 755 deploy/*.sh
-        
-        # Create environment file with image information
-        cat > deploy/.env << EOF
-        export IMAGE_TAG=${GITHUB_SHA}
-        export S3_BUCKET=${{secrets.AWS_BE_BUCKET_NAME}}
-        export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
-        export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
-        export TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
-        EOF
-        
-        # Create deployment archive
-        cd deploy && zip -r ../deploy.zip .
+      # 빌드 직후 S3에 바로 업로드 (Artifacts 제거)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
 
-    - name: Upload to S3
-      working-directory: ./backend
-      run: |
-        aws s3 cp deploy.zip s3://${{secrets.AWS_BE_BUCKET_NAME}}/deployments/backend-${GITHUB_SHA}.zip
+      - name: Upload to S3
+        run: |
+          aws s3 cp backend/docker-images/${{ matrix.svc }}.tar.gz \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/docker-images/${{ github.sha }}/${{ matrix.svc }}.tar.gz \
+            --storage-class STANDARD_IA
 
-    - name: Create CodeDeploy deployment
-      run: |
-        aws deploy create-deployment \
-          --application-name ${{secrets.CODEDEPLOY_APPLICATION}} \
-          --deployment-group-name ${{secrets.CODEDEPLOY_GROUP}} \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --s3-location bucket=${{secrets.AWS_BE_BUCKET_NAME}},key=deployments/backend-${GITHUB_SHA}.zip,bundleType=zip \
-          --description "Deployment of commit ${GITHUB_SHA}" 
-
-  notify:
-    needs: build-and-deploy
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
-    if: always()
+
     steps:
-    - name: Notify deployment status
-      run: |
-        if [ "${{ needs.build-and-deploy.result }}" == "success" ]; then
-          echo "✅ Deployment successful for commit ${GITHUB_SHA}"
-        else
-          echo "❌ Deployment failed for commit ${GITHUB_SHA}"
-        fi
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+
+      - name: Create deployment package
+        working-directory: ./backend
+        run: |
+          mkdir -p deploy/scripts
+          cp -r scripts/deploy/* deploy/
+          cp appspec.yml deploy/
+
+          # 들여쓰기 없이 .env 작성 (공백 유입 방지)
+          cat > deploy/.env <<EOF
+          export IMAGE_TAG=${GITHUB_SHA}
+          export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
+          export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
+          export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
+          export TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
+          EOF
+
+          # 실행 권한 부여
+          chmod 755 deploy/*.sh
+
+          # 패키징
+          cd deploy && zip -r ../deploy.zip .
+
+      - name: Upload deployment package to S3
+        working-directory: ./backend
+        run: |
+          aws s3 cp deploy.zip \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/deployments/backend-${GITHUB_SHA}.zip
+
+      - name: Create CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APPLICATION }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --s3-location bucket=${{ secrets.AWS_BE_BUCKET_NAME }},key=deployments/backend-${GITHUB_SHA}.zip,bundleType=zip \
+            --description "Deployment of commit ${GITHUB_SHA}" \
+            --ignore-application-stop-failures
