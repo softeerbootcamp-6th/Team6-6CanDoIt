@@ -78,11 +78,11 @@ jobs:
         
         # Create environment file with image information
         cat > deploy/.env << EOF
-        IMAGE_TAG=${GITHUB_SHA}
-        S3_BUCKET=${{secrets.AWS_BE_BUCKET_NAME}}
-        API_SERVER_IMAGE=api-server:${GITHUB_SHA}
-        BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
-        TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
+        export IMAGE_TAG=${GITHUB_SHA}
+        export S3_BUCKET=${{secrets.AWS_BE_BUCKET_NAME}}
+        export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
+        export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
+        export TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
         EOF
         
         # Create deployment archive
