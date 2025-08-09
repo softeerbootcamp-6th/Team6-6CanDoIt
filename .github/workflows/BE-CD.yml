@@ -74,6 +74,7 @@ jobs:
         # Copy deployment scripts
         cp -r scripts/deploy/* deploy/
         cp appspec.yml deploy/
+        chmod 755 deploy/*.sh
         
         # Create environment file with image information
         cat > deploy/.env << EOF
