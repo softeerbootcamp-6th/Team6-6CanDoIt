@@ -60,20 +60,6 @@ if [ ! $(docker ps -q -f name=^mysql$) ]; then
     sleep 30
 fi
 
-# Redis
-#if [ ! $(docker ps -q -f name=^redis$) ]; then
-#    docker run -d \
-#        --name redis \
-#        --network backend-network \
-#        -p 6379:6379 \
-#        -v redis-data:/data \
-#        --restart unless-stopped \
-#        redis:7-alpine redis-server --appendonly yes
-#fi
-
-# Wait a bit for infrastructure to be fully ready
-sleep 10
-
 # Start application services
 echo "Starting application services..."
 
@@ -89,8 +75,6 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-#    -e REDIS_HOST=redis \
-#    -e REDIS_PORT=6379 \
     --restart unless-stopped \
     $API_SERVER_IMAGE
 
@@ -106,8 +90,6 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-#    -e REDIS_HOST=redis \
-#    -e REDIS_PORT=6379 \
     -e BATCH_JOB_ENABLED=true \
     --restart unless-stopped \
     $BATCH_SERVER_IMAGE
