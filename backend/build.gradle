@@ -47,6 +47,9 @@ subprojects {
 	// common-modules 그룹인지를 체크
 	def isCommonModule = project.path.startsWith(':common-modules')
 
+	// application-modules 그룹인지를 체크
+	def isApplicationModule = project.path.startsWith(':common-modules')
+
 	dependencies {
 		if (!isCommonModule) {
 			implementation 'org.springframework.boot:spring-boot-starter'
@@ -54,6 +57,10 @@ subprojects {
 			annotationProcessor 'org.projectlombok:lombok'
 			testImplementation 'com.h2database:h2'
 
+		}
+
+		if (isApplicationModule) {
+			implementation 'org.springframework.boot:spring-boot-starter-actuator'
 		}
 
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
