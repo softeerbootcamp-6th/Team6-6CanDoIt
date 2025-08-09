@@ -5,6 +5,9 @@ on:
     branches:
       - "be/feature/#33"
   
+permissions:
+  id-token: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
