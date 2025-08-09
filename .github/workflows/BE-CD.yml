@@ -24,6 +24,7 @@ jobs:
         role-to-assume: ${{secrets.OIDC_ROLE}}
 
     - name: Build and save Docker images
+      platforms: linux/arm64
       working-directory: ./backend
       run: |
         # API Server
@@ -90,8 +91,7 @@ jobs:
           --deployment-group-name ${{secrets.CODEDEPLOY_GROUP}} \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --s3-location bucket=${{secrets.AWS_BE_BUCKET_NAME}},key=deployments/backend-${GITHUB_SHA}.zip,bundleType=zip \
-          --description "Deployment of commit ${GITHUB_SHA}" \
-          --ignore-application-stop-failures
+          --description "Deployment of commit ${GITHUB_SHA}" 
 
   notify:
     needs: build-and-deploy
