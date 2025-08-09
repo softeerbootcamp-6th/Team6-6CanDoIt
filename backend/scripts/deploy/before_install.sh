@@ -52,10 +52,21 @@ fi
 # Install AWS CLI if not present
 if ! command -v aws &> /dev/null; then
     echo "Installing AWS CLI..."
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    TEMP_DIR=$(mktemp -d)
+    cd "$TEMP_DIR"
+
+    # Detect architecture
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "aarch64" ]; then
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
+    else
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    fi
+
     unzip awscliv2.zip
     sudo ./aws/install
-    rm -rf aws awscliv2.zip
+    cd -
+    rm -rf "$TEMP_DIR"
 fi
 
 # Start Docker service
