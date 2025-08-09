@@ -21,28 +21,28 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: scripts/before_install.sh
+    - location: before_install.sh
       timeout: 300
       runas: ubuntu
 
   ApplicationStop:
-    - location: scripts/stop_application.sh
+    - location: stop_application.sh
       timeout: 300
       runas: ubuntu
 
   ApplicationStart:
-    - location: scripts/manage_images.sh
+    - location: manage_images.sh
       timeout: 600
       runas: ubuntu
-    - location: scripts/start_application.sh
+    - location: start_application.sh
       timeout: 300
       runas: ubuntu
 
   ValidateService:
-    - location: scripts/validate_service.sh
+    - location: validate_service.sh
       timeout: 300
       runas: ubuntu
-    - location: scripts/cleanup_s3.sh
+    - location: cleanup_s3.sh
       timeout: 300
       runas: ubuntu
 
