@@ -3,7 +3,7 @@ name: Backend CD
 on:
   push:
     branches:
-      - be/feature/#33
+      - "be/feature/#33"
   
 jobs:
   build-and-deploy:
