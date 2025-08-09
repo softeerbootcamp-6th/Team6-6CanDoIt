@@ -18,34 +18,41 @@ download_and_load_images() {
         return 1
     fi
 
-    # Create temporary directory
+    # Create temporary directory for downloads
     local temp_dir=$(mktemp -d)
+    echo "Using temporary directory: $temp_dir"
     cd "$temp_dir"
 
-    # Download images
-    echo "Downloading images for tag: $image_tag"
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${IMAGE_TAG}/api-server.tar.gz . || {
-        echo "Failed to download api-server image"
-        return 1
-    }
+    # Define services to download
+    local services=("api-server" "batch-server" "test-server")
 
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${image_tag}/batch-server.tar.gz . || {
-        echo "Failed to download batch-server image"
-        return 1
-    }
+    # Download all images first
+    for service in "${services[@]}"; do
+        echo "Downloading ${service} image for tag: ${image_tag}"
+        aws s3 cp "s3://${s3_bucket}/docker-images/${image_tag}/${service}.tar.gz" . || {
+            echo "❌ Failed to download ${service} image"
+            # Clean up and exit if any download fails
+            cd /
+            rm -rf "$temp_dir"
+            return 1
+        }
+    done
 
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${image_tag}/test-server.tar.gz . || {
-        echo "Failed to download test-server image"
-        return 1
-    }
-
-    # Load images
+    # Load images after all downloads are complete
     echo "Loading Docker images..."
-    docker load < api-server.tar.gz
-    docker load < batch-server.tar.gz
-    docker load < test-server.tar.gz
+    for service in "${services[@]}"; do
+        if [ -f "${service}.tar.gz" ]; then
+            echo "Loading ${service}..."
+            # Decompress the .gz file and pipe it to docker load
+            gunzip -c "${service}.tar.gz" | docker load
+            echo "✅ Loaded ${service}"
+        else
+            echo "⚠️ Warning: ${service}.tar.gz not found, skipping load."
+        fi
+    done
 
-    # Clean up
+    # Clean up the temporary directory
+    echo "Cleaning up temporary files..."
     cd /
     rm -rf "$temp_dir"
 
