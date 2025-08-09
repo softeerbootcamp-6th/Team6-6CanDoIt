@@ -1,38 +1,39 @@
-#!/bin/bash
-
-# scripts/deploy/stop_application.sh
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
 echo "=== Stopping application services ==="
 
-cd /opt/backend-app
+# If Docker is not installed or daemon isn't running, skip gracefully
+if ! command -v docker >/dev/null 2>&1; then
+  echo "Docker not installed; nothing to stop."
+  exit 0
+fi
+if ! docker info >/dev/null 2>&1; then
+  echo "Docker daemon not running; skipping stop."
+  exit 0
+fi
 
-# Function to stop container gracefully
-stop_container() {
-    local container_name=$1
-    if [ $(docker ps -q -f name=^${container_name}$) ]; then
-        echo "Stopping container: $container_name"
-        docker stop $container_name || true
-        docker rm $container_name || true
-    else
-        echo "Container $container_name is not running"
-    fi
-}
+# Containers to remove (remove if present; ignore if absent)
+containers=(api-server batch-server test-server mysql redis)
+for n in "${containers[@]}"; do
+  if docker ps -a --format '{{.Names}}' | grep -qx "$n"; then
+    echo "Removing container: $n"
+    docker rm -f "$n" || true
+  else
+    echo "Container $n not present"
+  fi
+done
 
-# Stop all application containers
-stop_container "api-server"
-stop_container "batch-server"
-stop_container "test-server"
+# Remove dedicated network if it exists
+if docker network ls --format '{{.Name}}' | grep -qx 'backend-network'; then
+  docker network rm backend-network || true
+fi
 
-# Stop infrastructure containers (optional - keep running for zero-downtime)
-# stop_container "mysql"
-# stop_container "redis"
+# Remove volumes if present (ignore errors)
+docker volume rm mysql-data >/dev/null 2>&1 || true
 
-# Remove old images to free up space (keep last 2 versions)
-echo "Cleaning up old Docker images..."
+# Prune dangling images and networks (safe: only unused resources)
 docker image prune -f || true
-
-# Remove unused networks
 docker network prune -f || true
 
 echo "=== Application stopped ==="
