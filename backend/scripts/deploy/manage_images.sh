@@ -24,7 +24,8 @@ download_and_load_images() {
     cd "$temp_dir"
 
     # Define services to download
-    local services=("api-server" "batch-server" "test-server")
+#    local services=("api-server" "batch-server" "test-server")
+    local services=("test-server")
 
     # Download all images first
     for service in "${services[@]}"; do
