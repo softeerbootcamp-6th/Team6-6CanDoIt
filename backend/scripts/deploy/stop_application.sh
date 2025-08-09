@@ -3,12 +3,14 @@ set -e
 
 echo "=== Stopping application services using Docker Compose ==="
 
-# .env 파일이 있는 배포 루트 디렉터리로 이동
+# 배포된 애플리케이션 디렉터리로 이동
 cd /opt/backend-app
 
-# docker-compose.yml 파일을 이용해 모든 서비스를 중지하고 컨테이너, 네트워크 제거
-# --volumes: docker-compose.yml에 정의된 볼륨까지 제거 (현재는 없으므로 안전)
-echo "Stopping and removing services..."
-docker-compose -f docker-compose.yml down --volumes
+# docker-compose.yml 파일이 존재할 경우에만 down 명령 실행
+if [ -f docker-compose.yml ]; then
+    docker-compose -f docker-compose.yml down --volumes
+else
+    echo "docker-compose.yml not found. Nothing to stop with compose."
+fi
 
 echo "=== Application stopped ==="
