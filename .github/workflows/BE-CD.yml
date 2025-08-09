@@ -23,24 +23,39 @@ jobs:
         aws-region: ${{secrets.AWS_BUCKET_REGION}}
         role-to-assume: ${{secrets.OIDC_ROLE}}
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Build and save Docker images
-      platforms: linux/arm64
       working-directory: ./backend
       run: |
         # API Server
-        docker build -t api-server:${GITHUB_SHA} \
+        docker buildx build --platform linux/arm64 \
+          --cache-from type=gha \
+          --cache-to type=gha,mode=max \
+          -t api-server:${GITHUB_SHA} \
           -t api-server:latest \
-          -f application-modules/api-server/Dockerfile .
+          -f application-modules/api-server/Dockerfile \
+          --load .
         
         # Batch Server  
-        docker build -t batch-server:${GITHUB_SHA} \
+        docker buildx build --platform linux/arm64 \
+          --cache-from type=gha \
+          --cache-to type=gha,mode=max \
+          -t batch-server:${GITHUB_SHA} \
           -t batch-server:latest \
-          -f application-modules/batch-server/Dockerfile .
+          -f application-modules/batch-server/Dockerfile \
+          --load .
         
         # Test Server
-        docker build -t test-server:${GITHUB_SHA} \
+        docker buildx build --platform linux/arm64 \
+          --cache-from type=gha \
+          --cache-to type=gha,mode=max \
+          -t test-server:${GITHUB_SHA} \
           -t test-server:latest \
-          -f application-modules/test-server/Dockerfile .
+          -f application-modules/test-server/Dockerfile \
+          --load .
+
         
         # Save Docker images to tar files
         echo "Saving Docker images..."
