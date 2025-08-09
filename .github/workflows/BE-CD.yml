@@ -90,13 +90,13 @@ jobs:
     - name: Upload to S3
       working-directory: ./backend
       run: |
-        aws s3 cp deploy.zip s3://$S3_BUCKET/deployments/backend-$GITHUB_SHA.zip
+        aws s3 cp deploy.zip ${{secrets.AWS_BE_BUCKET_NAME}}/deployments/backend-$GITHUB_SHA.zip
 
     - name: Create CodeDeploy deployment
       run: |
         aws deploy create-deployment \
-          --application-name $CODEDEPLOY_APPLICATION \
-          --deployment-group-name backend-deployment-group \
+          --application-name ${{secrets.CODEDEPLOY_APPLICATION}} \
+          --deployment-group-name ${{secrets.CODEDEPLOY_GROUP}} \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --s3-location bucket=$S3_BUCKET,key=deployments/backend-$GITHUB_SHA.zip,bundleType=zip \
           --description "Deployment of commit $GITHUB_SHA"
