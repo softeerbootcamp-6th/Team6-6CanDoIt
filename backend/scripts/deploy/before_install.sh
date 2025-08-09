@@ -72,38 +72,4 @@ fi
 # Start Docker service
 sudo systemctl start docker
 
-# .env 파일이 존재하는지 확인 후 환경변수 로드
-if [ -f /opt/backend-app/.env ]; then
-    echo "Loading environment variables..."
-    source /opt/backend-app/.env
-
-    # 환경변수가 제대로 설정되었는지 확인
-    if [ -z "$IMAGE_TAG" ] || [ -z "$S3_BUCKET" ]; then
-        echo "Error: Required environment variables not set"
-        exit 1
-    fi
-
-    echo "Downloading Docker images from S3..."
-
-    # Create directory for docker images
-    mkdir -p /opt/backend-app/docker-images
-
-    # Download Docker images from S3
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${IMAGE_TAG}/api-server.tar.gz /opt/backend-app/docker-images/
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${IMAGE_TAG}/batch-server.tar.gz /opt/backend-app/docker-images/
-    aws s3 cp s3://${S3_BUCKET}/docker-images/${IMAGE_TAG}/test-server.tar.gz /opt/backend-app/docker-images/
-
-    # Load Docker images
-    echo "Loading Docker images..."
-    docker load < /opt/backend-app/docker-images/api-server.tar.gz
-    docker load < /opt/backend-app/docker-images/batch-server.tar.gz
-    docker load < /opt/backend-app/docker-images/test-server.tar.gz
-
-    # Clean up downloaded files
-    rm -rf /opt/backend-app/docker-images
-else
-    echo "Warning: .env file not found at /opt/backend-app/.env"
-    echo "Skipping Docker image download..."
-fi
-
 echo "=== Before Install completed ==="
