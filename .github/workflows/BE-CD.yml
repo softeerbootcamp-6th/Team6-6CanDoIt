@@ -1,0 +1,107 @@
+name: Backend CD
+
+on:
+  push:
+    branches:
+      - dev
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{secrets.AWS_BUCKET_REGION}}
+        role-to-assume: ${{secrets.OIDC_ROLE}}
+
+    - name: Build and save Docker images
+      run: |
+        # API Server
+        docker build -t api-server:$GITHUB_SHA \
+          -t api-server:latest \
+          -f application-modules/api-server/Dockerfile .
+        
+        # Batch Server  
+        docker build -t batch-server:$GITHUB_SHA \
+          -t batch-server:latest \
+          -f application-modules/batch-server/Dockerfile .
+        
+        # Test Server
+        docker build -t test-server:$GITHUB_SHA \
+          -t test-server:latest \
+          -f application-modules/test-server/Dockerfile .
+        
+        # Save Docker images to tar files
+        echo "Saving Docker images..."
+        mkdir -p docker-images
+        docker save api-server:$GITHUB_SHA | gzip > docker-images/api-server.tar.gz
+        docker save batch-server:$GITHUB_SHA | gzip > docker-images/batch-server.tar.gz
+        docker save test-server:$GITHUB_SHA | gzip > docker-images/test-server.tar.gz
+
+    - name: Upload Docker images to S3
+      run: |
+        echo "Uploading Docker images to S3..."
+        aws s3 sync docker-images/ s3://$S3_BUCKET/docker-images/$GITHUB_SHA/ \
+          --delete \
+          --storage-class STANDARD_IA
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        
+        # Copy deployment scripts
+        cp -r scripts/deploy/* deploy/
+        cp appspec.yml deploy/
+        
+        # Create environment file with image information
+        cat > deploy/.env << EOF
+        IMAGE_TAG=$GITHUB_SHA
+        S3_BUCKET=$S3_BUCKET
+        API_SERVER_IMAGE=api-server:$GITHUB_SHA
+        BATCH_SERVER_IMAGE=batch-server:$GITHUB_SHA
+        TEST_SERVER_IMAGE=test-server:$GITHUB_SHA
+        EOF
+        
+        # Create deployment archive
+        cd deploy && zip -r ../deploy.zip .
+
+    - name: Upload to S3
+      run: |
+        aws s3 cp deploy.zip s3://$S3_BUCKET/deployments/backend-$GITHUB_SHA.zip
+
+    - name: Create CodeDeploy deployment
+      run: |
+        aws deploy create-deployment \
+          --application-name $CODEDEPLOY_APPLICATION \
+          --deployment-group-name backend-deployment-group \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --s3-location bucket=$S3_BUCKET,key=deployments/backend-$GITHUB_SHA.zip,bundleType=zip \
+          --description "Deployment of commit $GITHUB_SHA"
+
+  notify:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Notify deployment status
+      run: |
+        if [ "${{ needs.build-and-deploy.result }}" == "success" ]; then
+          echo "✅ Deployment successful for commit $GITHUB_SHA"
+        else
+          echo "❌ Deployment failed for commit $GITHUB_SHA"
+        fi
