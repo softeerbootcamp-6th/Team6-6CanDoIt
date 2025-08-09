@@ -31,7 +31,7 @@ hooks:
       runas: ubuntu
 
   ApplicationStart:
-    - location: manage_images.sh
+    - location: manage_images_entry.sh
       timeout: 600
       runas: ubuntu
     - location: start_application.sh
