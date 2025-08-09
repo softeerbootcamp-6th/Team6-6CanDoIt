@@ -5,16 +5,19 @@ set -e
 
 echo "=== Starting application services ==="
 
-cd /opt/backend
+echo "Current directory: $(pwd)"
+echo "Files in current directory: $(ls -la)"
+echo "Files in /opt/backend-app: $(ls -la /opt/backend-app)"
 
 # Load environment variables
-if [ -f .env ]; then
-    source .env
-    echo "Loaded environment variables"
+if [ -f /opt/backend-app/.env ]; then
+    source /opt/backend-app/.env
 else
-    echo "Warning: .env file not found"
+    echo "Warning: .env file not found at /opt/backend-app/.env"
     exit 1
 fi
+
+cd /opt/backend-app
 
 # Load Docker images if they exist in current directory
 if [ -d "docker-images" ]; then
@@ -58,15 +61,15 @@ if [ ! $(docker ps -q -f name=^mysql$) ]; then
 fi
 
 # Redis
-if [ ! $(docker ps -q -f name=^redis$) ]; then
-    docker run -d \
-        --name redis \
-        --network backend-network \
-        -p 6379:6379 \
-        -v redis-data:/data \
-        --restart unless-stopped \
-        redis:7-alpine redis-server --appendonly yes
-fi
+#if [ ! $(docker ps -q -f name=^redis$) ]; then
+#    docker run -d \
+#        --name redis \
+#        --network backend-network \
+#        -p 6379:6379 \
+#        -v redis-data:/data \
+#        --restart unless-stopped \
+#        redis:7-alpine redis-server --appendonly yes
+#fi
 
 # Wait a bit for infrastructure to be fully ready
 sleep 10
@@ -86,8 +89,8 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-    -e REDIS_HOST=redis \
-    -e REDIS_PORT=6379 \
+#    -e REDIS_HOST=redis \
+#    -e REDIS_PORT=6379 \
     --restart unless-stopped \
     $API_SERVER_IMAGE
 
@@ -103,8 +106,8 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-    -e REDIS_HOST=redis \
-    -e REDIS_PORT=6379 \
+#    -e REDIS_HOST=redis \
+#    -e REDIS_PORT=6379 \
     -e BATCH_JOB_ENABLED=true \
     --restart unless-stopped \
     $BATCH_SERVER_IMAGE

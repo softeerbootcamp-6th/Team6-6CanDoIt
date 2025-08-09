@@ -5,7 +5,7 @@ set -e
 
 echo "=== Stopping application services ==="
 
-cd /opt/backend
+cd /opt/backend0-app
 
 # Function to stop container gracefully
 stop_container() {
