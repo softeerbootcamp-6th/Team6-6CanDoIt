@@ -52,7 +52,6 @@ if [ ! $(docker ps -q -f name=^mysql$) ]; then
         -e MYSQL_USER=backend_user \
         -e MYSQL_PASSWORD=backend_pass \
         -v mysql-data:/var/lib/mysql \
-        --restart unless-stopped \
         mysql:8.0
 
     # Wait for MySQL to be ready
@@ -75,7 +74,6 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-    --restart unless-stopped \
     $API_SERVER_IMAGE
 
 # Batch Server
@@ -91,7 +89,6 @@ docker run -d \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
     -e BATCH_JOB_ENABLED=true \
-    --restart unless-stopped \
     $BATCH_SERVER_IMAGE
 
 # Test Server
@@ -106,7 +103,6 @@ docker run -d \
     -e DB_NAME=backend_db \
     -e DB_USER=backend_user \
     -e DB_PASSWORD=backend_pass \
-    --restart unless-stopped \
     $TEST_SERVER_IMAGE
 
 echo "=== Application services started ==="
