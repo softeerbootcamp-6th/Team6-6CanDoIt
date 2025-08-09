@@ -1,6 +1,5 @@
-package com.softeer.domain;
+package com.softeer.domain.condition;
 
-import com.softeer.domain.condition.WindCondition;
 import com.softeer.entity.enums.WindDirection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

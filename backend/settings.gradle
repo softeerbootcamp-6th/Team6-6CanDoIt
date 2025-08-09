@@ -19,4 +19,4 @@ include ':common-modules:exception'
 
 //external-layer
 include ':infrastructure-modules:querydsl-module'
-include 'application-modules:test-server'
+include ':infrastructure-modules:testcontainers-module'

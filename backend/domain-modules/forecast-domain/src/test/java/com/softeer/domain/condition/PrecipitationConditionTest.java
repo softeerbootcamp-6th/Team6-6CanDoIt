@@ -1,6 +1,5 @@
-package com.softeer.domain;
+package com.softeer.domain.condition;
 
-import com.softeer.domain.condition.PrecipitationCondition;
 import com.softeer.entity.enums.PrecipitationType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +16,7 @@ class PrecipitationConditionTest {
         // Given
         String testPrecipitation = "30.0~50.0mm"; // 이 값은 description에 영향을 주지 않으므로 임의로 설정
         int testProbability = 10;
-        int testSnowAccumulation = 1;
+        String testSnowAccumulation = "1.0mm";
 
         PrecipitationCondition condition = new PrecipitationCondition(type, testPrecipitation, testProbability, testSnowAccumulation);
 

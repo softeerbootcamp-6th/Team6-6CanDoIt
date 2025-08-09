@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ForestAdapterImpl implements ForecastAdapter {
 
-    private final ForecastJdbcRepository forecastJdbcRepository;
+    private final ForecastQuerydslRepository forecastQuerydslRepository;
 
     @Override
-    public List<Forecast> findForecastsFor24Hours(long gridId, LocalDateTime startTime) {
-        return forecastJdbcRepository.findForecastsFor24Hours(gridId, startTime);
+    public List<Forecast> findForecastsAfterStartTime(int gridId, LocalDateTime startTime) {
+        return forecastQuerydslRepository.findForecastsAfterStartDateTime(gridId, startTime);
     }
 }

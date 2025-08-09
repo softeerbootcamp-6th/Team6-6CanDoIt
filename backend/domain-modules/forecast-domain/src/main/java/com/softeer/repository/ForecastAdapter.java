@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ForecastAdapter {
-    List<Forecast> findForecastsFor24Hours(long gridId, LocalDateTime startTime);
+    List<Forecast> findForecastsAfterStartTime(int gridId, LocalDateTime startTime);
 }

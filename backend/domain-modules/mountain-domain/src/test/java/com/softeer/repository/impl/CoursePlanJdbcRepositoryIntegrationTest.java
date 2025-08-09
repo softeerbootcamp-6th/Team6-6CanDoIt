@@ -1,18 +1,18 @@
 package com.softeer.repository.impl;
 
+import com.softeer.SpringBootTestWithContainer;
 import com.softeer.domain.CoursePlan;
 import com.softeer.entity.enums.Level;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
+@SpringBootTestWithContainer
 @Sql(scripts = {
         "/sql/course-plan-schema.sql",
         "/sql/course-plan-data.sql"

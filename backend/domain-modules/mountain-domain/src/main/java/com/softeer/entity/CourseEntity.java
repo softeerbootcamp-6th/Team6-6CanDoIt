@@ -29,7 +29,7 @@ public class CourseEntity {
     @Column(nullable = false)
     private Level level;
 
-    private int totalDuration;
+    private double totalDuration;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mountain_id")

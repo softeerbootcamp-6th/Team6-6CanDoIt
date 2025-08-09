@@ -26,14 +26,14 @@ class CourseMapperTest {
         when(e1.getId()).thenReturn(1L);
         when(e1.getName()).thenReturn("공룡능선");
         when(e1.getTotalDistance()).thenReturn(12.3);
-        when(e1.getTotalDuration()).thenReturn(480);
+        when(e1.getTotalDuration()).thenReturn(4.5);
         when(e1.getLevel()).thenReturn(Level.HARD);
 
         CourseEntity e2 = mock(CourseEntity.class, RETURNS_DEEP_STUBS);
         when(e2.getId()).thenReturn(2L);
         when(e2.getName()).thenReturn("비선대 코스");
         when(e2.getTotalDistance()).thenReturn(8.2);
-        when(e2.getTotalDuration()).thenReturn(300);
+        when(e2.getTotalDuration()).thenReturn(3.0);
         when(e2.getLevel()).thenReturn(Level.MEDIUM);
 
         // when
@@ -47,7 +47,7 @@ class CourseMapperTest {
                 () -> assertEquals(1L, c1.id()),
                 () -> assertEquals("공룡능선", c1.name()),
                 () -> assertEquals(12.3, c1.totalDistance(), 1e-9),
-                () -> assertEquals(480, c1.totalDuration()),
+                () -> assertEquals(4.5, c1.totalDuration()),
                 () -> assertEquals(Level.HARD, c1.level())
         );
 
@@ -56,7 +56,7 @@ class CourseMapperTest {
                 () -> assertEquals(2L, c2.id()),
                 () -> assertEquals("비선대 코스", c2.name()),
                 () -> assertEquals(8.2, c2.totalDistance(), 1e-9),
-                () -> assertEquals(300, c2.totalDuration()),
+                () -> assertEquals(3.0, c2.totalDuration()),
                 () -> assertEquals(Level.MEDIUM, c2.level())
         );
     }
