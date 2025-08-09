@@ -3,25 +3,32 @@
 FROM gradle:8.6-jdk17 AS builder
 WORKDIR /workspace
 
-# 1-A) Gradle 설정 복사
+# 1-A) Gradle 설정 파일들만 먼저 복사 (캐시 최적화)
 COPY ../../settings.gradle ../../build.gradle ../../gradlew ./
 COPY ../../gradle gradle
 RUN chmod +x gradlew
 RUN echo "=== Step 1-A: API Server - Gradle wrapper setup ===" && ls -la
 
-# 1-B) 전체 소스 복사
-COPY ../../ .
-RUN echo "=== Step 1-B: API Server - Full source copied ===" && ls -la
-RUN echo "=== Application modules structure ===" && ls -la application-modules/
+# 1-B) 모든 서브모듈의 build.gradle 파일들을 디렉토리 구조 유지하며 복사
+COPY ../../application-modules/*/build.gradle* application-modules/
+COPY ../../common-modules/*/build.gradle* common-modules/
+COPY ../../domain-modules/*/build.gradle* domain-modules/
+COPY ../../infrastructure-modules/*/build.gradle* infrastructure-modules/
+RUN echo "=== Step 1-B: API Server - Build files copied ===" && find . -name "build.gradle*" -type f
 
-# 1-C) 의존성 다운로드
+# 1-C) 의존성 다운로드 (소스 코드 변경 시에도 캐시 유지)
 RUN echo "=== Step 1-C: API Server - Downloading dependencies ==="
-RUN ./gradlew --no-daemon :application-modules:api-server:dependencies
+RUN ./gradlew --no-daemon :application-modules:api-server:dependencies --refresh-dependencies
+RUN echo "=== Step 1-C: API Server - Dependencies cached ==="
 
-# 1-D) 부트 JAR 빌드
-RUN echo "=== Step 1-D: API Server - Building bootJar ==="
-RUN ./gradlew --no-daemon :application-modules:api-server:bootJar
-RUN echo "=== Step 1-D: API Server - Build completed ===" && find . -name "*.jar" -type f
+# 1-D) 이제 전체 소스 복사 (의존성 캐시 이후)
+COPY ../../ .
+RUN echo "=== Step 1-D: API Server - Full source copied ==="
+
+# 1-E) 부트 JAR 빌드
+RUN echo "=== Step 1-E: API Server - Building bootJar ==="
+RUN ./gradlew --no-daemon :application-modules:api-server:bootJar --no-build-cache
+RUN echo "=== Step 1-E: API Server - Build completed ===" && find . -name "*.jar" -type f
 
 # ── 2) 런타임 스테이지 ──────────────────────────────────────────────
 FROM eclipse-temurin:17-jre
@@ -33,13 +40,14 @@ COPY --from=builder /workspace/application-modules/api-server/build/libs/*.jar a
 # 환경변수 설정
 ENV SERVER_PORT=8080
 ENV SPRING_PROFILES_ACTIVE=docker
+ENV JVM_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC"
 
 # 포트 노출
 EXPOSE 8080
 
-# 헬스체크 (선택사항)
+# 헬스체크
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar /app/app.jar"]
