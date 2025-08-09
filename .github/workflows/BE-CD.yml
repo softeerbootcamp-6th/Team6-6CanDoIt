@@ -81,13 +81,18 @@ jobs:
           cp -r scripts/deploy/* deploy/
           cp appspec.yml deploy/
 
-          # 들여쓰기 없이 .env 작성 (공백 유입 방지)
           cat > deploy/.env <<EOF
           export IMAGE_TAG=${GITHUB_SHA}
           export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
           export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
           export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
           export TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
+
+          export DB_HOST=${{ secrets.DB_HOST }}
+          export DB_PORT=3306
+          export DB_NAME=${{ secrets.DB_NAME }}
+          export DB_USER=${{ secrets.DB_USER }}
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           EOF
 
           # 실행 권한 부여

@@ -1,112 +1,28 @@
 #!/bin/bash
-
-# scripts/deploy/start_application.sh
 set -e
 
-echo "=== Starting application services ==="
+echo "=== Starting application services using Docker Compose ==="
 
-echo "Current directory: $(pwd)"
-echo "Files in current directory: $(ls -la)"
-echo "Files in /opt/backend-app: $(ls -la /opt/backend-app)"
+# .env 파일이 있는 배포 루트 디렉터리로 이동
+cd /opt/backend-app
 
-# Load environment variables
-if [ -f /opt/backend-app/.env ]; then
-    source /opt/backend-app/.env
+# .env 파일 로드 (docker-compose가 자동으로 읽지만, 명시적으로 로드할 수도 있음)
+if [ -f .env ]; then
+    source .env
+    echo "Loaded .env file."
 else
-    echo "Warning: .env file not found at /opt/backend-app/.env"
+    echo "Error: .env file not found!"
     exit 1
 fi
 
-cd /opt/backend-app
-
-# Load Docker images if they exist in current directory
-if [ -d "docker-images" ]; then
-    echo "Loading Docker images from local files..."
-    if [ -f "docker-images/api-server.tar.gz" ]; then
-        docker load < docker-images/api-server.tar.gz
-    fi
-    if [ -f "docker-images/batch-server.tar.gz" ]; then
-        docker load < docker-images/batch-server.tar.gz
-    fi
-    if [ -f "docker-images/test-server.tar.gz" ]; then
-        docker load < docker-images/test-server.tar.gz
-    fi
-else
-    echo "Docker images already loaded from before_install step"
-fi
-
-# Create network if it doesn't exist
-docker network create backend-network || true
-
-# Start infrastructure services first (if not already running)
-echo "Starting infrastructure services..."
-
-# MySQL
-if [ ! $(docker ps -q -f name=^mysql$) ]; then
-    docker run -d \
-        --name mysql \
-        --network backend-network \
-        -p 3306:3306 \
-        -e MYSQL_ROOT_PASSWORD=root_pass \
-        -e MYSQL_DATABASE=backend_db \
-        -e MYSQL_USER=backend_user \
-        -e MYSQL_PASSWORD=backend_pass \
-        -v mysql-data:/var/lib/mysql \
-        mysql:8.0
-
-    # Wait for MySQL to be ready
-    echo "Waiting for MySQL to be ready..."
-    sleep 30
-fi
-
-# Start application services
-echo "Starting application services..."
-
-# API Server
-docker run -d \
-    --name api-server \
-    --network backend-network \
-    -p 8080:8080 \
-    -e SPRING_PROFILES_ACTIVE=docker \
-    -e SERVER_PORT=8080 \
-    -e DB_HOST=mysql \
-    -e DB_PORT=3306 \
-    -e DB_NAME=backend_db \
-    -e DB_USER=backend_user \
-    -e DB_PASSWORD=backend_pass \
-    $API_SERVER_IMAGE
-
-# Batch Server
-docker run -d \
-    --name batch-server \
-    --network backend-network \
-    -p 8081:8080 \
-    -e SPRING_PROFILES_ACTIVE=docker \
-    -e SERVER_PORT=8080 \
-    -e DB_HOST=mysql \
-    -e DB_PORT=3306 \
-    -e DB_NAME=backend_db \
-    -e DB_USER=backend_user \
-    -e DB_PASSWORD=backend_pass \
-    -e BATCH_JOB_ENABLED=true \
-    $BATCH_SERVER_IMAGE
-
-# Test Server
-docker run -d \
-    --name test-server \
-    --network backend-network \
-    -p 8082:8080 \
-    -e SPRING_PROFILES_ACTIVE=docker \
-    -e SERVER_PORT=8080 \
-    -e DB_HOST=mysql \
-    -e DB_PORT=3306 \
-    -e DB_NAME=backend_db \
-    -e DB_USER=backend_user \
-    -e DB_PASSWORD=backend_pass \
-    $TEST_SERVER_IMAGE
+# docker-compose.yml 파일을 이용해 모든 서비스를 백그라운드에서 실행
+# --detach(-d): 백그라운드 실행
+# --force-recreate: 기존 컨테이너가 있어도 강제로 다시 만듦
+echo "Starting services defined in docker-compose.yml..."
+docker-compose -f docker-compose.yml up --detach --force-recreate
 
 echo "=== Application services started ==="
 
-# Show running containers
+# 실행 중인 컨테이너 목록 표시
 echo "Running containers:"
-docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+docker-compose ps
