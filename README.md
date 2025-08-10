@@ -58,5 +58,5 @@
 </table>
 
 # 프로젝트 구조
-
+<img width="100%" height="auto" alt="프로젝트 구조도" src="https://github.com/user-attachments/assets/b11b2701-a9fb-4331-b2b6-506f4e1c3439" />
 
