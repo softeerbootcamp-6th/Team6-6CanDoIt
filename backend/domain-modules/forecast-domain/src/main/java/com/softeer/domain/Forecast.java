@@ -7,6 +7,7 @@ import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
 import com.softeer.entity.enums.Sky;
 import com.softeer.entity.enums.WindDirection;
+import com.softeer.recommend.CommentProvider;
 
 import java.time.LocalDateTime;
 
@@ -63,5 +64,14 @@ public record Forecast(
                 precipitationCondition,
                 dailyTemperature
         );
+    }
+
+    public String provideRecommendComment(Forecast atTopForecast) {
+        String precipitation = precipitationCondition.precipitation();
+        String snowedAccumulation = precipitationCondition.snowAccumulation();
+        double windSpeed = windCondition.windSpeed();
+        double temperatureDiff = temperatureCondition.temperature() - atTopForecast.temperatureCondition.temperature();
+
+        return CommentProvider.provideComment(precipitation, snowedAccumulation, windSpeed, temperatureDiff);
     }
 }
