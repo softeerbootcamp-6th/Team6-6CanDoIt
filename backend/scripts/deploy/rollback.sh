@@ -27,11 +27,9 @@ stop_current_containers() {
 
     docker stop api-server || true
     docker stop batch-server || true
-    docker stop test-server || true
 
     docker rm api-server || true
     docker rm batch-server || true
-    docker rm test-server || true
 }
 
 # Function to download and load rollback images
@@ -54,15 +52,13 @@ start_rollback_containers() {
         --name api-server \
         --network backend-network \
         -p 8080:8080 \
-        -e SPRING_PROFILES_ACTIVE=docker \
+        -e SPRING_PROFILES_ACTIVE=prod \
         -e SERVER_PORT=8080 \
         -e DB_HOST=mysql \
         -e DB_PORT=3306 \
         -e DB_NAME=backend_db \
         -e DB_USER=backend_user \
         -e DB_PASSWORD=backend_pass \
-        -e REDIS_HOST=redis \
-        -e REDIS_PORT=6379 \
         --restart unless-stopped \
         api-server:${ROLLBACK_TAG}
 
@@ -70,32 +66,16 @@ start_rollback_containers() {
         --name batch-server \
         --network backend-network \
         -p 8081:8080 \
-        -e SPRING_PROFILES_ACTIVE=docker \
+        -e SPRING_PROFILES_ACTIVE=prod \
         -e SERVER_PORT=8080 \
         -e DB_HOST=mysql \
         -e DB_PORT=3306 \
         -e DB_NAME=backend_db \
         -e DB_USER=backend_user \
         -e DB_PASSWORD=backend_pass \
-        -e REDIS_HOST=redis \
-        -e REDIS_PORT=6379 \
         -e BATCH_JOB_ENABLED=true \
         --restart unless-stopped \
         batch-server:${ROLLBACK_TAG}
-
-    docker run -d \
-        --name test-server \
-        --network backend-network \
-        -p 8082:8080 \
-        -e SPRING_PROFILES_ACTIVE=docker \
-        -e SERVER_PORT=8080 \
-        -e DB_HOST=mysql \
-        -e DB_PORT=3306 \
-        -e DB_NAME=backend_db \
-        -e DB_USER=backend_user \
-        -e DB_PASSWORD=backend_pass \
-        --restart unless-stopped \
-        test-server:${ROLLBACK_TAG}
 }
 
 # Function to validate rollback
@@ -116,19 +96,13 @@ validate_rollback() {
         return 1
     fi
 
-    if ! docker ps | grep -q "test-server"; then
-        echo "❌ Test Server rollback failed"
-        return 1
-    fi
-
     # Health checks
     local max_attempts=10
     local attempt=1
 
     while [ $attempt -le $max_attempts ]; do
         if curl -f http://localhost:8080/actuator/health &>/dev/null && \
-           curl -f http://localhost:8081/actuator/health &>/dev/null && \
-           curl -f http://localhost:8082/actuator/health &>/dev/null; then
+           curl -f http://localhost:8081/actuator/health &>/dev/null ; then
             echo "✅ Rollback validation successful"
             return 0
         fi
@@ -151,7 +125,6 @@ IMAGE_TAG=$ROLLBACK_TAG
 S3_BUCKET=$S3_BUCKET
 API_SERVER_IMAGE=api-server:$ROLLBACK_TAG
 BATCH_SERVER_IMAGE=batch-server:$ROLLBACK_TAG
-TEST_SERVER_IMAGE=test-server:$ROLLBACK_TAG
 EOF
 }
 

@@ -2,7 +2,6 @@ rootProject.name = 'backend'
 //application-layer
 include ':application-modules:batch-server'
 include ':application-modules:api-server'
-include ':application-modules:test-server'
 
 //domain-layer
 include ':domain-modules:image-domain'

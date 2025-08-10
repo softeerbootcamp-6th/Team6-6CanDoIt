@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        svc: [api-server, batch-server, test-server]
+        svc: [api-server, batch-server]
 
     steps:
       - name: Checkout code
@@ -88,7 +88,6 @@ jobs:
           export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
           export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
           export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
-          export TEST_SERVER_IMAGE=test-server:${GITHUB_SHA}
 
           export DB_HOST=${{ secrets.DB_HOST }}
           export DB_PORT=3306

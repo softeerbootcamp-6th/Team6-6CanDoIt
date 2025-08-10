@@ -24,8 +24,7 @@ download_and_load_images() {
     cd "$temp_dir"
 
     # Define services to download
-#    local services=("api-server" "batch-server" "test-server")
-    local services=("test-server")
+    local services=("api-server" "batch-server")
 
     # Download all images first
     for service in "${services[@]}"; do
@@ -80,13 +79,11 @@ save_and_upload_images() {
     echo "Saving Docker images..."
     docker save api-server:${image_tag} | gzip > api-server.tar.gz
     docker save batch-server:${image_tag} | gzip > batch-server.tar.gz
-    docker save test-server:${image_tag} | gzip > test-server.tar.gz
 
     # Upload to S3
     echo "Uploading images to S3..."
     aws s3 cp api-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
     aws s3 cp batch-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
-    aws s3 cp test-server.tar.gz s3://${S3_BUCKET}/docker-images/${image_tag}/
 
     # Clean up
     cd /

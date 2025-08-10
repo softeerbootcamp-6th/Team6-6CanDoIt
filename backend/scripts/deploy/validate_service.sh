@@ -45,9 +45,8 @@ check_container() {
 
 # Check container status first
 echo "Checking container status..."
-#check_container "api-server"
-#check_container "batch-server"
-check_container "test-server"
+check_container "api-server"
+check_container "batch-server"
 
 # Wait for applications to fully start
 echo "Waiting for applications to start up..."
@@ -55,9 +54,8 @@ sleep 30
 
 # Check service health endpoints
 echo "Checking service health endpoints..."
-#check_service "API Server" 8080
-#check_service "Batch Server" 8081
-check_service "Test Server" 8082
+check_service "API Server" 8080
+check_service "Batch Server" 8081
 
 # Final summary
 echo ""
@@ -65,8 +63,7 @@ echo "=== Deployment Validation Summary ==="
 echo "✅ All services are running and healthy"
 echo ""
 echo "Service URLs:"
-#echo "- API Server: http://localhost:8080"
-#echo "- Batch Server: http://localhost:8081"
-echo "- Test Server: http://localhost:8082"
+echo "- API Server: http://localhost:8080"
+echo "- Batch Server: http://localhost:8081"
 echo ""
 echo "=== Deployment validation completed successfully ==="
