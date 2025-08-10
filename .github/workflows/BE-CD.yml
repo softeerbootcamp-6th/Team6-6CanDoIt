@@ -3,7 +3,7 @@ name: Backend CD
 on:
   push:
     branches:
-      - "be/feature/#33"
+      - dev
 
 permissions:
   id-token: write
