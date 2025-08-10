@@ -48,7 +48,7 @@ subprojects {
 	def isCommonModule = project.path.startsWith(':common-modules')
 
 	// application-modules 그룹인지를 체크
-	def isApplicationModule = project.path.startsWith(':common-modules')
+	def isApplicationModule = project.path.startsWith(':application-modules')
 
 	dependencies {
 		if (!isCommonModule) {
