@@ -3,6 +3,13 @@
 # scripts/deploy/cleanup_s3.sh
 set -e
 
+# .env 파일 로드
+if [ -f /opt/backend-app/.env ]; then
+    set -a
+    source /opt/backend-app/.env
+    set +a
+fi
+
 echo "=== S3 Docker Images Cleanup ==="
 
 S3_BUCKET=${1:-$S3_BUCKET}
