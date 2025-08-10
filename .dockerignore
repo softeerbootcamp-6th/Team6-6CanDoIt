@@ -1,0 +1,19 @@
+# Git
+.git
+**/.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# Build outputs
+build
+out
+**/target
+**/build/
+**/.gradle/
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
