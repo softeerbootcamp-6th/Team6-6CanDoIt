@@ -38,8 +38,6 @@ WORKDIR /app
 COPY --from=builder /workspace/application-modules/api-server/build/libs/*.jar app.jar
 
 # 환경변수 설정
-ENV SERVER_PORT=8080
-ENV SPRING_PROFILES_ACTIVE=docker
 ENV JVM_OPTS="-Xmx512m -Xms256m -XX:+UseG1GC"
 
 # 포트 노출

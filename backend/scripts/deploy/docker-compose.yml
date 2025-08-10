@@ -1,55 +1,12 @@
 # 파일 이름: docker-compose.yml
 services:
-#  api-server:
-#    image: api-server:${IMAGE_TAG:-latest}
-#    container_name: api-server
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      - SERVER_PORT=8080
-#      # 외부 DB 정보를 환경 변수로 주입받도록 변경
-#      - DB_HOST=${DB_HOST}
-#      - DB_PORT=${DB_PORT:-3306}
-#      - DB_NAME=${DB_NAME}
-#      - DB_USER=${DB_USER}
-#      - DB_PASSWORD=${DB_PASSWORD}
-#    networks:
-#      - backend-network
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 1G
-#        reservations:
-#          memory: 512M
-#
-#  batch-server:
-#    image: batch-server:${IMAGE_TAG:-latest}
-#    container_name: batch-server
-#    ports:
-#      - "8081:8080"
-#    environment:
-#      - SERVER_PORT=8080
-#      - DB_HOST=${DB_HOST}
-#      - DB_PORT=${DB_PORT:-3306}
-#      - DB_NAME=${DB_NAME}
-#      - DB_USER=${DB_USER}
-#      - DB_PASSWORD=${DB_PASSWORD}
-#      - BATCH_JOB_ENABLED=true
-#    networks:
-#      - backend-network
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 1G
-#        reservations:
-#          memory: 512M
-
-  test-server:
-    image: test-server:${IMAGE_TAG:-latest}
-    container_name: test-server
+  api-server:
+    image: api-server:${IMAGE_TAG:-latest}
+    container_name: api-server
     ports:
-      - "8082:8080"
+      - "8080:8080"
     environment:
+      - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=8080
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT:-3306}
@@ -61,9 +18,32 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
         reservations:
-          memory: 256M
+          memory: 512M
+
+  batch-server:
+    image: batch-server:${IMAGE_TAG:-latest}
+    container_name: batch-server
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SERVER_PORT=8080
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - BATCH_JOB_ENABLED=true
+    networks:
+      - backend-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 networks:
   backend-network:

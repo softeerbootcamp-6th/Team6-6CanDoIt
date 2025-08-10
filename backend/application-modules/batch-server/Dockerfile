@@ -38,8 +38,6 @@ WORKDIR /app
 COPY --from=builder /workspace/application-modules/batch-server/build/libs/*.jar app.jar
 
 # 환경변수 설정 (배치 서버는 더 많은 메모리 할당)
-ENV SERVER_PORT=8081
-ENV SPRING_PROFILES_ACTIVE=docker
 ENV JVM_OPTS="-Xmx1024m -Xms512m -XX:+UseG1GC -XX:+UseStringDeduplication"
 
 # 포트 노출
