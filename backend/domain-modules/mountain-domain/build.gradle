@@ -9,6 +9,8 @@ dependencies {
     // spring-web
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    testFixturesImplementation project(':domain-modules:grid-domain')
 }
 
 bootJar {
