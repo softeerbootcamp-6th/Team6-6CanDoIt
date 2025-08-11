@@ -2,7 +2,6 @@ package com.softeer.repository.impl;
 
 import com.softeer.domain.Course;
 import com.softeer.domain.CoursePlan;
-import com.softeer.mapper.CourseMapper;
 import com.softeer.repository.CourseAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,8 +15,6 @@ public class CourseAdapterImpl implements CourseAdapter {
 
     private final CoursePlanJdbcRepository coursePlanJdbcRepository;
     private final CourseJdbcRepository courseJdbcRepository;
-
-    private final CourseMapper courseMapper;
 
     @Override
     public CoursePlan findCoursePlanByIdAndDate(long courseId, LocalDate date) {

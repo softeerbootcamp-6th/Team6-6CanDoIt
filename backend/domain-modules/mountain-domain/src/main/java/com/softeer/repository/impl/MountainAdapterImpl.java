@@ -1,19 +1,14 @@
 package com.softeer.repository.impl;
 
-import com.softeer.domain.Course;
-import com.softeer.domain.CoursePlan;
 import com.softeer.domain.Mountain;
-import com.softeer.entity.CourseEntity;
 import com.softeer.entity.MountainEntity;
 import com.softeer.error.ExceptionCreator;
 import com.softeer.exception.MountainException;
-import com.softeer.mapper.CourseMapper;
 import com.softeer.mapper.MountainMapper;
 import com.softeer.repository.MountainAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Repository

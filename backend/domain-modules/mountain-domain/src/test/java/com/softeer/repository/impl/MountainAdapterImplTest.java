@@ -1,15 +1,11 @@
 package com.softeer.repository.impl;
 
-import com.softeer.domain.Course;
 import com.softeer.domain.Mountain;
 import com.softeer.domain.MountainFixture;
-import com.softeer.entity.CourseEntity;
 import com.softeer.entity.MountainEntity;
 import com.softeer.error.CustomException;
 import com.softeer.exception.MountainException;
-import com.softeer.mapper.CourseMapper;
 import com.softeer.mapper.MountainMapper;
-import com.softeer.repository.MountainAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
