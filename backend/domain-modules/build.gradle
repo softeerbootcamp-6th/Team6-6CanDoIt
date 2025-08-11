@@ -3,6 +3,8 @@ def querydslVersion = dependencyManagement.importedProperties['querydsl.version'
 
 subprojects {
     dependencies {
+        implementation project(':common-modules:exception')
+
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-jdbc'
         runtimeOnly 'com.mysql:mysql-connector-j'
