@@ -15,7 +15,7 @@ public class UserFixture {
     public static class UserFixtureBuilder {
         private long id = 0L;
         private String nickname = "testNickname";
-        private String email = "testEmail";
+        private String loginId = "testLoginId";
         private String password = "testPassword";
         private Role role = Role.NORMAL;
         private String imageUrl = "testImageUrl";
@@ -30,8 +30,8 @@ public class UserFixture {
             return this;
         }
 
-        public UserFixtureBuilder email(String email) {
-            this.email = email;
+        public UserFixtureBuilder loginId(String loginId) {
+            this.loginId = loginId;
             return this;
         }
 
@@ -51,7 +51,7 @@ public class UserFixture {
         }
 
         public User build() {
-            return new User(id, nickname, email, password, role, imageUrl);
+            return new User(id, nickname, loginId, password, role, imageUrl);
         }
     }
 }
