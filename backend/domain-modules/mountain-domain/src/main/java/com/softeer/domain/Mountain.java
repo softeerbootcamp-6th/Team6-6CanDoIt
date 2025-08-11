@@ -5,6 +5,7 @@ public record Mountain(
         String name,
         int altitude,
         String imageUrl,
-        String description
+        String description,
+        Grid grid
 ) {
 }
