@@ -1,5 +1,7 @@
 dependencies {
     implementation project(':domain-modules:image-domain')
+    testImplementation(testFixtures(project(':domain-modules:image-domain')))
+    testImplementation(testFixtures(project(':domain-modules:user-domain')))
 }
 
 bootJar {
