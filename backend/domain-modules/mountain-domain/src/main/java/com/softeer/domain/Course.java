@@ -7,7 +7,10 @@ public record Course(
         String name,
         double totalDistance,
         double totalDuration,
+        int altitude,
         Level level,
-        String imageUrl
+        String imageUrl,
+        Grid startGrid,
+        Grid destinationGrid
 ) {
 }
