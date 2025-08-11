@@ -90,7 +90,7 @@ class ForecastQuerydslRepositoryTest {
         }
 
         //When
-        List<Forecast> result = target.findForecastsAfterStartDateTime(expectGrid.id(), startTime);
+        List<Forecast> result = target.findForecastsAfterStartDateTime(expectGrid.id(), startTime,  endTime);
 
         //Then
         Assertions.assertEquals(expected, result);
