@@ -4,12 +4,12 @@ import ReporterImage from '../../atoms/ReporterImage/ReporterImage.tsx';
 import CardCommentEllipsis from '../../molecules/CardCommentEllipsis/CardCommentEllipsis.tsx';
 import MinutesAgo from '../../molecules/MinutesAgo/MinutesAgo.tsx';
 import { css } from '@emotion/react';
-import BaseCard, { type PropsState } from './ReportCard.tsx';
+import BaseReportCard, { type PropsState } from './BaseReportCard.tsx';
 
 export default function FrontReportCard(props: PropsState) {
     const { comment, minutesAgo, filterLabels } = props;
     return (
-        <BaseCard>
+        <BaseReportCard>
             <ReportImage />
             <LabelList labels={filterLabels} />
             <div css={frontCardFooterStyle}>
@@ -17,7 +17,7 @@ export default function FrontReportCard(props: PropsState) {
                 <CardCommentEllipsis>{comment}</CardCommentEllipsis>
                 <MinutesAgo value={minutesAgo} />
             </div>
-        </BaseCard>
+        </BaseReportCard>
     );
 }
 

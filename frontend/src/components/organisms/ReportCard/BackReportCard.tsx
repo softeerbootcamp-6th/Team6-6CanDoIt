@@ -4,12 +4,12 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import HeartStat from '../../molecules/HeartStat/HeartStat.tsx';
 import LabelList from '../../molecules/LabelList/LabelList.tsx';
 import { css } from '@emotion/react';
-import BaseCard, { type PropsState } from './ReportCard.tsx';
+import BaseReportCard, { type PropsState } from './BaseReportCard.tsx';
 
 export default function BackReportCard(props: PropsState) {
     const { comment, minutesAgo, heartCount = 0, filterLabels } = props;
     return (
-        <BaseCard>
+        <BaseReportCard>
             <div css={backReportCardHeaderStyle}>
                 <ReporterImage size='3.75rem' />
                 <MinutesAgo value={minutesAgo} />
@@ -17,7 +17,7 @@ export default function BackReportCard(props: PropsState) {
             <CommonText {...textProps}>{comment}</CommonText>
             <HeartStat count={heartCount} />
             <LabelList labels={filterLabels} isCut={false} />
-        </BaseCard>
+        </BaseReportCard>
     );
 }
 
