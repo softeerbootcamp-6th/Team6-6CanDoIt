@@ -7,15 +7,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTestWithContainer
-@Sql(scripts = {
-        "/sql/course-plan-schema.sql",
-        "/sql/course-plan-data.sql"
+@SqlGroup({
+        @Sql(scripts = {"/sql/course-plan-schema.sql", "/sql/course-plan-data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        @Sql(scripts = "/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 })
 public class CoursePlanJdbcRepositoryIntegrationTest {
 
