@@ -74,4 +74,21 @@ class UserJpaRepositoryTest {
         UserEntity userEntity = UserEntity.from(user.nickname(), user.loginId(), user.password());
         userJpaRepository.saveAndFlush(userEntity);
     }
+
+    @Test
+    public void existByLoginIdAndPassword_return_true() {
+        User user = UserFixture.createDefault();
+
+        UserEntity userEntity = UserEntity.from(user.nickname(), user.loginId(), user.password());
+        userJpaRepository.saveAndFlush(userEntity);
+
+        Assertions.assertTrue(userJpaRepository.existsByLoginIdAndPassword(user.loginId(), user.password()));
+    }
+
+    @Test
+    public void existByLoginIdAndPassword_return_false() {
+        User user = UserFixture.createDefault();
+
+        Assertions.assertFalse(userJpaRepository.existsByLoginIdAndPassword(user.loginId(), user.password()));
+    }
 }
