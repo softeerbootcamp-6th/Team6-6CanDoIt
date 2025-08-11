@@ -2,7 +2,6 @@ package com.softeer.repository.impl;
 
 import com.softeer.domain.Course;
 import com.softeer.domain.CoursePlan;
-import com.softeer.entity.CourseEntity;
 import com.softeer.mapper.CourseMapper;
 import com.softeer.repository.CourseAdapter;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ import java.util.List;
 public class CourseAdapterImpl implements CourseAdapter {
 
     private final CoursePlanJdbcRepository coursePlanJdbcRepository;
-    private final CourseJpaRepository courseJpaRepository;
+    private final CourseJdbcRepository courseJdbcRepository;
 
     private final CourseMapper courseMapper;
 
@@ -27,8 +26,6 @@ public class CourseAdapterImpl implements CourseAdapter {
 
     @Override
     public List<Course> findCoursesByMountainId(long id) {
-        List<CourseEntity> courseEntities = courseJpaRepository.findEntitiesByMountainId(id);
-
-        return courseMapper.toDomainList(courseEntities);
+        return courseJdbcRepository.findCoursesByMountainId(id);
     }
 }
