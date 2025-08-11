@@ -25,4 +25,9 @@ public class UserAdapterImpl implements UserAdapter {
     public void save(String loginId, String nickname, String password) {
         userJpaRepository.save(UserEntity.from(loginId, nickname, password));
     }
+
+    @Override
+    public boolean existsByLoginIdAndPassword(String loginId, String password) {
+        return userJpaRepository.existsByLoginIdAndPassword(loginId, password);
+    }
 }
