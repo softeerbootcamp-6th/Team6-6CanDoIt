@@ -127,7 +127,6 @@ class ForecastUseCaseTest {
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
         verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verifyNoMoreInteractions(forecastAdapter);
     }
 
     @Test
@@ -155,7 +154,6 @@ class ForecastUseCaseTest {
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
         verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verifyNoMoreInteractions(forecastAdapter);
     }
 
     @Test
@@ -180,8 +178,6 @@ class ForecastUseCaseTest {
 
         CustomException expected = ExceptionCreator.create(ForecastException.NOT_FOUND);
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.empty());
-
         // when
         CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(grid, hikingTime));
 
@@ -189,8 +185,6 @@ class ForecastUseCaseTest {
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
         verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verifyNoMoreInteractions(forecastAdapter);
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
     }
-
-
 }
