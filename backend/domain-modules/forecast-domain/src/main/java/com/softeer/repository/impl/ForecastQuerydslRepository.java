@@ -25,7 +25,7 @@ public class ForecastQuerydslRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Forecast> findForecastsAfterStartDateTime(int gridId, LocalDateTime startDaTeTime) {
+    public List<Forecast> findForecastsAfterStartDateTime(int gridId, LocalDateTime startDaTeTime,  LocalDateTime endDaTeTime) {
         DateTemplate<LocalDate> forecastDate = extractForecastDate();
 
         return selectForecast()
@@ -36,7 +36,7 @@ public class ForecastQuerydslRepository {
                 )
                 .where(
                         gridEntity.id.eq(gridId),
-                        forecastEntity.dateTime.goe(startDaTeTime)
+                        forecastEntity.dateTime.between(startDaTeTime,  endDaTeTime)
                 )
                 .orderBy(forecastEntity.dateTime.asc())
                 .fetch();
