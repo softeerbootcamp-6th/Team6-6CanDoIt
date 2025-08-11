@@ -1,9 +1,6 @@
 package com.softeer.repository.impl;
 
-import com.softeer.domain.Course;
-import com.softeer.domain.CoursePlan;
-import com.softeer.domain.Mountain;
-import com.softeer.domain.SunTime;
+import com.softeer.domain.*;
 import com.softeer.entity.enums.Level;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
@@ -38,13 +35,18 @@ public class CoursePlanJdbcRepository {
                 s.date,
             
                 mi.image_url AS mountain_image_url,
-                ci.image_url AS course_image_url
+                ci.image_url AS course_image_url,
+            
+                mg.id AS mountain_grid_id,
+                mg.x AS mountain_grid_x,
+                mg.y AS mountain_grid_y
             FROM course c
             INNER JOIN mountain m ON m.id = c.mountain_id
             INNER JOIN sun_time s ON s.mountain_id = m.id 
                                    AND s.date = :date
             INNER JOIN image mi ON mi.id = m.image_id
             INNER JOIN image ci ON ci.id = c.image_id
+            INNER JOIN grid mg ON mg.id = m.grid_id
             WHERE c.id = :courseId
             """;
 
@@ -57,12 +59,19 @@ public class CoursePlanJdbcRepository {
     }
 
     protected static final RowMapper<CoursePlan> ROW_MAPPER = (rs, rowNum) -> {
+        var grid = new Grid(
+                rs.getInt("mountain_grid_id"),
+                rs.getInt("mountain_grid_x"),
+                rs.getInt("mountain_grid_y")
+        );
+
         var mountain = new Mountain(
                 rs.getLong("mountain_id"),
                 rs.getString("mountain_name"),
                 rs.getInt("mountain_altitude"),
                 rs.getString("mountain_image_url"),
-                rs.getString("description")
+                rs.getString("description"),
+                grid
         );
 
         var sunTime = new SunTime(
