@@ -16,6 +16,7 @@ public class MountainFixture {
         private int altitude = 999;
         private String imageUrl = "www.test.com";
         private String description = "test description";
+        private Grid grid = new Grid(1, 1, 1);
 
         public MountainBuilder id(long id) {
             this.id = id;
@@ -42,13 +43,19 @@ public class MountainFixture {
             return this;
         }
 
+        public MountainBuilder grid(Grid grid) {
+            this.grid = grid;
+            return this;
+        }
+
         public Mountain build() {
             return new Mountain(
                     id,
                     name,
                     altitude,
                     imageUrl,
-                    description
+                    description,
+                    grid
             );
         }
     }
