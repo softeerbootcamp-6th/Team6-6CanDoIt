@@ -1,5 +1,7 @@
 package com.softeer.service.impl;
 
+import com.softeer.error.ExceptionCreator;
+import com.softeer.exception.UserException;
 import com.softeer.repository.UserAdapter;
 import com.softeer.service.SignUseCase;
 import com.softeer.service.check.LoginIdChecker;
@@ -29,10 +31,23 @@ public class SignUseCaseImpl implements SignUseCase {
 
     @Override
     public void singUp(SingUpRequest singUpRequest) {
-        nickNameChecker.check(singUpRequest.nickname());
-        loginIdChecker.check(singUpRequest.loginId());
-        passwordChecker.check(singUpRequest.password());
+        String nickname = singUpRequest.nickname();
+        String loginId = singUpRequest.loginId();
+        String password = singUpRequest.password();
 
-        userAdapter.save(singUpRequest.loginId(), singUpRequest.nickname(), singUpRequest.password());
+        validateSignUpRequest(nickname, loginId, password);
+        userAdapter.save(loginId, nickname, password);
+    }
+
+    @Override
+    public void signIn(SignInRequest signInRequest) {
+        if(userAdapter.existsByLoginIdAndPassword(signInRequest.loginId(), signInRequest.password()))
+            throw ExceptionCreator.create(UserException.WRONG_LOGIN_ID_OR_PASSWORD, "loginId : " + signInRequest.loginId() + " password : " + signInRequest.password());
+    }
+
+    private void validateSignUpRequest(String nickname, String loginId, String password) {
+        nickNameChecker.check(nickname);
+        loginIdChecker.check(loginId);
+        passwordChecker.check(password);
     }
 }
