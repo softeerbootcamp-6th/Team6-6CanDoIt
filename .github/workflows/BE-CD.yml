@@ -1,0 +1,119 @@
+name: Backend CD
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        svc: [api-server, batch-server]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ARM64 빌드를 위한 QEMU + buildx
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Prepare output dir
+        run: mkdir -p backend/docker-images
+
+      # ARM64로 캐시 사용해서 빌드 → tar로 저장
+      - name: Build ${{ matrix.svc }} (ARM64)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: backend/application-modules/${{ matrix.svc }}/Dockerfile
+          platforms: linux/arm64
+          tags: ${{ matrix.svc }}:${{ github.sha }}
+          cache-from: type=gha,scope=${{ matrix.svc }}-arm64
+          cache-to:   type=gha,mode=max,scope=${{ matrix.svc }}-arm64
+          load: true  # 빌드한 이미지를 runner의 Docker daemon으로 로드
+          push: false # ECR로 푸시하지 않음 (outputs 옵션 제거)
+
+      # 로드된 이미지를 'docker save' 명령어로 직접 .tar.gz 파일로 저장
+      - name: Save Docker image to .tar.gz
+        run: |
+          mkdir -p backend/docker-images
+          docker save ${{ matrix.svc }}:${{ github.sha }} | gzip > backend/docker-images/${{ matrix.svc }}.tar.gz
+
+      # 위에서 생성된 .tar.gz 파일을 S3에 업로드
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+
+      - name: Upload to S3
+        run: |
+          aws s3 cp backend/docker-images/${{ matrix.svc }}.tar.gz \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/docker-images/${{ github.sha }}/${{ matrix.svc }}.tar.gz \
+            --storage-class STANDARD_IA
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+
+      - name: Create deployment package
+        working-directory: ./backend
+        run: |
+          mkdir -p deploy/scripts
+          cp -r scripts/deploy/* deploy/
+          cp appspec.yml deploy/
+
+          cat > deploy/.env <<EOF
+          export IMAGE_TAG=${GITHUB_SHA}
+          export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
+          export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
+          export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
+
+          export DB_HOST=${{ secrets.DB_HOST }}
+          export DB_PORT=3306
+          export DB_NAME=${{ secrets.DB_NAME }}
+          export DB_USER=${{ secrets.DB_USER }}
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          EOF
+
+          # 실행 권한 부여
+          chmod 755 deploy/*.sh
+
+          # 패키징
+          cd deploy && zip -r ../deploy.zip .
+
+      - name: Upload deployment package to S3
+        working-directory: ./backend
+        run: |
+          aws s3 cp deploy.zip \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/deployments/backend-${GITHUB_SHA}.zip
+
+      - name: Create CodeDeploy deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name ${{ secrets.CODEDEPLOY_APPLICATION }} \
+            --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --s3-location bucket=${{ secrets.AWS_BE_BUCKET_NAME }},key=deployments/backend-${GITHUB_SHA}.zip,bundleType=zip \
+            --description "Deployment of commit ${GITHUB_SHA}" \
+            --ignore-application-stop-failures
