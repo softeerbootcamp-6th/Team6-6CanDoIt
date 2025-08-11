@@ -32,10 +32,10 @@ public class ForecastUseCaseImpl implements ForecastUseCase {
     }
 
     @Override
-    public CourseForecast findForecastsByHikingTime(Grid grid, HikingTime hikingTime) {
-        Forecast startForecast = findForecast(grid, ForecastType.SHORT, hikingTime.startTime());
-        Forecast arrivalForecast = findForecast(grid, ForecastType.MOUNTAIN, hikingTime.arrivalTime());
-        Forecast descentForecast = findForecast(grid, ForecastType.SHORT, hikingTime.descentTime());
+    public CourseForecast findForecastsByHikingTime(Grid startGrid, Grid destinationGrid, HikingTime hikingTime) {
+        Forecast startForecast = findForecast(startGrid, ForecastType.SHORT, hikingTime.startTime());
+        Forecast arrivalForecast = findForecast(destinationGrid, ForecastType.MOUNTAIN, hikingTime.arrivalTime());
+        Forecast descentForecast = findForecast(startGrid, ForecastType.SHORT, hikingTime.descentTime());
         return new CourseForecast(startForecast, arrivalForecast, descentForecast);
     }
 
