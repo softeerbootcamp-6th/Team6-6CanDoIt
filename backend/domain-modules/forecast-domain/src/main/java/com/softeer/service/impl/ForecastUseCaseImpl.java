@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ForecastUseCaseImpl implements ForecastUseCase {
 
-    private static final long THREE_DAYS =3L;
+    private static final long THREE_DAYS = 3L;
 
     private final ForecastAdapter forecastAdapter;
 
