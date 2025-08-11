@@ -146,7 +146,7 @@ class ForecastUseCaseTest {
         Forecast startForecast = ForecastFixture.builder().id(1L).forecastType(ForecastType.SHORT).dateTime(hikingTime.startTime()).build();
 
         when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.empty());
+        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.empty());
 
         // when
         CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(grid, hikingTime));
