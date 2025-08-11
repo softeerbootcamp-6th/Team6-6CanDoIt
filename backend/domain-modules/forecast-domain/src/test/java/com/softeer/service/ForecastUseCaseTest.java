@@ -75,7 +75,8 @@ class ForecastUseCaseTest {
     @DisplayName("출발/정상/하산 시간별 예보를 조회해 CourseForecast를 반환한다")
     void findForecastsByHikingTime_success() {
         // given
-        Grid grid = GridFixture.builder().id(101).build();
+        Grid startGrid = GridFixture.builder().id(101).build();
+        Grid destinationGrid = GridFixture.builder().id(102).build();
 
         LocalDateTime start = LocalDateTime.of(2025, 8, 10, 9, 37, 21);
         LocalDateTime arrival = start.plusHours(3).plusMinutes(50);  // 등정
@@ -87,28 +88,29 @@ class ForecastUseCaseTest {
         Forecast arrivalForecast = ForecastFixture.builder().id(2L).forecastType(ForecastType.MOUNTAIN).dateTime(hikingTime.arrivalTime()).build();
         Forecast descentForecast = ForecastFixture.builder().id(3L).forecastType(ForecastType.SHORT).dateTime(hikingTime.descentTime()).build();
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.of(descentForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.of(descentForecast));
 
 
         ForecastUseCase.CourseForecast expected = new ForecastUseCase.CourseForecast(startForecast, arrivalForecast, descentForecast);
 
         // when
-        ForecastUseCase.CourseForecast result = target.findForecastsByHikingTime(grid, hikingTime);
+        ForecastUseCase.CourseForecast result = target.findForecastsByHikingTime(startGrid, destinationGrid, hikingTime);
 
         // then
         assertThat(result).isEqualTo(expected);
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.descentTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime());
     }
 
     @Test
     @DisplayName("시작 지점 예보가 없으면 CustomException(FCT-001)을 던진다")
     void findForecastsByHikingTime_notFoundStartForecast_throws() {
         // given
-        Grid grid = GridFixture.builder().id(101).build();
+        Grid startGrid = GridFixture.builder().id(101).build();
+        Grid destinationGrid = GridFixture.builder().id(102).build();
 
         LocalDateTime start = LocalDateTime.of(2025, 8, 10, 9, 37, 21);
         LocalDateTime arrival = start.plusHours(3).plusMinutes(50);  // 등정
@@ -118,22 +120,23 @@ class ForecastUseCaseTest {
 
         CustomException expected = ExceptionCreator.create(ForecastException.NOT_FOUND);
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.empty());
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.empty());
 
         // when
-        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(grid, hikingTime));
+        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(startGrid, destinationGrid, hikingTime));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
     }
 
     @Test
     @DisplayName("도착 지점 예보가 없으면 CustomException(FCT-001)을 던진다")
     void findForecastsByHikingTime_notFoundArrivalForecast_throws() {
         // given
-        Grid grid = GridFixture.createDefault();
+        Grid startGrid = GridFixture.builder().id(101).build();
+        Grid destinationGrid = GridFixture.builder().id(102).build();
 
         LocalDateTime start = LocalDateTime.of(2025, 8, 10, 7, 12, 0);
         LocalDateTime arrival = start.plusHours(2);
@@ -144,23 +147,24 @@ class ForecastUseCaseTest {
 
         Forecast startForecast = ForecastFixture.builder().id(1L).forecastType(ForecastType.SHORT).dateTime(hikingTime.startTime()).build();
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.empty());
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.empty());
 
         // when
-        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(grid, hikingTime));
+        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(startGrid, destinationGrid, hikingTime));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
     }
 
     @Test
     @DisplayName("마지막 지점 예보가 없으면 CustomException(FCT-001)을 던진다")
     void findForecastsByHikingTime_notFound_throws() {
         // given
-        Grid grid = GridFixture.createDefault();
+        Grid startGrid = GridFixture.builder().id(101).build();
+        Grid destinationGrid = GridFixture.builder().id(102).build();
 
         LocalDateTime start = LocalDateTime.of(2025, 8, 10, 7, 12, 0);
         LocalDateTime arrival = start.plusHours(2);
@@ -172,19 +176,19 @@ class ForecastUseCaseTest {
         Forecast arrivalForecast = ForecastFixture.builder().id(2L).forecastType(ForecastType.MOUNTAIN).dateTime(hikingTime.arrivalTime()).build();
 
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.empty());
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.empty());
 
         CustomException expected = ExceptionCreator.create(ForecastException.NOT_FOUND);
 
         // when
-        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(grid, hikingTime));
+        CustomException ex = assertThrows(CustomException.class, () -> target.findForecastsByHikingTime(startGrid, destinationGrid, hikingTime));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(ForecastException.NOT_FOUND.getErrorCode());
         assertThat(ex.getMessage()).isEqualTo(expected.getMessage());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
+        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
     }
 }
