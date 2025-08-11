@@ -39,4 +39,15 @@ public class CustomException extends RuntimeException {
         String logPrefix = "[" + this.errorCode + "]";
         return Objects.isNull(errorLog) ? logPrefix : logPrefix + ": " + errorLog;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CustomException that)) return false;
+        return status == that.status && Objects.equals(errorCode, that.errorCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(status, errorCode);
+    }
 }
