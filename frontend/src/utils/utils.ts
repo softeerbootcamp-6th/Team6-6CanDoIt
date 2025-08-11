@@ -21,14 +21,17 @@ export function createTextStyle({
     fontSize = 'label',
     fontWeight = 'regular',
     color = 'grey-100',
+    lineHeight = 1,
 }: {
     fontSize?: FontSizeType;
     fontWeight?: FontWeightType;
     color?: string;
+    lineHeight?: number;
 }) {
     return `
         color: ${getColor({ colors: theme.colors, colorString: color })};
         font-size: ${theme.typography.fontSize[fontSize]};
         font-weight: ${theme.typography.fontWeight[fontWeight]};
+        line-height: ${lineHeight};
     `;
 }

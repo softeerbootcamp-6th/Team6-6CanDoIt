@@ -8,14 +8,22 @@ interface PropsState {
     TextTag: TextTagType;
     fontSize?: FontSizeType;
     fontWeight?: FontWeightType;
+    lineHeight?: number;
     color?: string;
     children: React.ReactNode;
     flexColoumn?: boolean;
 }
 
 export default function CommonText(props: PropsState) {
-    const { TextTag, color, fontSize, fontWeight, children, flexColoumn } =
-        props;
+    const {
+        TextTag,
+        color,
+        fontSize,
+        fontWeight,
+        lineHeight,
+        children,
+        flexColoumn,
+    } = props;
 
     const textStyle = css`
         ${flexColoumn &&
@@ -24,6 +32,7 @@ export default function CommonText(props: PropsState) {
             fontSize,
             fontWeight,
             color,
+            lineHeight,
         })}
     `;
 
