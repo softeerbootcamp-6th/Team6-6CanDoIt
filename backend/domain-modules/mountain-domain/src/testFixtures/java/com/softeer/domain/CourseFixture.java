@@ -20,7 +20,6 @@ public class CourseFixture {
         private double totalDuration = 123;
         private int altitude = 1000;
         private Level level = Level.EASY;
-        private boolean withTop = true;
         private String imageUrl = "imageUrl";
         private Grid startGrid = new Grid(1, 1, 1);
         private Grid destinationGrid = new Grid(999, 999, 999);
@@ -55,11 +54,6 @@ public class CourseFixture {
             return this;
         }
 
-        public CourseBuilder withTop(boolean withTop) {
-            this.withTop = withTop;
-            return this;
-        }
-
         public CourseBuilder imageUrl(String imageUrl) {
             this.imageUrl = imageUrl;
             return this;
@@ -83,7 +77,6 @@ public class CourseFixture {
                     totalDuration,
                     altitude,
                     level,
-                    withTop,
                     imageUrl,
                     startGrid,
                     destinationGrid

@@ -23,7 +23,6 @@ public class CoursePlanJdbcRepository {
                 c.altitude AS course_altitude,
                 c.name AS course_name,
                 c.level,
-                c.with_top,
                 c.total_duration,
             
                 m.id AS mountain_id,
@@ -121,7 +120,6 @@ public class CoursePlanJdbcRepository {
                 rs.getDouble("total_duration"),
                 rs.getInt("course_altitude"),
                 Level.valueOf(rs.getString("level")),
-                rs.getBoolean("with_top"),
                 rs.getString("course_image_url"),
                 startGrid,
                 destinationGrid
