@@ -4,13 +4,14 @@ import { css } from '@emotion/react';
 export default function DaySelector() {
     return (
         <div css={daySelectorStyle}>
-            <DayButton>오늘</DayButton>
-            <DayButton>내일</DayButton>
-            <DayButton>모레</DayButton>
-            <DayButton>글피</DayButton>
+            {dayList.map((day) => (
+                <DayButton>{day}</DayButton>
+            ))}
         </div>
     );
 }
+
+const dayList = ['오늘', '내일', '모레', '글피'];
 
 const daySelectorStyle = css`
     width: 100%;
