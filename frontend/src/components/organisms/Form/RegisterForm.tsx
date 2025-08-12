@@ -10,7 +10,7 @@ export default function RegisterForm() {
             icon: 'x-circle',
             label: '이메일 주소',
             type: 'text',
-            iconLabel: '이메일 지우기',
+            iconAriaLabel: '이메일 지우기',
             validationMessage: '이메일 형식이 올바르지 않습니다.',
         },
         {
@@ -18,7 +18,7 @@ export default function RegisterForm() {
             icon: 'eye-off',
             label: '비밀번호',
             type: 'password',
-            iconLabel: '비밀번호 보기',
+            iconAriaLabel: '비밀번호 보기',
             validationMessage: '비밀번호 형식이 올바르지 않습니다.',
         },
         {
@@ -26,7 +26,7 @@ export default function RegisterForm() {
             icon: 'eye-off',
             label: '비밀번호 확인',
             type: 'password',
-            iconLabel: '비밀번호 보기',
+            iconAriaLabel: '비밀번호 보기',
             validationMessage: '비밀번호가 일치하지 않습니다.',
         },
         {
@@ -34,7 +34,7 @@ export default function RegisterForm() {
             icon: 'x-circle',
             label: '닉네임',
             type: 'text',
-            iconLabel: '닉네임 지우기',
+            iconAriaLabel: '닉네임 지우기',
             validationMessage: '닉네임을 입력해주세요.',
         },
     ] as const;
