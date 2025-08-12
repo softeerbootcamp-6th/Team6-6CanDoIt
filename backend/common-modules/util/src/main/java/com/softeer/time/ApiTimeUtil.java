@@ -36,13 +36,4 @@ public class ApiTimeUtil {
 
         return new ApiTime(baseTime);
     }
-
-    public static String getMountainBaseTime(LocalDateTime dateTime) {
-        return String.format("%d%02d%02d%02d%02d",
-                dateTime.getYear(),
-                dateTime.getMonthValue(),
-                dateTime.getDayOfMonth(),
-                dateTime.getHour(),
-                dateTime.getMinute());
-    }
 }

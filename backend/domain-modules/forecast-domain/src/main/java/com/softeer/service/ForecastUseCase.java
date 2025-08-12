@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface ForecastUseCase {
     List<Forecast> findForecastsFromStartDateTime(Grid grid, LocalDateTime startDateTime);
-    CourseForecast findForecastsByHikingTime(Grid grid, HikingTime hikingTime);
+    CourseForecast findForecastsByHikingTime(Grid startGrid, Grid destinationGrid, HikingTime hikingTime);
     record CourseForecast(Forecast startForecast, Forecast arrivalForecast, Forecast descentForecast) {}
 }
