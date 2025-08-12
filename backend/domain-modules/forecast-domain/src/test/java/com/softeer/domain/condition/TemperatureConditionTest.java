@@ -1,91 +1,62 @@
 package com.softeer.domain.condition;
 
+import com.softeer.apparent.ApparentTemperatureCalculator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TemperatureConditionTest {
 
-    @ParameterizedTest
-    @ValueSource(doubles = {-100.0, 0.0, 10.0})
-    @DisplayName("온도가 -100.0°C 이상 10.0°C 이하일 때 '매우 추워요'를 반환해야 한다.")
-    void displayDescription_shouldReturnVeryCold_whenTemperatureIsInRange(double temperature) {
-        // Given
-        TemperatureCondition condition = new TemperatureCondition(temperature);
+    @Test
+    @DisplayName("계산 위임: (temperature, windSpeed, humidity) 생성자가 실제 체감온도를 정확히 채운다")
+    void apparentTemperatureDelegation() {
+        double temperature = 5.0;       // °C
+        double windSpeed = 4.0;         // m/s
+        double humidity = 80.0;         // %
 
-        // When
-        String description = condition.displayDescription();
+        double expected = ApparentTemperatureCalculator.calculateApparentTemperature(temperature, windSpeed, humidity);
 
-        // Then
-        assertEquals("매우 추워요", description);
+        TemperatureCondition condition = new TemperatureCondition(temperature, windSpeed, humidity);
+
+        assertEquals(expected, condition.apparentTemperature());
     }
 
-    @ParameterizedTest
-    @ValueSource(doubles = {10.1, 15.0, 18.0})
-    @DisplayName("온도가 10.1°C 이상 18.0°C 이하일 때 '추워요'를 반환해야 한다.")
-    void displayDescription_shouldReturnCold_whenTemperatureIsInRange(double temperature) {
-        // Given
-        TemperatureCondition condition = new TemperatureCondition(temperature);
+    @ParameterizedTest(name = "[{index}] apparent={0}°C → \"{1}\"")
+    @DisplayName("설명 매핑: 체감온도 구간(경계 포함/배제) 검증")
+    @CsvSource({
+            // VERY_COLD: [-100.0, 10.0]
+            "-15.0, 매우 추워요",
+            "10.0, 매우 추워요",
 
-        // When
-        String description = condition.displayDescription();
+            // COLD: [10.1, 18.0]
+            "10.1, 추워요",
+            "18.0, 추워요",
 
-        // Then
-        assertEquals("추워요", description);
+            // PLEASANT: [18.1, 25.0]
+            "18.1, 쾌적해요",
+            "25.0, 쾌적해요",
+
+            // HOT: [25.1, 30.0]
+            "25.1, 더워요",
+            "30.0, 더워요",
+
+            // VERY_HOT: [30.1, 100.0]
+            "30.1, 매우 더워요",
+            "45.0, 매우 더워요"
+    })
+    void descriptionMappingByRange(double apparent, String expectedDescription) {
+        // temperature 필드는 로직에 영향 없고, displayDescription은 apparentTemperature만 사용
+        TemperatureCondition condition = new TemperatureCondition(0.0, apparent);
+        assertEquals(expectedDescription, condition.displayDescription());
     }
 
-    @ParameterizedTest
-    @ValueSource(doubles = {18.1, 22.0, 25.0})
-    @DisplayName("온도가 18.1°C 이상 25.0°C 이하일 때 '쾌적해요'를 반환해야 한다.")
-    void displayDescription_shouldReturnPleasant_whenTemperatureIsInRange(double temperature) {
-        // Given
-        TemperatureCondition condition = new TemperatureCondition(temperature);
-
-        // When
-        String description = condition.displayDescription();
-
-        // Then
-        assertEquals("쾌적해요", description);
-    }
-
-    @ParameterizedTest
-    @ValueSource(doubles = {25.1, 28.0, 30.0})
-    @DisplayName("온도가 25.1°C 이상 30.0°C 이하일 때 '더워요'를 반환해야 한다.")
-    void displayDescription_shouldReturnHot_whenTemperatureIsInRange(double temperature) {
-        // Given
-        TemperatureCondition condition = new TemperatureCondition(temperature);
-
-        // When
-        String description = condition.displayDescription();
-
-        // Then
-        assertEquals("더워요", description);
-    }
-
-    @ParameterizedTest
-    @ValueSource(doubles = {30.1, 50.0, 100.0})
-    @DisplayName("온도가 30.1°C 이상 100.0°C 이하일 때 '매우 더워요'를 반환해야 한다.")
-    void displayDescription_shouldReturnVeryHot_whenTemperatureIsInRange(double temperature) {
-        // Given
-        TemperatureCondition condition = new TemperatureCondition(temperature);
-
-        // When
-        String description = condition.displayDescription();
-
-        // Then
-        assertEquals("매우 더워요", description);
-    }
-
-    @ParameterizedTest
-    @ValueSource(doubles = {-101.0, 100.1, 150.0})
-    @DisplayName("유효하지 않은 온도 값일 때 IllegalArgumentException을 던져야 한다.")
-    void displayDescription_shouldThrowException_whenTemperatureIsInvalid(double temperature) {
-        // Given & When & Then
-        assertThrows(IllegalArgumentException.class, () -> {
-            new TemperatureCondition(temperature).displayDescription();
-        });
+    @Test
+    @DisplayName("예외: 체감온도가 정의된 구간 밖이면 IllegalArgumentException")
+    void descriptionOutOfRangeThrows() {
+        TemperatureCondition condition = new TemperatureCondition(0.0, 1000.0);
+        assertThrows(IllegalArgumentException.class, condition::displayDescription);
     }
 }
