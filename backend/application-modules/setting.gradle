@@ -1,4 +1,4 @@
-rootProject.name = 'domain-modules'
-//domain-layer
+rootProject.name = 'application-modules'
+//application-layer
 include ':application-modules:api-server'
 include ':application-modules:batch-server'
