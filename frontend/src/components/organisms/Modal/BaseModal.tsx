@@ -1,13 +1,38 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import ModalHeader from '../../molecules/ModalHeader/ModalHeader.tsx';
+import ModalFooter from '../../molecules/ModalFooter/ModalFooter.tsx';
 
-export interface BaseModalProps {
+interface propsState {
     title: string;
     description: string;
+    modalHeaderChildren?: React.ReactNode;
+    footerFirstButtonText: string;
+    footerSecondButtonText: string;
+    children: React.ReactNode;
 }
 
-export default function BaseModal({ children }: { children: React.ReactNode }) {
-    return <div css={modalStyle}>{children}</div>;
+export default function BaseModal(props: propsState) {
+    const {
+        title,
+        description,
+        modalHeaderChildren,
+        footerFirstButtonText,
+        footerSecondButtonText,
+        children,
+    } = props;
+    return (
+        <div css={modalStyle}>
+            <ModalHeader title={title} description={description}>
+                {modalHeaderChildren}
+            </ModalHeader>
+            {children}
+            <ModalFooter
+                firstButtonText={footerFirstButtonText}
+                secondButtonText={footerSecondButtonText}
+            />
+        </div>
+    );
 }
 
 const { colors } = theme;
@@ -20,11 +45,4 @@ const modalStyle = css`
     align-items: center;
     background-color: ${colors.grey[30]};
     border-radius: 2.5rem;
-`;
-
-export const modalContentBase = css`
-    width: 100%;
-    display: flex;
-    box-sizing: border-box;
-    background-color: ${colors.greyOpacityWhite[98]};
 `;
