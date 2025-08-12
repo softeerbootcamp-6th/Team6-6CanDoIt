@@ -10,8 +10,8 @@ export default function TableBodyRow<
 >({ rowData }: Props<T>) {
     return (
         <TableRow>
-            {Object.values(rowData).map((value, index) => (
-                <TableCell key={index}>{value}</TableCell>
+            {Object.entries(rowData).map(([k, value]) => (
+                <TableCell key={k}>{value}</TableCell>
             ))}
         </TableRow>
     );
