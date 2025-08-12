@@ -39,6 +39,14 @@ public class ForecastUseCaseImpl implements ForecastUseCase {
         return new CourseForecast(startForecast, arrivalForecast, descentForecast);
     }
 
+    @Override
+    public WeatherCondition findForecastWeatherCondition(Grid grid, LocalDateTime dateTime) {
+        Forecast surfaceForecast = findForecast(grid, ForecastType.SHORT, dateTime);
+        Forecast topForecast = findForecast(grid, ForecastType.MOUNTAIN, dateTime);
+
+        return new WeatherCondition(surfaceForecast, topForecast);
+    }
+
     private Forecast findForecast(Grid grid, ForecastType forecastType, LocalDateTime dateTime) {
         return forecastAdapter.findForecastByTypeAndDateTime(grid.id(), forecastType, dateTime).orElseThrow(
                 () -> ExceptionCreator.create(ForecastException.NOT_FOUND,

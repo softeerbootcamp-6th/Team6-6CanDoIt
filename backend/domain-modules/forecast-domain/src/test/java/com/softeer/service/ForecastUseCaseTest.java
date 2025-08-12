@@ -191,4 +191,25 @@ class ForecastUseCaseTest {
         verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
         verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
     }
+
+    @Test
+    void findForecastWeatherCondition() {
+        //given
+        Grid grid = GridFixture.builder().id(101).build();
+        LocalDateTime dateTime = LocalDateTime.of(2025, 8, 10, 7, 12, 0);
+
+        Forecast shortForecast = ForecastFixture.builder().forecastType(ForecastType.SHORT).dateTime(dateTime).build();
+        Forecast topForecast = ForecastFixture.builder().forecastType(ForecastType.MOUNTAIN).dateTime(dateTime).build();
+
+        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, dateTime)).thenReturn(Optional.of(shortForecast));
+        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, dateTime)).thenReturn(Optional.of(topForecast));
+
+        ForecastUseCase.WeatherCondition weatherCondition = new ForecastUseCase.WeatherCondition(shortForecast, topForecast);
+
+        //when
+        ForecastUseCase.WeatherCondition result = target.findForecastWeatherCondition(grid, dateTime);
+
+        //then
+        assertThat(result).isEqualTo(weatherCondition);
+    }
 }
