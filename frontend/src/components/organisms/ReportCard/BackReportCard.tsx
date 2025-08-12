@@ -1,23 +1,25 @@
-import ReporterImage from '../../atoms/ReporterImage/ReporterImage.tsx';
-import MinutesAgo from '../../molecules/MinutesAgo/MinutesAgo.tsx';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import HeartStat from '../../molecules/HeartStat/HeartStat.tsx';
 import LabelList from '../../molecules/LabelList/LabelList.tsx';
-import { css } from '@emotion/react';
-import BaseReportCard, { type PropsState } from './BaseReportCard.tsx';
+import ReportCardWrapper from './ReportCardWrapper.tsx';
+import BackReportCardHeader from '../../molecules/ReportCardHeader/BackReportCardHeader.tsx';
 
-export default function BackReportCard(props: PropsState) {
+interface propsState {
+    comment: string;
+    minutesAgo: number;
+    heartCount?: number;
+    filterLabels: string[];
+}
+
+export default function BackReportCard(props: propsState) {
     const { comment, minutesAgo, heartCount = 0, filterLabels } = props;
     return (
-        <BaseReportCard>
-            <div css={backReportCardHeaderStyle}>
-                <ReporterImage size='3.75rem' />
-                <MinutesAgo value={minutesAgo} />
-            </div>
+        <ReportCardWrapper>
+            <BackReportCardHeader minutesAgo={minutesAgo} />
             <CommonText {...textProps}>{comment}</CommonText>
             <HeartStat count={heartCount} />
             <LabelList labels={filterLabels} isCut={false} />
-        </BaseReportCard>
+        </ReportCardWrapper>
     );
 }
 
@@ -28,12 +30,3 @@ const textProps = {
     color: 'grey-70',
     lineHeight: 1.5,
 } as const;
-
-const backReportCardHeaderStyle = css`
-    width: 23rem;
-    height: 3.75rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-`;
