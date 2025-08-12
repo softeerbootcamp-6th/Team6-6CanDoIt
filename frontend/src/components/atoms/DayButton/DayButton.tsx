@@ -14,7 +14,7 @@ const { colors, typography } = theme;
 const buttonStyle = css`
     width: 4.25rem;
     height: 3.125rem;
-    border-radius: 62.4375rem;
+    border-radius: 999px;
     border: none;
     cursor: pointer;
     background-color: ${colors.grey[30]};
