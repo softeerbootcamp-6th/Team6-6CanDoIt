@@ -6,6 +6,7 @@ import ModalFooter from '../../molecules/ModalFooter/ModalFooter.tsx';
 interface propsState {
     title: string;
     description: string;
+    width?: string;
     modalHeaderChildren?: React.ReactNode;
     footerFirstButtonText: string;
     footerSecondButtonText: string;
@@ -17,12 +18,13 @@ export default function BaseModal(props: propsState) {
         title,
         description,
         modalHeaderChildren,
+        width = '37.1875rem',
         footerFirstButtonText,
         footerSecondButtonText,
         children,
     } = props;
     return (
-        <div css={modalStyle}>
+        <div css={modalStyle({ width })}>
             <ModalHeader title={title} description={description}>
                 {modalHeaderChildren}
             </ModalHeader>
@@ -37,8 +39,8 @@ export default function BaseModal(props: propsState) {
 
 const { colors } = theme;
 
-const modalStyle = css`
-    width: 37.1875rem;
+const modalStyle = ({ width }: { width: string }) => css`
+    width: ${width};
     height: max-content;
     display: flex;
     flex-direction: column;
