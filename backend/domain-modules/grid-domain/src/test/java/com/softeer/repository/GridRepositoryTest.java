@@ -1,9 +1,11 @@
 package com.softeer.repository;
 
 import com.softeer.SpringBootTestWithContainer;
+import com.softeer.domain.Coordinate;
 import com.softeer.domain.Grid;
 import com.softeer.domain.GridFixture;
 import com.softeer.entity.GridEntity;
+import com.softeer.service.GridConverter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -74,5 +76,37 @@ class GridRepositoryTest {
         assertEquals(gridEntity.getId(), grid.id());
         assertEquals(gridEntity.getX(), grid.x());
         assertEquals(gridEntity.getY(), grid.y());
+    }
+
+    @Test
+    @DisplayName("위도, 경도를 기준으로 GridEntity를 조회할 수 있어야 한다.")
+    void findByXAndY_shouldReturnEntity() {
+        // Given
+        Grid grid = GridFixture.builder().id(0).build();
+        GridEntity gridEntity = GridEntity.from(grid);
+        gridJpaRepository.saveAndFlush(gridEntity);
+
+        // When
+        Optional<GridEntity> foundEntity = gridJpaRepository.findByXAndY(grid.x(), grid.y());
+
+        // Then
+        assertTrue(foundEntity.isPresent());
+        assertEquals(grid.x(), foundEntity.get().getX());
+        assertEquals(grid.y(), foundEntity.get().getY());
+    }
+
+    @Test
+    @DisplayName("위도, 경도를 기준으로 GridEntity를 조회할 때, 존재하지 않는 좌표는 빈 Optional을 반환해야 한다.")
+    void findByXAndY_shouldThrowNotFoundException() {
+        // Given
+        double longitude = 126.9784;
+        double latitude = 37.5665;
+
+        // When
+        Coordinate coordinate = GridConverter.convertWgsToCoordinate(longitude, latitude);
+
+        // Then
+        Optional<GridEntity> foundEntity = gridJpaRepository.findByXAndY(coordinate.x(), coordinate.y());
+        assertTrue(foundEntity.isEmpty());
     }
 }
