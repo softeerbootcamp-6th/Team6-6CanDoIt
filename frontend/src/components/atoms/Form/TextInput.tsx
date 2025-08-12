@@ -37,8 +37,7 @@ const inputStyles = css`
     color: ${colors.grey[90]};
     font-weight: ${typography.fontWeight.medium};
     cursor: text;
-    font-size: ${typography.fontSize.caption}
-    line-height: 1.4rem;
+    font-size: ${typography.fontSize.caption};
 
     &::placeholder {
         color: ${colors.grey[60]};
