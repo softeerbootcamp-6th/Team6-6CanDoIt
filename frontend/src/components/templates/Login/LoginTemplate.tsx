@@ -31,7 +31,6 @@ export default function LoginTemplate() {
 const LinkStyles = css`
     color: ${colors.grey[100]};
     text-align: center;
-    font-family: Pretendard;
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.regular};
     text-decoration-line: underline;

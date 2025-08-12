@@ -1,5 +1,4 @@
 import TableCell from '../../atoms/Table/TableCell';
-import TableRow from '../../atoms/Table/TableRow';
 
 interface Props {
     columns: string[];
@@ -7,10 +6,10 @@ interface Props {
 
 export default function TableHeadRow({ columns }: Props) {
     return (
-        <TableRow>
+        <tr>
             {columns.map((col) => (
                 <TableCell key={col}>{col}</TableCell>
             ))}
-        </TableRow>
+        </tr>
     );
 }

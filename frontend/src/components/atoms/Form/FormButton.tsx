@@ -40,7 +40,7 @@ const buttonStyles = css`
 
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 0.625rem;
     flex-shrink: 0;
     cursor: pointer;
 `;

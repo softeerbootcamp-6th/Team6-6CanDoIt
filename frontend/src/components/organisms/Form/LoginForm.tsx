@@ -8,20 +8,16 @@ export default function LoginForm() {
     return (
         <form>
             <div css={InputWrapperStyles}>
-                <TextInputWithIcon
-                    id='email-input'
-                    icon='x-circle'
-                    label='이메일 주소'
-                    type='text'
-                    iconLabel='이메일 지우기'
-                />
-                <TextInputWithIcon
-                    id='email-input'
-                    icon='eye-off'
-                    label='비밀번호'
-                    type='password'
-                    iconLabel='패스워드 보이기/숨기기'
-                />
+                {inputFields.map((field) => (
+                    <TextInputWithIcon
+                        key={field.id}
+                        id={field.id}
+                        icon={field.icon}
+                        label={field.label}
+                        type={field.type}
+                        iconAriaLabel={field.iconAriaLabel}
+                    />
+                ))}
             </div>
             <CheckBox
                 id='login-button'
@@ -32,6 +28,23 @@ export default function LoginForm() {
         </form>
     );
 }
+
+const inputFields = [
+    {
+        id: 'email-input',
+        icon: 'x-circle',
+        label: '이메일 주소',
+        type: 'text',
+        iconAriaLabel: '이메일 지우기',
+    },
+    {
+        id: 'password-input',
+        icon: 'eye-off',
+        label: '비밀번호',
+        type: 'password',
+        iconAriaLabel: '패스워드 보이기/숨기기',
+    },
+] as const;
 
 const InputWrapperStyles = css`
     display: flex;
