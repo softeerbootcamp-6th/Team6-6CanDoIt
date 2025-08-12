@@ -16,7 +16,7 @@ public class GridUseCase {
     private final GridJpaRepository gridJpaRepository;
 
     public Grid getGridByLatitudeAndLongitude(double latitude, double longitude) {
-        Coordinate coordinate = GridConverter.convertWgsToGrid(longitude, latitude);
+        Coordinate coordinate = GridConverter.convertWgsToCoordinate(longitude, latitude);
 
         GridEntity gridEntity = gridJpaRepository.findByXAndY(coordinate.x(), coordinate.y())
                 .orElseThrow(() -> ExceptionCreator.create(GridException.NOT_FOUND));
