@@ -5,7 +5,7 @@ import com.softeer.service.ForecastUseCase;
 
 public record ForecastCardResponse(ForecastCardDetail startCard, ForecastCardDetail arrivalCard,
                                    ForecastCardDetail adjustedArrivalCard, ForecastCardDetail descentCard,
-                                   int courseAltitude
+                                   int courseAltitude, String recommendComment, String adjustedRecommendComment
                                    ) {
 
     public static ForecastCardResponse from(ForecastUseCase.CourseForecast courseForecast, int courseAltitude, int mountainAltitude) {
@@ -17,7 +17,7 @@ public record ForecastCardResponse(ForecastCardDetail startCard, ForecastCardDet
         return new ForecastCardResponse(
                 ForecastCardDetail.from(startForecast), ForecastCardDetail.from(arrivalForecast),
                 ForecastCardDetail.from(adjustedArrivalForecast), ForecastCardDetail.from(descentForecast),
-                courseAltitude
+                courseAltitude, startForecast.provideRecommendComment(arrivalForecast), startForecast.provideRecommendComment(adjustedArrivalForecast)
         );
     }
 }
