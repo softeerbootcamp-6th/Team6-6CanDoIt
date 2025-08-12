@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import com.softeer.domain.Image;
 
 @Table(name = "image")
 @Entity
@@ -24,4 +25,12 @@ public class ImageEntity {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    public static ImageEntity from(Image image) {
+        return new ImageEntity(image.id(), image.imageUrl(), image.createdAt());
+    }
+
+    public static Image toDomain(ImageEntity imageEntity) {
+        return new Image(imageEntity.id, imageEntity.imageUrl,  imageEntity.createdAt);
+    }
 }

@@ -2,7 +2,7 @@ package com.softeer.activity.factor;
 
 import com.softeer.condition.Condition;
 import com.softeer.condition.Literal;
-import com.softeer.condition.Range;
+import com.softeer.condition.MillimeterRange;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,10 +11,10 @@ public enum PrecipitationFactor  {
 
     NO_RAIN   (4, new Literal("강수없음")),
     DRIZZLE   (3, new Literal("1mm 미만")),
-    LIGHT     (3, new Range(1.0, 1.3)),
-    MODERATE  (2, new Range(1.3, 2.5)),
-    HEAVY     (1, new Range(2.5, 7.6)),
-    DOWNPOUR  (1, new Range(7.6, 30.0)),
+    LIGHT     (3, new MillimeterRange(1.0, 1.3)),
+    MODERATE  (2, new MillimeterRange(1.3, 2.5)),
+    HEAVY     (1, new MillimeterRange(2.5, 7.6)),
+    DOWNPOUR  (1, new MillimeterRange(7.6, 30.0)),
     VERY_HEAVY(1, new Literal("30.0~50.0mm")),
     EXTREME   (1, new Literal("50.0mm 이상"));
 

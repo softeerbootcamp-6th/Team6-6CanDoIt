@@ -1,5 +1,6 @@
 dependencies {
-    testImplementation 'com.h2database:h2'
+    testImplementation(testFixtures(project(':domain-modules:image-domain')))
+
 }
 
 bootJar {

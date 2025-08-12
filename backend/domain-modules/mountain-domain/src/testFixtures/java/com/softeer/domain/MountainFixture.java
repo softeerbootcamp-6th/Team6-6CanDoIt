@@ -12,13 +12,20 @@ public class MountainFixture {
 
     public static class MountainBuilder {
         private long id= 1L;
+        private int code = 123;
         private String name = "test";
         private int altitude = 999;
         private String imageUrl = "www.test.com";
         private String description = "test description";
+        private Grid grid = new Grid(1, 1, 1);
 
         public MountainBuilder id(long id) {
             this.id = id;
+            return this;
+        }
+
+        public MountainBuilder code(int code) {
+            this.code = code;
             return this;
         }
 
@@ -42,13 +49,20 @@ public class MountainFixture {
             return this;
         }
 
+        public MountainBuilder grid(Grid grid) {
+            this.grid = grid;
+            return this;
+        }
+
         public Mountain build() {
             return new Mountain(
                     id,
+                    code,
                     name,
                     altitude,
                     imageUrl,
-                    description
+                    description,
+                    grid
             );
         }
     }

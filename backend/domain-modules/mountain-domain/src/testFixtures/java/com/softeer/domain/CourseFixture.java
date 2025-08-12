@@ -17,9 +17,12 @@ public class CourseFixture {
         private long id = 1L;
         private String name = "test course name";
         private double totalDistance = 9.9;
-        private int totalDuration = 123;
+        private double totalDuration = 123;
+        private int altitude = 1000;
         private Level level = Level.EASY;
         private String imageUrl = "imageUrl";
+        private Grid startGrid = new Grid(1, 1, 1);
+        private Grid destinationGrid = new Grid(999, 999, 999);
 
         public CourseBuilder id(long id) {
             this.id = id;
@@ -36,8 +39,13 @@ public class CourseFixture {
             return this;
         }
 
-        public CourseBuilder totalDuration(int minutes) {
-            this.totalDuration = minutes;
+        public CourseBuilder totalDuration(double duration) {
+            this.totalDuration = duration;
+            return this;
+        }
+
+        public CourseBuilder altitude(int altitude) {
+            this.altitude = altitude;
             return this;
         }
 
@@ -51,14 +59,27 @@ public class CourseFixture {
             return this;
         }
 
+        public CourseBuilder startGrid(Grid startGrid) {
+            this.startGrid = startGrid;
+            return this;
+        }
+
+        public CourseBuilder destinationGrid(Grid destinationGrid) {
+            this.destinationGrid = destinationGrid;
+            return this;
+        }
+
         public Course build() {
             return new Course(
                     id,
                     name,
                     totalDistance,
                     totalDuration,
+                    altitude,
                     level,
-                    imageUrl
+                    imageUrl,
+                    startGrid,
+                    destinationGrid
             );
         }
     }

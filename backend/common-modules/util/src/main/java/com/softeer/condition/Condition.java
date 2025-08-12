@@ -1,5 +1,5 @@
 package com.softeer.condition;
 
-public sealed interface Condition permits Literal, Range {
+public interface Condition {
     boolean matches(String input);
 }

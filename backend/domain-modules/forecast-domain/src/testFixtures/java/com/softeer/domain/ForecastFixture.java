@@ -21,7 +21,7 @@ public class ForecastFixture {
     public static class ForecastBuilder {
         private long id = 0L;
         private LocalDateTime dateTime = LocalDateTime.of(2025, 8, 1, 00, 0, 0);
-        private ForecastType forecastType;
+        private ForecastType forecastType =  ForecastType.SHORT;
         private Sky sky = Sky.CLOUDY;
         private double temperature = 20.5;
         private int humidity = 60;
@@ -30,7 +30,7 @@ public class ForecastFixture {
         private PrecipitationType precipitationType = PrecipitationType.NONE;
         private String precipitation = "1.5mm";
         private double precipitationProbability = 10;
-        private double snowAccumulation = 2.0;
+        private String snowAccumulation = "2.0mm";
         private DailyTemperature dailyTemperature = DailyTemperatureFixture.createDefault();
 
         public ForecastBuilder id(long id) {
@@ -88,6 +88,10 @@ public class ForecastFixture {
             return this;
         }
 
+        public ForecastBuilder snowAccumulation(String snowAccumulation) {
+            this.snowAccumulation = snowAccumulation;
+            return this;
+        }
         public ForecastBuilder dailyTemperature(DailyTemperature dailyTemperature) {
             this.dailyTemperature = dailyTemperature;
             return this;
@@ -100,7 +104,7 @@ public class ForecastFixture {
                     dateTime,
                     forecastType,
                     new SkyCondition(sky),
-                    new TemperatureCondition(temperature),
+                    new TemperatureCondition(temperature, windSpeed, humidity),
                     new HumidityCondition(humidity),
                     new WindCondition(windDir, windSpeed),
                     new PrecipitationCondition(precipitationType, precipitation, precipitationProbability, snowAccumulation),

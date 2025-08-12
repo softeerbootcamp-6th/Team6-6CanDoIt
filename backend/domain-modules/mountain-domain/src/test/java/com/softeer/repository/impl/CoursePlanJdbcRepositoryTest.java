@@ -28,7 +28,7 @@ class CoursePlanJdbcRepositoryTest {
         // given
         long courseId = 10L;
         double distance = 12.3;
-        int duration = 480;
+        double duration = 4.5;
         String courseName = "공룡능선";
         Level level = Level.HARD;
         String courseImageUrl = "https://cdn/course-img.jpg";
@@ -49,7 +49,7 @@ class CoursePlanJdbcRepositoryTest {
         when(rs.getLong("course_id")).thenReturn(courseId);
         when(rs.getString("course_name")).thenReturn(courseName);
         when(rs.getDouble("total_distance")).thenReturn(distance);
-        when(rs.getInt("total_duration")).thenReturn(duration);
+        when(rs.getDouble("total_duration")).thenReturn(duration);
         when(rs.getString("level")).thenReturn(level.name());
         when(rs.getString("course_image_url")).thenReturn(courseImageUrl);
 

@@ -1,11 +1,13 @@
 package com.softeer.domain;
 
 import com.softeer.activity.HikingActivityCalculator;
+import com.softeer.altitude.AltitudeAdjuster;
 import com.softeer.domain.condition.*;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
 import com.softeer.entity.enums.Sky;
 import com.softeer.entity.enums.WindDirection;
+import com.softeer.recommend.CommentProvider;
 
 import java.time.LocalDateTime;
 
@@ -21,12 +23,12 @@ public record Forecast(
 
     public Forecast(long id, LocalDateTime dateTime, ForecastType forecastType, Sky sky, double temperature,
                     double humidity, WindDirection windDir, double windSpeed, PrecipitationType precipitationType,
-                    String precipitation, double precipitationProbability, double snowAccumulation,
+                    String precipitation, double precipitationProbability, String snowAccumulation,
                     double highestTemperature, double lowestTemperature
     ) {
         this(id, dateTime, forecastType,
                 new SkyCondition(sky),
-                new TemperatureCondition(temperature),
+                new TemperatureCondition(temperature, windSpeed, humidity),
                 new HumidityCondition(humidity),
                 new WindCondition(windDir, windSpeed),
                 new PrecipitationCondition(precipitationType, precipitation, precipitationProbability, snowAccumulation),
@@ -42,5 +44,34 @@ public record Forecast(
                 windCondition.windSpeed(),
                 humidityCondition.humidity()
         );
+    }
+
+    public Forecast withAltitudeAdjustment(double courseAltitude, double mountainAltitude) {
+        double adjustedTemperature = AltitudeAdjuster.adjustTemperature(temperatureCondition.temperature(), courseAltitude, mountainAltitude);
+        double adjustedWindSpeed = AltitudeAdjuster.adjustWindSpeed(windCondition.windSpeed(), courseAltitude, mountainAltitude);
+
+        TemperatureCondition adjustedTemperatureCondition = new TemperatureCondition(adjustedTemperature, adjustedWindSpeed, humidityCondition.humidity());
+        WindCondition adjustedWindCondition = new WindCondition(windCondition.direction(), adjustedWindSpeed);
+
+        return new Forecast(
+                id,
+                dateTime,
+                forecastType,
+                skyCondition,
+                adjustedTemperatureCondition,
+                humidityCondition,
+                adjustedWindCondition,
+                precipitationCondition,
+                dailyTemperature
+        );
+    }
+
+    public String provideRecommendComment(Forecast atTopForecast) {
+        String precipitation = precipitationCondition.precipitation();
+        String snowedAccumulation = precipitationCondition.snowAccumulation();
+        double windSpeed = windCondition.windSpeed();
+        double temperatureDiff = temperatureCondition.temperature() - atTopForecast.temperatureCondition.temperature();
+
+        return CommentProvider.provideComment(precipitation, snowedAccumulation, windSpeed, temperatureDiff);
     }
 }
