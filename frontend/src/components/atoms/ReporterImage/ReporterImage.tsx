@@ -1,7 +1,11 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-export default function ReporterImage({ size = '2.5rem' }: { size?: string }) {
+interface propsState {
+    size?: string;
+}
+
+export default function ReporterImage({ size = '2.5rem' }: propsState) {
     return <div css={reporterStyle({ size })} />;
 }
 

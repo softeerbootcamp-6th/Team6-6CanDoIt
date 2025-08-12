@@ -1,11 +1,11 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-interface prosState {
+interface propsState {
     children: React.ReactNode;
 }
 
-export default function CardCommentEllipsis(props: prosState) {
+export default function CardCommentEllipsis(props: propsState) {
     const { children } = props;
     return <p css={commentStyle}>{children}</p>;
 }

@@ -1,6 +1,10 @@
 import CommonText from '../../atoms/Text/CommonText.tsx';
 
-export default function MinutesAgo({ value }: { value: number }) {
+interface propsState {
+    value: number;
+}
+
+export default function MinutesAgo({ value }: propsState) {
     return <CommonText {...minutesAgoProps}>{`${value}분전`}</CommonText>;
 }
 

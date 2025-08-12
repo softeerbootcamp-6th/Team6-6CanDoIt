@@ -2,28 +2,27 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import LabelTextBox from '../../atoms/LabelTextBox/LabelTextBox.tsx';
 import { css } from '@emotion/react';
 
-type alertTime = {
+interface alertTime {
     day: string;
     startTime: string;
     endTime: string;
-};
+}
 
-export default function DayColumn({
-    title,
-    alertTimes,
-}: {
+interface propsState {
     title: string;
     alertTimes: alertTime[];
-}) {
+}
+
+export default function DayColumn({ title, alertTimes }: propsState) {
     return (
         <div css={dayColumnStyle}>
             <CommonText {...timeLabelText}>{title}</CommonText>
             <div css={inProgressListStyle}>
-                {alertTimes.map((t) => (
+                {alertTimes.map((time) => (
                     <LabelTextBox>
                         {title === '요일'
-                            ? t.day
-                            : `${t.startTime} ~ ${t.endTime}`}
+                            ? time.day
+                            : `${time.startTime} ~ ${time.endTime}`}
                     </LabelTextBox>
                 ))}
             </div>

@@ -2,7 +2,11 @@ import Icon from '../../atoms/Icon/Icons.tsx';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
 
-export default function HeartStat({ count }: { count: number }) {
+interface propsState {
+    count: number;
+}
+
+export default function HeartStat({ count }: propsState) {
     return (
         <div css={heartStyle}>
             <Icon {...heartIconProps} />

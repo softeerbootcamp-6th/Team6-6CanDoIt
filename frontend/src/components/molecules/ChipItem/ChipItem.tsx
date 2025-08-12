@@ -2,13 +2,12 @@ import TextWithIcon from '../TextWithIcon/TextWithIcon.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-export default function ChipItem({
-    text,
-    iconName,
-}: {
+interface propsState {
     text: string;
     iconName: string;
-}) {
+}
+
+export default function ChipItem({ text, iconName }: propsState) {
     return (
         <div css={chipStyle}>
             <TextWithIcon text={text} iconName={iconName} color='grey-80' />

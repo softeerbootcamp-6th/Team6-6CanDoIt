@@ -1,17 +1,16 @@
 import LabelTextBox from '../../atoms/LabelTextBox/LabelTextBox.tsx';
 import { css } from '@emotion/react';
 
-export default function LabelList({
-    labels,
-    isCut = true,
-}: {
+interface propsState {
     labels: string[];
     isCut?: boolean;
-}) {
+}
+
+export default function LabelList({ labels, isCut = true }: propsState) {
     return (
         <div css={isCut ? cutFilterLabelsStyle : uncutFilterLabelsStyle}>
             {labels.map((label) => (
-                <LabelTextBox key={label}>{label}</LabelTextBox>
+                <LabelTextBox>{label}</LabelTextBox>
             ))}
         </div>
     );
