@@ -13,7 +13,7 @@ interface Props {
     placeholder?: string;
     onIconClick?: () => void;
     type?: InputType;
-    iconLabel: string;
+    iconAriaLabel: string;
     icon: string;
     isValid?: boolean;
     validationMessage?: string;
@@ -28,7 +28,7 @@ export default function TextInputWithIcon({
     onIconClick,
     type = 'text',
     icon,
-    iconLabel,
+    iconAriaLabel,
     isValid = false,
     validationMessage,
 }: Props) {
@@ -45,7 +45,7 @@ export default function TextInputWithIcon({
                     />
                     <IconButton
                         iconName={icon}
-                        ariaLabel={iconLabel}
+                        ariaLabel={iconAriaLabel}
                         onClick={onIconClick}
                     />
                 </div>

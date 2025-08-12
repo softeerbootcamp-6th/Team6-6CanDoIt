@@ -13,14 +13,14 @@ export default function LoginForm() {
                     icon='x-circle'
                     label='이메일 주소'
                     type='text'
-                    iconLabel='이메일 지우기'
+                    iconAriaLabel='이메일 지우기'
                 />
                 <TextInputWithIcon
                     id='email-input'
                     icon='eye-off'
                     label='비밀번호'
                     type='password'
-                    iconLabel='패스워드 보이기/숨기기'
+                    iconAriaLabel='패스워드 보이기/숨기기'
                 />
             </div>
             <CheckBox
