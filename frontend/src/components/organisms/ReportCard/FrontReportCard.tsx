@@ -1,29 +1,21 @@
 import ReportImage from '../../atoms/ReportImage/ReportImage.tsx';
 import LabelList from '../../molecules/LabelList/LabelList.tsx';
-import ReporterImage from '../../atoms/ReporterImage/ReporterImage.tsx';
-import CardCommentEllipsis from '../../molecules/CardCommentEllipsis/CardCommentEllipsis.tsx';
-import MinutesAgo from '../../molecules/MinutesAgo/MinutesAgo.tsx';
-import { css } from '@emotion/react';
-import BaseReportCard, { type PropsState } from './BaseReportCard.tsx';
+import ReportCardWrapper from './ReportCardWrapper.tsx';
+import FrontCardFooter from '../../molecules/ReportCardFooter/FrontCardFooter.tsx';
 
-export default function FrontReportCard(props: PropsState) {
-    const { comment, minutesAgo, filterLabels } = props;
-    return (
-        <BaseReportCard>
-            <ReportImage />
-            <LabelList labels={filterLabels} />
-            <div css={frontCardFooterStyle}>
-                <ReporterImage />
-                <CardCommentEllipsis>{comment}</CardCommentEllipsis>
-                <MinutesAgo value={minutesAgo} />
-            </div>
-        </BaseReportCard>
-    );
+interface propsState {
+    comment: string;
+    minutesAgo: number;
+    filterLabels: string[];
 }
 
-const frontCardFooterStyle = css`
-    width: 23rem;
-    height: 2.875rem;
-    display: flex;
-    justify-content: space-between;
-`;
+export default function FrontReportCard(props: propsState) {
+    const { comment, minutesAgo, filterLabels } = props;
+    return (
+        <ReportCardWrapper>
+            <ReportImage />
+            <LabelList labels={filterLabels} />
+            <FrontCardFooter minutesAgo={minutesAgo} comment={comment} />
+        </ReportCardWrapper>
+    );
+}
