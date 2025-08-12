@@ -1,8 +1,17 @@
 dependencies {
 	implementation project(':domain-modules:grid-domain')
+	implementation project(':domain-modules:forecast-domain')
+	implementation project(':domain-modules:mountain-domain')
+
+	implementation project(':common-modules:exception')
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework:spring-tx'
+
+
+	testImplementation(testFixtures(project(':domain-modules:grid-domain')))
+	testImplementation(testFixtures(project(':domain-modules:forecast-domain')))
+	testImplementation(testFixtures(project(':domain-modules:mountain-domain')))
 
 	testImplementation 'com.h2database:h2'
 }
