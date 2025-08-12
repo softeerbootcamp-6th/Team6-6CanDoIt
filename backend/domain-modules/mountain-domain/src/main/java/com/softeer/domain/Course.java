@@ -9,6 +9,7 @@ public record Course(
         double totalDuration,
         int altitude,
         Level level,
+        boolean withTop,
         String imageUrl,
         Grid startGrid,
         Grid destinationGrid
