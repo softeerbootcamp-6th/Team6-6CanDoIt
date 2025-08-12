@@ -1,38 +1,34 @@
-import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
+import { theme } from '../../../theme/theme.ts';
+
+interface propsState {
+    firstButtonText: string;
+    secondButtonText: string;
+}
 
 export default function ModalHeaderButtons({
     firstButtonText,
     secondButtonText,
-}: {
-    firstButtonText: string;
-    secondButtonText: string;
-}) {
+}: propsState) {
     return (
-        <div css={modalHeaderButtonsStyle}>
-            <button css={modalHeaderButtonStyle}>
-                <CommonText {...textProps}>{firstButtonText}</CommonText>
-            </button>
-            <CommonText {...textProps}>|</CommonText>
-            <button css={modalHeaderButtonStyle}>
-                <CommonText {...textProps}>{secondButtonText}</CommonText>
-            </button>
+        <div css={modalHeaderButtonWrapperStyle}>
+            <button css={modalHeaderButtonStyle}>{firstButtonText}</button>
+            <button css={modalHeaderButtonStyle}>{secondButtonText}</button>
         </div>
     );
 }
 
-const textProps = {
-    TextTag: 'span',
-    fontSize: 'caption',
-    fontWeight: 'medium',
-    color: 'grey-60',
-} as const;
+const { colors, typography } = theme;
 
-const modalHeaderButtonsStyle = css`
+const modalHeaderButtonWrapperStyle = css`
     width: max-content;
     height: max-content;
     display: flex;
-    gap: 0.5rem;
+    & > button:not(:first-child) {
+        border-left: 1.5px solid ${colors.grey[60]};
+        padding-left: 0.5rem;
+        margin-left: 0.5rem;
+    }
 `;
 
 const modalHeaderButtonStyle = css`
@@ -42,4 +38,7 @@ const modalHeaderButtonStyle = css`
     background-color: transparent;
     padding: 0;
     cursor: pointer;
+    font-size: ${typography.fontSize.caption};
+    font-weight: ${typography.fontWeight.medium};
+    color: ${colors.grey[60]};
 `;
