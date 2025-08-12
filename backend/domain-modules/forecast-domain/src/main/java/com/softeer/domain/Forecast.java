@@ -28,7 +28,7 @@ public record Forecast(
     ) {
         this(id, dateTime, forecastType,
                 new SkyCondition(sky),
-                new TemperatureCondition(temperature),
+                new TemperatureCondition(temperature, windSpeed, humidity),
                 new HumidityCondition(humidity),
                 new WindCondition(windDir, windSpeed),
                 new PrecipitationCondition(precipitationType, precipitation, precipitationProbability, snowAccumulation),
@@ -50,7 +50,7 @@ public record Forecast(
         double adjustedTemperature = AltitudeAdjuster.adjustTemperature(temperatureCondition.temperature(), courseAltitude, mountainAltitude);
         double adjustedWindSpeed = AltitudeAdjuster.adjustWindSpeed(windCondition.windSpeed(), courseAltitude, mountainAltitude);
 
-        TemperatureCondition adjustedTemperatureCondition = new TemperatureCondition(adjustedTemperature);
+        TemperatureCondition adjustedTemperatureCondition = new TemperatureCondition(adjustedTemperature, adjustedWindSpeed, humidityCondition.humidity());
         WindCondition adjustedWindCondition = new WindCondition(windCondition.direction(), adjustedWindSpeed);
 
         return new Forecast(

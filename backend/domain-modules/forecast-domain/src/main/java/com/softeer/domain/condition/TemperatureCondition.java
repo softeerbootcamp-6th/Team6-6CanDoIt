@@ -1,15 +1,20 @@
 package com.softeer.domain.condition;
 
+import com.softeer.apparent.ApparentTemperatureCalculator;
 import com.softeer.domain.Displayable;
 
 import java.util.Arrays;
 import java.util.List;
 
-public record TemperatureCondition(double temperature) implements Displayable {
+public record TemperatureCondition(double temperature, double apparentTemperature) implements Displayable {
+
+    public TemperatureCondition(double temperature, double windSpeed, double humidity) {
+        this(temperature, ApparentTemperatureCalculator.calculateApparentTemperature(temperature, windSpeed, humidity));
+    }
 
     @Override
     public String displayDescription() {
-        return TemperatureStatus.getDescription(temperature);
+        return TemperatureStatus.getDescription(apparentTemperature);
     }
 
     private enum TemperatureStatus {
