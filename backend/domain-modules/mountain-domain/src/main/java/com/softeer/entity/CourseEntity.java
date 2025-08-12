@@ -31,6 +31,9 @@ public class CourseEntity {
 
     private double totalDuration;
 
+    @Column(name = "with_top")
+    private boolean withTop;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mountain_id")
     private MountainEntity mountainEntity;
