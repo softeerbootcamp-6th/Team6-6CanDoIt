@@ -2,13 +2,12 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import TimeInput from '../TimeInput/TimeInput.tsx';
 import { css } from '@emotion/react';
 
-export default function TimeRow({
-    label,
-    day,
-}: {
+interface propsState {
     label: string;
     day: string;
-}) {
+}
+
+export default function TimeRow({ label, day }: propsState) {
     return (
         <div css={timeRowStyle}>
             <CommonText {...timeLabelText}>{label}</CommonText>
