@@ -44,7 +44,7 @@ public final class GridConverter {
      * @param latitude  위도 (degree)
      * @return 변환된 격자 좌표 Coordinate 객체
      */
-    public static Coordinate convertWgsToGrid(double longitude, double latitude) {
+    public static Coordinate convertWgsToCoordinate(double longitude, double latitude) {
         double ra = Math.tan(PI * 0.25 + latitude * DEGRAD * 0.5);
         ra = (RADIUS_OF_EARTH / GRID_SIZE) * SF / Math.pow(ra, SN);
 
