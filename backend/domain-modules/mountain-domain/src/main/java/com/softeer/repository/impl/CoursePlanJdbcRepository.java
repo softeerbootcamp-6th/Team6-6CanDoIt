@@ -27,6 +27,7 @@ public class CoursePlanJdbcRepository {
                 c.total_duration,
             
                 m.id AS mountain_id,
+                m.code AS mountain_code,
                 m.name AS mountain_name,
                 m.altitude AS mountain_altitude,
                 m.description,
@@ -88,6 +89,7 @@ public class CoursePlanJdbcRepository {
 
         var mountain = new Mountain(
                 rs.getLong("mountain_id"),
+                rs.getInt("mountain_altitude"),
                 rs.getString("mountain_name"),
                 rs.getInt("mountain_altitude"),
                 rs.getString("mountain_image_url"),
