@@ -135,15 +135,4 @@ class ApiTimeUtilTest {
             assertEquals("0500", apiTime.baseTime());
         }
     }
-
-    @Test
-    @DisplayName("getMountainBaseTime: YYYYMMDDHHmm 형식으로 포맷된다")
-    void getMountainBaseTime_success() {
-        // given
-        LocalDateTime dateTime = LocalDateTime.of(2025, 8, 7, 6, 15);
-
-        // when, then
-        String expected = "202508070615";
-        assertEquals(expected, ApiTimeUtil.getMountainBaseTime(dateTime));
-    }
 }

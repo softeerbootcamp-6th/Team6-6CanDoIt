@@ -5,6 +5,21 @@ import java.time.LocalTime;
 
 public final class TimeUtil {
 
+    public static HikingTime getHikingTime(LocalDateTime dateTime, double duration) {
+        long hours = (long) duration;
+        long minutes = Math.round((duration - hours) * 60); // 소수 부분을 분으로 환산
+
+        LocalDateTime arrivalTime = dateTime.plusHours(hours).plusMinutes(minutes);
+        LocalDateTime descentTime = dateTime.plusHours(hours * 2).plusMinutes(minutes * 2);
+
+        return new HikingTime(
+                dateTime,
+                arrivalTime,
+                descentTime
+        );
+    }
+
+
     public static HikingTime getHikingTime(LocalDateTime dateTime, LocalTime duration) {
         LocalDateTime arrivalTime = dateTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
         LocalDateTime descentTime = dateTime.plusHours(duration.getHour() * 2).plusMinutes(duration.getMinute() * 2);
