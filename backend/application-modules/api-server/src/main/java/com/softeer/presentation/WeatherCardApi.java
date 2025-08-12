@@ -29,13 +29,14 @@ public interface WeatherCardApi {
     ---
     
     #### 📌 **Response 필드 설명**
-    - **mountainName**: 산 이름 \s
-    - **mountainImageUrl**: 산 대표 이미지 URL \s
-    - **weatherMetric**: 날씨 정보 객체 \s
-      - **precipitationType**: 강수 형태 (예: NONE, RAIN, SNOW 등) \s
-      - **sky**: 하늘 상태 (예: CLEAR, CLOUDY, OVERCAST 등) \s
-      - **surfaceTemperature**: 해발 하단부 기온 (°C) \s
-      - **topTemperature**: 정상 기온 (°C) \s
+    - **mountainName**: 산 이름  
+    - **mountainImageUrl**: 산 대표 이미지 URL  
+    - **mountainDescription**: 산 설명 문구  
+    - **weatherMetric**: 날씨 정보 객체  
+      - **precipitationType**: 강수 형태 (예: NONE, RAIN, SNOW 등)  
+      - **sky**: 하늘 상태 (예: SUNNY, CLOUDY, OVERCAST 등)  
+      - **surfaceTemperature**: 해발 하단부 기온 (°C)  
+      - **topTemperature**: 정상 기온 (°C)
     
     ---
     
@@ -44,15 +45,16 @@ public interface WeatherCardApi {
     {
       "mountainName": "태백산",
       "mountainImageUrl": "https://cdn.example.com/images/taebaek.png",
+      "mountainDescription": "한겨울 설경이 아름다운 산입니다.",
       "weatherMetric": {
-        "precipitationType": "SUNNY",
-        "sky": "CLEAR",
+        "precipitationType": "NONE",
+        "sky": "SUNNY",
         "surfaceTemperature": 23.5,
         "topTemperature": 18.2
       }
     }
     ```
-                    """
+    """
     )
     @GetMapping("/mountain/{mountainId}")
     ResponseEntity<MountainCardResponse> mountainCard(@PathVariable Long mountainId);
