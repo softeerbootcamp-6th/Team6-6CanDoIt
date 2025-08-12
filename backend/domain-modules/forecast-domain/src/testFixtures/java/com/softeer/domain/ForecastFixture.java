@@ -104,7 +104,7 @@ public class ForecastFixture {
                     dateTime,
                     forecastType,
                     new SkyCondition(sky),
-                    new TemperatureCondition(temperature),
+                    new TemperatureCondition(temperature, windSpeed, humidity),
                     new HumidityCondition(humidity),
                     new WindCondition(windDir, windSpeed),
                     new PrecipitationCondition(precipitationType, precipitation, precipitationProbability, snowAccumulation),
