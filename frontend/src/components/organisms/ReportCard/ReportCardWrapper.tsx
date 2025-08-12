@@ -1,18 +1,11 @@
 import { theme } from '../../../theme/theme.ts';
 import { css } from '@emotion/react';
 
-export interface PropsState {
-    comment: string;
-    minutesAgo: number;
-    heartCount?: number;
-    filterLabels: string[];
+interface propsState {
+    children: React.ReactNode;
 }
 
-export default function BaseReportCard({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function ReportCardWrapper({ children }: propsState) {
     return <div css={cardStyle}>{children}</div>;
 }
 
