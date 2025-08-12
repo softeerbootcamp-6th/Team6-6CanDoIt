@@ -13,8 +13,7 @@ export default function WarningText({ children }: PropsState) {
 
 const textStyles = css`
     color: ${colors.status.regular.bad};
-    font-family: Pretendard;
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.regular};
-    line-height: 22px;
+    line-height: 140%;
 `;
