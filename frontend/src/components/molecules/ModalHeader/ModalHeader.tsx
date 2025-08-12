@@ -29,11 +29,13 @@ const descriptionTextProps = {
 } as const;
 
 const modalHeaderStyle = css`
-    width: 34.125rem;
+    width: 100%;
+    padding: 0 2rem;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: start;
     gap: 1rem 0.25rem;
-    margin-top: 1.5rem;
+    margin-top: 2rem;
     margin-bottom: 1.5rem;
 `;
