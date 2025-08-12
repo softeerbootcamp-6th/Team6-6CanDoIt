@@ -1,40 +1,54 @@
 // URL을 보고 홈, 제보에 맞게 검색바를 다르게 렌더링
 import Dropdown from '../../molecules/Dropdown/Dropdown.tsx';
-import { css } from '@emotion/react';
 import { LabelHeading } from '../../atoms/Heading/Heading.tsx';
-import { getColor } from '../../../utils/utils.ts';
+import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
 
+type pageName = 'main' | 'report' | 'safety';
+
 interface propsState {
     searchBarTitle?: string;
     searchBarMessage: string;
-    isHomePage: boolean;
-    mountainCourseData: { title: string; options: string[] }[];
+    pageName?: pageName;
+    mountainData: string[];
+    courseData?: string[];
 }
 
 export default function SearchBar(props: propsState) {
-    const { searchBarTitle, searchBarMessage, isHomePage, mountainCourseData } =
-        props;
+    const {
+        searchBarTitle,
+        searchBarMessage,
+        pageName = 'main',
+        mountainData,
+        courseData,
+    } = props;
+
+    const isMainPage = pageName === 'main';
+    const isReportPage = pageName === 'report';
+    const isSafetyPage = pageName === 'safety';
 
     return (
         <div css={searchBarContainerStyle}>
             <LabelHeading HeadingTag='h2'>{searchBarTitle}</LabelHeading>
             <div css={searchBarStyle}>
-                {mountainCourseData.map((data) => (
-                    <Dropdown title={data.title} options={data.options} />
-                ))}
+                <Dropdown title='산' options={mountainData} />
+                {(isMainPage || isReportPage) && (
+                    <Dropdown title='코스' options={courseData || []} />
+                )}
                 <SearchBarText>{searchBarMessage}</SearchBarText>
-                {isHomePage && (
+                {isMainPage && (
                     <Dropdown
                         title={weekdayData.title}
                         options={weekdayData.options}
                     />
                 )}
-                <button css={searchButtonStyle}>
-                    <Icon {...searchButtonIconProps} />
-                </button>
+                {(isMainPage || isSafetyPage) && (
+                    <button css={searchButtonStyle}>
+                        <Icon {...searchButtonIconProps} />
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -61,12 +75,9 @@ const searchBarStyle = css`
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: ${getColor({ colors, colorString: 'grey-100' })};
+    color: ${colors.grey[100]};
     border-radius: 6.25rem;
-    background-color: ${getColor({
-        colors,
-        colorString: 'greyOpacityWhite-70',
-    })};
+    background-color: ${colors.greyOpacityWhite[70]};
     width: max-content;
     padding: 0.75rem;
 `;
@@ -74,12 +85,7 @@ const searchBarStyle = css`
 const searchButtonStyle = css`
     width: 3rem;
     height: 3rem;
-
-    background-color: ${getColor({
-        colors,
-        colorString: 'greyOpacityWhite-70',
-    })};
-
+    background-color: ${colors.greyOpacityWhite[70]};
     margin-left: auto;
     border-radius: 50%;
     border: none;
