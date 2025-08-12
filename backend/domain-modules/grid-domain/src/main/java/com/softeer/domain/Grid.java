@@ -13,6 +13,4 @@ public record Grid(int id, Coordinate coordinate) {
     public int y() {
         return coordinate.y();
     }
-
-    private record Coordinate(int x, int y) { }
 }
