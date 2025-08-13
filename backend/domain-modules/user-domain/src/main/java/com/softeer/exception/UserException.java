@@ -16,7 +16,9 @@ public enum UserException implements ExceptionInterface {
     LOGIN_ID_RANGE_6_20(HttpStatus.BAD_REQUEST, "USR-007", "아이디는 6자 이상 20자 이하여야 합니다."),
     LOGIN_ID_ONLY_ENGLISH_AND_DIGIT(HttpStatus.BAD_REQUEST, "USR-008", "영어와 숫자로 된 아이디만 가능합니다. 다시 한번 확인해주세요."),
 
-    WRONG_LOGIN_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "USR-009", "아이디 또는 패스워드를 잘못 입력하셨습니다.")
+    DUPLICATED_NICKNAME_OR_LOGIN_ID(HttpStatus.BAD_REQUEST, "USER-009", "이미 등록된 닉네임 또는 아이디입니다."),
+
+    WRONG_LOGIN_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "USR-010", "아이디 또는 패스워드를 잘못 입력하셨습니다.")
 
 
     ;
