@@ -5,5 +5,5 @@ management:
         include: "health,info"
 jwt:
   access-token-expiration-ms: 10800000
-  secret-key: @YOUR_SECRET_KEY@
+  secret-key: qweiofjqewmiofqe3mifo130i2jen1390kf123r3efdf13f341f134f
 
