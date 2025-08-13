@@ -3,4 +3,7 @@ management:
     web:
       exposure:
         include: "health,info"
+jwt:
+  access-token-expiration-ms: 10800000
+  secret-key: @YOUR_SECRET_KEY@
 
