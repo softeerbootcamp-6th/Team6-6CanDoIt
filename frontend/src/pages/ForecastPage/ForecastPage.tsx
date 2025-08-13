@@ -5,12 +5,10 @@ import CommonText from '../../components/atoms/Text/CommonText';
 import { css, keyframes } from '@emotion/react';
 import bgImage from '../../assets/Bg-fixed.png';
 import cloudImage from '../../assets/Bg-scroll.png';
-import Header from '../../components/organisms/Common/Header.tsx';
 
 export default function ForecastPage() {
     return (
         <div css={wrapperStyles}>
-            <Header />
             <div css={contentSectionStyles}>
                 <img src={cloudImage} css={animatedImageStyles} alt='cloud' />
                 <DisplayHeading HeadingTag='h1'>
