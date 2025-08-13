@@ -5,6 +5,8 @@ import com.softeer.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Objects;
+
 @Table(name = "user")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,7 +36,8 @@ public class UserEntity {
     private ImageEntity imageEntity;
 
     public static User toDomain(UserEntity userEntity) {
-        return new User(userEntity.id, userEntity.nickname, userEntity.loginId, userEntity.password, userEntity.role, userEntity.imageEntity.getImageUrl());
+        return new User(userEntity.id, userEntity.nickname, userEntity.loginId, userEntity.password,
+                userEntity.role, Objects.isNull(userEntity.imageEntity) ? null : userEntity.imageEntity.getImageUrl());
     }
 
     public static UserEntity from(User user, Image image) {
