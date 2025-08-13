@@ -1,11 +1,11 @@
 import { css } from '@emotion/react';
 import CautionText from '../../components/atoms/Text/CautionText';
-import MapButton from '../../components/organisms/MapButton/MapButton';
-import Table from '../../components/templates/Table';
+import MapButton from '../../components/molecules/Button/MapButton.tsx';
+import Table from '../../components/organisms/Alert/Table.tsx';
 import CommonText from '../../components/atoms/Text/CommonText';
 import { theme } from '../../theme/theme';
-import SearchBar from '../../components/organisms/SearchBar/SearchBar';
-import Header from '../../components/organisms/Header/Header';
+import SearchBar from '../../components/organisms/Common/SearchBar.tsx';
+import Header from '../../components/organisms/Common/Header.tsx';
 
 const data = [
     {

@@ -1,11 +1,11 @@
-import WeatherCard from '../../components/organisms/WeatherCard/WeatherCard';
-import TimeSeletor from '../../components/organisms/TimeSeletor/TimeSeletor';
+import WeatherCard from '../../components/organisms/Forecast/WeatherCard.tsx';
+import TimeSeletor from '../../components/organisms/Forecast/TimeSeletor.tsx';
 import { DisplayHeading } from '../../components/atoms/Heading/Heading';
 import CommonText from '../../components/atoms/Text/CommonText';
 import { css, keyframes } from '@emotion/react';
 import bgImage from '../../assets/Bg-fixed.png';
 import cloudImage from '../../assets/Bg-scroll.png';
-import Header from '../../components/organisms/Header/Header';
+import Header from '../../components/organisms/Common/Header.tsx';
 
 export default function ForecastPage() {
     return (

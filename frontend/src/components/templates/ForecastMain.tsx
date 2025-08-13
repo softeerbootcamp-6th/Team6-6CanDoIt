@@ -1,8 +1,8 @@
 import { css } from '@emotion/react';
-import MountainInfoPreview from '../molecules/MountainInfoPreview/MountainInfoPreview';
-import Header from '../organisms/Header/Header';
-import SearchBar from '../organisms/SearchBar/SearchBar';
-import { WeatherIndexLight } from '../molecules/WeatherIndex/WeatherIndex';
+import MountainInfoPreview from '../molecules/Forecast/MountainInfoPreview.tsx';
+import Header from '../organisms/Common/Header.tsx';
+import SearchBar from '../organisms/Common/SearchBar.tsx';
+import { WeatherIndexLight } from '../atoms/Text/WeatherIndex.tsx';
 import CommonText from '../atoms/Text/CommonText';
 import Icon from '../atoms/Icon/Icons';
 

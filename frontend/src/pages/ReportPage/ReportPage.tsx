@@ -1,15 +1,15 @@
-import Header from '../../components/organisms/Header/Header.tsx';
+import Header from '../../components/organisms/Common/Header.tsx';
 import { theme } from '../../theme/theme.ts';
-import SearchSection from '../../components/templates/ReportPage/SearchSection.tsx';
-import ReportCardContainer from '../../components/templates/ReportPage/ReportCardContainer.tsx';
+import ReportSearchSection from '../../components/templates/Report/ReportSearchSection.tsx';
+import ReportCardSection from '../../components/templates/Report/ReportCardSection.tsx';
 
 export default function ReportPage() {
     return (
         <>
             <Header />
-            <SearchSection />
-            <ReportCardContainer {...reportSectionWeatherProps} />
-            <ReportCardContainer {...reportSectionSafetyProps} />
+            <ReportSearchSection />
+            <ReportCardSection {...reportSectionWeatherProps} />
+            <ReportCardSection {...reportSectionSafetyProps} />
         </>
     );
 }
