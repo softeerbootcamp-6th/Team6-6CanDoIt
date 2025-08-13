@@ -33,13 +33,18 @@ public class SignUseCaseImpl implements SignUseCase {
     }
 
     @Override
-    public void singUp(SingUpRequest singUpRequest) {
-        String nickname = singUpRequest.nickname();
-        String loginId = singUpRequest.loginId();
-        String password = singUpRequest.password();
+    public void singUp(SignUpCommand signUpCommand) {
+        String nickname = signUpCommand.nickname();
+        String loginId = signUpCommand.loginId();
+        String password = signUpCommand.password();
 
         validateSignUpRequest(nickname, loginId, password);
-        userAdapter.save(loginId, nickname, password);
+
+        try {
+            userAdapter.save(loginId, nickname, password);
+        } catch (DataIntegrityViolationException e) {
+            throw ExceptionCreator.create(UserException.DUPLICATED_NICKNAME_OR_LOGIN_ID, "nickname : " + nickname + " loginId : " + loginId);
+        }
     }
 
     @Override
