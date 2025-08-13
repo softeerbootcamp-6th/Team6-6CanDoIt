@@ -1,6 +1,6 @@
-import MountainCard from '../../components/organisms/MountainCard/MountainCard.tsx';
+import MountainCard from '../../components/organisms/Main/MountainCard.tsx';
 import { css } from '@emotion/react';
-import SearchBar from '../../components/organisms/SearchBar/SearchBar.tsx';
+import SearchBar from '../../components/organisms/Common/SearchBar.tsx';
 import { DisplayHeading } from '../../components/atoms/Heading/Heading.tsx';
 
 export default function MainPage() {

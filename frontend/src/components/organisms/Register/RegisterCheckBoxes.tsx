@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import CheckBox from '../../atoms/Form/ChekBox';
+import CheckBox from '../../atoms/Form/CheckBox.tsx';
 import type { ColorValueType } from '../../../types/themeTypes';
 
 export default function RegisterCheckBoxes() {
