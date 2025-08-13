@@ -1,5 +1,6 @@
 package com.softeer.repository.impl;
 
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.DateTemplate;
 import com.querydsl.core.types.dsl.Expressions;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.softeer.entity.QDailyTemperatureEntity.*;
@@ -57,6 +59,45 @@ public class ForecastQuerydslRepository {
                         forecastEntity.dateTime.eq(dateTime),
                         forecastEntity.type.eq(type)
                 ).fetchOne());
+    }
+
+    public Map<Integer, Forecast> findForecastsByTypeAndDateTime(List<Integer> gridIds, ForecastType type, LocalDateTime dateTime) {
+
+        DateTemplate<LocalDate> forecastDate = extractForecastDate();
+
+        return queryFactory
+                .from(forecastEntity)
+                .innerJoin(gridEntity).on(forecastEntity.gridEntity.id.eq(gridEntity.id))
+                .innerJoin(dailyTemperatureEntity).on(
+                        gridEntity.id.eq(dailyTemperatureEntity.gridEntity.id),
+                        dailyTemperatureEntity.date.eq(forecastDate)
+                )
+                .where(
+                        gridEntity.id.in(gridIds),
+                        forecastEntity.dateTime.eq(dateTime),
+                        forecastEntity.type.eq(type)
+                )
+                .transform(
+                        GroupBy.groupBy(gridEntity.id).as(
+                                Projections.constructor(
+                                        Forecast.class,
+                                        forecastEntity.id,
+                                        forecastEntity.dateTime,
+                                        forecastEntity.type,
+                                        forecastEntity.sky,
+                                        forecastEntity.temperature,
+                                        forecastEntity.humidity,
+                                        forecastEntity.windDir,
+                                        forecastEntity.windSpeed,
+                                        forecastEntity.precipitationType,
+                                        forecastEntity.precipitation,
+                                        forecastEntity.precipitationProbability,
+                                        forecastEntity.snowAccumulation,
+                                        dailyTemperatureEntity.highestTemperature,
+                                        dailyTemperatureEntity.lowestTemperature
+                                )
+                        )
+                );
     }
 
     private JPAQuery<Forecast> selectForecast() {
