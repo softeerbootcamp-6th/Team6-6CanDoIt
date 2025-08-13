@@ -15,7 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +38,28 @@ public class WeatherCardService {
                 .toList();
     }
 
-    public MountainCardResponse createMountainCard(long mountainId) {
+    public List<MountainCardResponse> createMountainCards() {
         LocalDateTime baseTime = TimeUtil.getBaseTime(LocalDateTime.now());
 
-        Mountain mountain = mountainUseCase.getMountainById(mountainId);
-        ForecastUseCase.WeatherCondition gridWeatherCondition = forecastUseCase.findForecastWeatherCondition(mountain.grid(), baseTime);
+        Map<Integer, Mountain> mountainMap = mountainUseCase.getMountains()
+                .stream()
+                .collect(Collectors.toMap(mountain -> mountain.grid().id(), Function.identity()));
 
-        return new MountainCardResponse(mountain, gridWeatherCondition);
+        List<Integer> gridIds = mountainMap.keySet().stream().toList();
+
+        Map<Integer, ForecastUseCase.WeatherCondition> weatherConditionMap = forecastUseCase.findAllWeatherConditions(gridIds, baseTime);
+
+        if(mountainMap.size() != weatherConditionMap.size()) throw new RuntimeException();
+
+        List<MountainCardResponse> mountainCardResponses  = new ArrayList<>();
+
+        for (Integer gridId : mountainMap.keySet()) {
+            Mountain mountain = mountainMap.get(gridId);
+            ForecastUseCase.WeatherCondition weatherCondition = weatherConditionMap.get(gridId);
+
+            mountainCardResponses.add(new MountainCardResponse(mountain, weatherCondition));
+        }
+        return mountainCardResponses;
     }
 
     public CourseCardResponse createCourseCard(long courseId, LocalDateTime dateTime) {
