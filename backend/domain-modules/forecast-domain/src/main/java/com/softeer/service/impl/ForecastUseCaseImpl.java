@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,24 @@ public class ForecastUseCaseImpl implements ForecastUseCase {
         Forecast topForecast = findForecast(grid, ForecastType.MOUNTAIN, dateTime);
 
         return new WeatherCondition(surfaceForecast, topForecast);
+    }
+
+    @Override
+    public Map<Integer, WeatherCondition> findAllWeatherConditions(List<Integer> gridIds, LocalDateTime dateTime) {
+        Map<Integer, WeatherCondition> weatherConditionMap = new HashMap<>();
+
+        Map<Integer, Forecast> shortForecastMap = forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.SHORT, dateTime);
+        Map<Integer, Forecast> mountainForecastMap = forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.MOUNTAIN, dateTime);
+
+        for (Integer gridId : gridIds) {
+
+            Forecast forecast = shortForecastMap.get(gridId);
+            Forecast topForecast = mountainForecastMap.get(gridId);
+            WeatherCondition weatherCondition = new WeatherCondition(forecast, topForecast);
+            weatherConditionMap.put(gridId, weatherCondition);
+        }
+
+        return weatherConditionMap;
     }
 
     private Forecast findForecast(Grid grid, ForecastType forecastType, LocalDateTime dateTime) {

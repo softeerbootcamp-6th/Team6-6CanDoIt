@@ -20,8 +20,8 @@ public class WeatherCardController implements WeatherCardApi {
     private final WeatherCardService weatherCardService;
 
     @Override
-    public ResponseEntity<MountainCardResponse> mountainCard(Long mountainId) {
-        return ResponseEntity.ok(weatherCardService.createMountainCard(mountainId));
+    public ResponseEntity<List<MountainCardResponse>> mountainCards() {
+        return ResponseEntity.ok(weatherCardService.createMountainCards());
     }
 
     @Override

@@ -20,15 +20,15 @@ import java.util.List;
 public interface WeatherCardApi {
 
     @Operation(
-            summary = "산 카드 정보 조회",
+            summary = "산 카드 정보 목록 조회",
             description = """
-    ### 🏔️ **산 카드 응답 정보**
+    **🏔️ 산 카드 응답 정보**
     
-    해당 API는 산의 기본 정보와 날씨 정보를 포함한 **카드 형태의 응답**을 제공합니다.
+    해당 API는 여러 산에 대한 기본 정보와 날씨 정보를 포함한 **카드 형태의 응답 리스트**를 제공합니다.
     
     ---
     
-    #### 📌 **Response 필드 설명**
+    **📌 Response 필드 설명**
     - **mountainName**: 산 이름  
     - **mountainImageUrl**: 산 대표 이미지 URL  
     - **mountainDescription**: 산 설명 문구  
@@ -40,24 +40,38 @@ public interface WeatherCardApi {
     
     ---
     
-    #### ✅ **성공 응답 예시 (HTTP 200)**
+    #### ✅ 성공 응답 예시 (HTTP 200)**  
     ```json
-    {
-      "mountainName": "태백산",
-      "mountainImageUrl": "https://cdn.example.com/images/taebaek.png",
-      "mountainDescription": "한겨울 설경이 아름다운 산입니다.",
-      "weatherMetric": {
-        "precipitationType": "NONE",
-        "sky": "SUNNY",
-        "surfaceTemperature": 23.5,
-        "topTemperature": 18.2
-      }
-    }
+    [  
+      {  
+        "mountainName": "태백산",  
+        "mountainImageUrl": "https://cdn.example.com/images/taebaek.png",  
+        "mountainDescription": "한겨울 설경이 아름다운 산입니다.",  
+        "weatherMetric": {  
+          "precipitationType": "NONE",  
+          "sky": "SUNNY",  
+          "surfaceTemperature": 23.5,  
+          "topTemperature": 18.2  
+        }  
+      },  
+      {  
+        "mountainName": "지리산",  
+        "mountainImageUrl": "https://cdn.example.com/images/jiri.png",  
+        "mountainDescription": "한국에서 두 번째로 높은 산입니다.",  
+        "weatherMetric": {  
+          "precipitationType": "RAIN",  
+          "sky": "OVERCAST",  
+          "surfaceTemperature": 20.1,  
+          "topTemperature": 15.3  
+        }  
+      }  
+    ]
     ```
     """
     )
-    @GetMapping("/mountain/{mountainId}")
-    ResponseEntity<MountainCardResponse> mountainCard(@PathVariable Long mountainId);
+    @GetMapping("/mountains")
+    ResponseEntity<List<MountainCardResponse>> mountainCards();
+
 
     @Operation(
             summary = "코스 카드 정보 조회",
@@ -73,7 +87,7 @@ public interface WeatherCardApi {
     - **totalDuration**: 총 예상 소요 시간 (단위: 시간)
     - **totalDistance**: 총 거리 (단위: km)
     - **weatherMetric**: 날씨 정보 객체
-      - **precipitationType**: 강수 형태 (예: NONE, RAIN, SNOW 등)  
+      - **precipitationType**: 강수 형태 (예: NONE, RAIN, SNOW 등)
       - **sky**: 하늘 상태 (예: SUNNY, CLOUDY, OVERCAST 등)  
       - **surfaceTemperature**: 시작점 기온 (°C)  
       - **topTemperature**: 정상 기온 (°C)  

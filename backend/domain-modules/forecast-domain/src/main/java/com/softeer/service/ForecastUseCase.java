@@ -8,6 +8,7 @@ import com.softeer.time.HikingTime;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface ForecastUseCase {
     List<Forecast> findForecastsFromStartDateTime(Grid grid, LocalDateTime startDateTime);
@@ -17,6 +18,8 @@ public interface ForecastUseCase {
     record CourseForecast(Forecast startForecast, Forecast arrivalForecast, Forecast descentForecast) {}
 
     WeatherCondition findForecastWeatherCondition(Grid grid, LocalDateTime dateTime);
+
+    Map<Integer, WeatherCondition> findAllWeatherConditions(List<Integer> gridIds, LocalDateTime dateTime);
 
     record WeatherCondition(PrecipitationType precipitationType, Sky sky, double surfaceTemperature, double topTemperature, String hikingActivityStatus) {
         public WeatherCondition(Forecast surfaceForecast, Forecast topForecast) {

@@ -7,6 +7,7 @@ import com.softeer.dto.response.card.ForecastCardResponse;
 import com.softeer.dto.response.card.MountainCardResponse;
 import com.softeer.time.HikingTime;
 import com.softeer.time.TimeUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -60,34 +63,45 @@ public class WeatherCardServiceTest {
         //then
         assertEquals(expected, result);
     }
-
     @Test
-    @DisplayName("createMountainCard: baseTime 기준 Grid 날씨조건으로 MountainCardResponse 생성")
-    void createMountainCard_success() {
-        //given
-        long mountainId = 7L;
+    @DisplayName("createMountainCards: baseTime 기준 Grid 날씨조건으로 MountainCardResponse 리스트 생성")
+    void createMountainCards_success() {
+        // given
+        int mountainSize = 10;
         LocalDateTime dateTime = LocalDateTime.of(2025, 8, 12, 8, 0);
         LocalDateTime baseTime = TimeUtil.getBaseTime(dateTime);
 
-        Grid grid = GridFixture.createDefault();
-        Mountain mountain = MountainFixture.builder().id(mountainId).grid(grid).build();
+        List<Mountain> mountains = new ArrayList<>();
+        Map<Integer, ForecastUseCase.WeatherCondition> weatherConditionMap = new HashMap<>();
+        List<MountainCardResponse> expectedResponses = new ArrayList<>();
 
-        Forecast surefaceForecast = ForecastFixture.builder().dateTime(baseTime).temperature(10).build();
-        Forecast topForecast = ForecastFixture.builder().dateTime(baseTime).temperature(20).build();
+        for (int i = 0; i < mountainSize; i++) {
+            long mountainId = i + 1L;
+            Grid grid = GridFixture.builder().id(i).build();
+            Mountain mountain = MountainFixture.builder().id(mountainId).grid(grid).build();
+            mountains.add(mountain);
 
-        ForecastUseCase.WeatherCondition weatherCondition = new ForecastUseCase.WeatherCondition(surefaceForecast, topForecast);
+            Forecast surface = ForecastFixture.builder().dateTime(baseTime).temperature(10 + i).build();
+            Forecast top     = ForecastFixture.builder().dateTime(baseTime).temperature(20 + i).build();
+            ForecastUseCase.WeatherCondition condition = new ForecastUseCase.WeatherCondition(surface, top);
 
-        when(mountainUseCase.getMountainById(mountainId)).thenReturn(mountain);
-        when(forecastUseCase.findForecastWeatherCondition(eq(grid), any(LocalDateTime.class))).thenReturn(weatherCondition);
+            weatherConditionMap.put(grid.id(), condition);
+            expectedResponses.add(new MountainCardResponse(mountain, condition));
+        }
 
-        MountainCardResponse expected = new MountainCardResponse(mountain, weatherCondition);
+        // mocking
+        when(mountainUseCase.getMountains()).thenReturn(mountains);
+        when(forecastUseCase.findAllWeatherConditions(
+                eq(mountains.stream().map(m -> m.grid().id()).toList()), any(LocalDateTime.class)
+        )).thenReturn(weatherConditionMap);
 
-        //when
-        MountainCardResponse response = target.createMountainCard(mountainId);
+        // when
+        List<MountainCardResponse> responses = target.createMountainCards();
 
-        //then
-        assertEquals(expected, response);
+        // then
+        Assertions.assertEquals(expectedResponses, responses);
     }
+
 
     @Test
     @DisplayName("createCourseCard: 주어진 courseId와 dateTime으로 CoursePlan 조회 후 Grid 날씨조건으로 카드 생성")

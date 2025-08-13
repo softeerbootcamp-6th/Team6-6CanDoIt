@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -24,5 +25,10 @@ public class ForestAdapterImpl implements ForecastAdapter {
     @Override
     public Optional<Forecast> findForecastByTypeAndDateTime(int gridId, ForecastType forecastType, LocalDateTime dateTime) {
         return forecastQuerydslRepository.findForecastByTypeAndDateTime(gridId, forecastType, dateTime);
+    }
+
+    @Override
+    public Map<Integer, Forecast> findForecastsByTypeAndDateTime(List<Integer> gridIds, ForecastType forecastType, LocalDateTime dateTime) {
+        return forecastQuerydslRepository.findForecastsByTypeAndDateTime(gridIds, forecastType, dateTime);
     }
 }

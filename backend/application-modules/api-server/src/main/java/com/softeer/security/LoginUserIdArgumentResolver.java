@@ -37,7 +37,7 @@ public class LoginUserIdArgumentResolver implements HandlerMethodArgumentResolve
     HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
     String jwtToken = request.getHeader(AUTHORIZATION_HEADER);
 
-    if (jwtToken == null) {
+    if (jwtToken == null || jwtResolver.validate(jwtToken)) {
       throw ExceptionCreator.create(JwtException.UNAUTHORIZED_USER); // 401
     }
 
