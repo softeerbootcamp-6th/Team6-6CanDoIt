@@ -1,7 +1,6 @@
 import MountainCard from '../../components/organisms/Main/MountainCard.tsx';
 import { css } from '@emotion/react';
 import SearchBar from '../../components/organisms/Common/SearchBar.tsx';
-import { DisplayHeading } from '../../components/atoms/Heading/Heading.tsx';
 
 export default function MainPage() {
     const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -15,7 +14,6 @@ export default function MainPage() {
         <>
             {isOpen && <div css={backgroundStyle} />}
             <div css={overBackgroundStyle}>
-                <DisplayHeading HeadingTag='h1'>Header</DisplayHeading>
                 <SearchBar {...searchBarProps} />
             </div>
             <div css={mountainCardContainerStyle} onWheel={handleWheel}>
