@@ -1,5 +1,7 @@
 package com.softeer.service;
 
+import com.softeer.domain.User;
+
 public interface SignUseCase {
     void checkLoginId(String loginId);
     void checkNickname(String nickname);
@@ -8,7 +10,7 @@ public interface SignUseCase {
 
     record SingUpRequest(String nickname, String loginId, String password) { }
 
-    void signIn(SignInRequest signInRequest);
+    User signIn(SignInCommand signInCommand);
 
-    record SignInRequest(String loginId, String password) { }
+    record SignInCommand(String loginId, String password) { }
 }

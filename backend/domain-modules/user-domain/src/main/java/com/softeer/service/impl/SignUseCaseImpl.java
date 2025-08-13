@@ -1,5 +1,7 @@
 package com.softeer.service.impl;
 
+import com.softeer.domain.User;
+import com.softeer.entity.UserEntity;
 import com.softeer.error.ExceptionCreator;
 import com.softeer.exception.UserException;
 import com.softeer.repository.UserAdapter;
@@ -8,6 +10,7 @@ import com.softeer.service.check.LoginIdChecker;
 import com.softeer.service.check.NickNameChecker;
 import com.softeer.service.check.PasswordChecker;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,9 +43,10 @@ public class SignUseCaseImpl implements SignUseCase {
     }
 
     @Override
-    public void signIn(SignInRequest signInRequest) {
-        if(userAdapter.existsByLoginIdAndPassword(signInRequest.loginId(), signInRequest.password()))
-            throw ExceptionCreator.create(UserException.WRONG_LOGIN_ID_OR_PASSWORD, "loginId : " + signInRequest.loginId() + " password : " + signInRequest.password());
+    public User signIn(SignInCommand signInCommand) {
+        return userAdapter.findByLoginIdAndPassword(signInCommand.loginId(), signInCommand.password())
+                .map(UserEntity::toDomain)
+                .orElseThrow(() -> ExceptionCreator.create(UserException.WRONG_LOGIN_ID_OR_PASSWORD, "loginId : " + signInCommand.loginId() + " password : " + signInCommand.password()));
     }
 
     private void validateSignUpRequest(String nickname, String loginId, String password) {
