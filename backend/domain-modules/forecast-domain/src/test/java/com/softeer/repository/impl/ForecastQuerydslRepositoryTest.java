@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @SpringBootTestWithContainer
@@ -164,6 +165,54 @@ class ForecastQuerydslRepositoryTest {
         //Then
         Assertions.assertTrue(result.isEmpty());
     }
+
+    @Test
+    @DisplayName("gridIds, type, dateTime에 맞는 예보를 Map<Integer, Forecast> 형태로 반환")
+    void findForecastsByTypeAndDateTime_ShouldReturnMap() {
+        // Given
+        ForecastType type = ForecastType.SHORT;
+        LocalDateTime dateTime = LocalDateTime.of(2023, 11, 1, 0, 0);
+        LocalDate date = dateTime.toLocalDate();
+
+        GridEntity grid1 = gridJpaRepository.save(GridEntity.from(GridFixture.builder().x(55).y(126).build()));
+        GridEntity grid2 = gridJpaRepository.save(GridEntity.from(GridFixture.builder().x(56).y(127).build()));
+        GridEntity grid3 = gridJpaRepository.save(GridEntity.from(GridFixture.builder().x(57).y(128).build()));
+
+        List<Integer> gridIds = List.of(grid1.getId(), grid2.getId(), grid3.getId());
+
+        // DailyTemperature 매핑
+        DailyTemperature dailyTemperature = DailyTemperatureFixture.createDefault();
+        for (GridEntity gridEntity : List.of(grid1, grid2, grid3)) {
+            persistDailyTemperature(dailyTemperature, date, GridEntity.toDomainEntity(gridEntity));
+        }
+
+        // Forecast 생성
+        Forecast f1 = ForecastFixture.builder().dateTime(dateTime).forecastType(type).dailyTemperature(dailyTemperature).build();
+        Forecast f2 = ForecastFixture.builder().dateTime(dateTime).forecastType(type).dailyTemperature(dailyTemperature).build();
+        Forecast f3 = ForecastFixture.builder().dateTime(dateTime).forecastType(type).dailyTemperature(dailyTemperature).build();
+
+        Forecast expected1 = ForecastFixture.builder().id(persistForecast(f1, GridEntity.toDomainEntity(grid1))).dateTime(dateTime).forecastType(type).build();
+        Forecast expected2 = ForecastFixture.builder().id(persistForecast(f2, GridEntity.toDomainEntity(grid2))).dateTime(dateTime).forecastType(type).build();
+        Forecast expected3 = ForecastFixture.builder().id(persistForecast(f3, GridEntity.toDomainEntity(grid3))).dateTime(dateTime).forecastType(type).build();
+
+        // 잘못된 타입 추가 (필터링 되어야 함)
+        Forecast wrongType = ForecastFixture.builder().dateTime(dateTime).forecastType(ForecastType.MOUNTAIN).build();
+        persistForecast(wrongType, GridEntity.toDomainEntity(grid1));
+
+        // 잘못된 시간 추가 (필터링 되어야 함)
+        Forecast wrongTime = ForecastFixture.builder().dateTime(dateTime.plusDays(1)).forecastType(type).build();
+        persistForecast(wrongTime, GridEntity.toDomainEntity(grid2));
+
+        // When
+        Map<Integer, Forecast> result = target.findForecastsByTypeAndDateTime(gridIds, type, dateTime);
+
+        // Then
+        Assertions.assertEquals(3, result.size());
+        Assertions.assertEquals(expected1, result.get(grid1.getId()));
+        Assertions.assertEquals(expected2, result.get(grid2.getId()));
+        Assertions.assertEquals(expected3, result.get(grid3.getId()));
+    }
+
 
     private void persistDailyTemperature(DailyTemperature dailyTemperature, LocalDate localDate, Grid grid) {
         DailyTemperatureEntity dailyTemperatureEntity = new DailyTemperatureEntity(DailyTemperatureFixture.DEFAULT_ID, localDate,

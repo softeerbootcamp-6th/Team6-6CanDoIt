@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
+
 @SpringBootTestWithContainer
 class UserJpaRepositoryTest {
 
@@ -76,19 +78,26 @@ class UserJpaRepositoryTest {
     }
 
     @Test
-    public void existByLoginIdAndPassword_return_true() {
+    public void findByLoginIdAndPassword_return_true() {
         User user = UserFixture.createDefault();
 
         UserEntity userEntity = UserEntity.from(user.nickname(), user.loginId(), user.password());
-        userJpaRepository.saveAndFlush(userEntity);
 
-        Assertions.assertTrue(userJpaRepository.existsByLoginIdAndPassword(user.loginId(), user.password()));
+        UserEntity persistedUser = userJpaRepository.saveAndFlush(userEntity);
+
+
+        Optional<UserEntity> opUser = userJpaRepository.findByLoginIdAndPassword(user.loginId(), user.password());
+        Assertions.assertTrue(opUser.isPresent());
+        Assertions.assertEquals(userEntity.getId(), opUser.get().getId());
+        Assertions.assertEquals(userEntity.getLoginId(), persistedUser.getLoginId());
+        Assertions.assertEquals(userEntity.getPassword(), opUser.get().getPassword());
+        Assertions.assertEquals(userEntity.getNickname(), opUser.get().getNickname());
     }
 
     @Test
-    public void existByLoginIdAndPassword_return_false() {
+    public void findByLoginIdAndPassword_return_false() {
         User user = UserFixture.createDefault();
 
-        Assertions.assertFalse(userJpaRepository.existsByLoginIdAndPassword(user.loginId(), user.password()));
+        Assertions.assertEquals(userJpaRepository.findByLoginIdAndPassword(user.loginId(), user.password()), Optional.empty());
     }
 }

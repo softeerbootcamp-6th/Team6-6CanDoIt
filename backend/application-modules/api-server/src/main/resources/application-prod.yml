@@ -4,3 +4,7 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+jwt:
+  access-token-expiration-ms: ${JWT_EXPIRATION_MS}
+  secret-key: ${JWT_SECRET_KEY}

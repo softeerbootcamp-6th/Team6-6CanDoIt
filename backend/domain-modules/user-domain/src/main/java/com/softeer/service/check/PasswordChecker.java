@@ -36,13 +36,9 @@ public class PasswordChecker implements Check {
             } else {
                 return false;
             }
-
-            if (hasEnglish && hasDigit) {
-                return true;
-            }
         }
 
-        return false;
+        return  hasEnglish && hasDigit;
     }
 
     private boolean satisfyMinimumLength(String password) {

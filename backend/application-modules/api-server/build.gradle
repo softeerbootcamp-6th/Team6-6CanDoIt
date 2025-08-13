@@ -1,5 +1,6 @@
 dependencies {
 	implementation project(':domain-modules:grid-domain')
+	implementation project(':domain-modules:user-domain')
 	implementation project(':domain-modules:forecast-domain')
 	implementation project(':domain-modules:mountain-domain')
 
@@ -8,6 +9,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework:spring-tx'
 
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	testImplementation(testFixtures(project(':domain-modules:grid-domain')))
 	testImplementation(testFixtures(project(':domain-modules:forecast-domain')))
