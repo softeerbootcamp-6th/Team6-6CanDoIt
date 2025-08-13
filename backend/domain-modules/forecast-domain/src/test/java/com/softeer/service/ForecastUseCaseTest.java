@@ -18,9 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -212,4 +210,36 @@ class ForecastUseCaseTest {
         //then
         assertThat(result).isEqualTo(weatherCondition);
     }
+
+    @DisplayName("findAllForecastWeatherCondition: 주어진 gridId들에 대해 SHORT, MOUNTAIN forecast를 병합하여 WeatherCondition 생성")
+    @Test
+    void findAllWeatherConditions_success() {
+        // given
+        LocalDateTime dateTime = LocalDateTime.of(2025, 8, 12, 8, 0);
+        List<Integer> gridIds = List.of(101, 102, 103);
+
+        Map<Integer, Forecast> shortMap = new HashMap<>();
+        Map<Integer, Forecast> mountainMap = new HashMap<>();
+        Map<Integer, ForecastUseCase.WeatherCondition> expected = new HashMap<>();
+
+        for (Integer gridId : gridIds) {
+            Forecast shortForecast = ForecastFixture.builder().dateTime(dateTime).temperature(10.0 + gridId).build();
+            Forecast topForecast = ForecastFixture.builder().dateTime(dateTime).temperature(20.0 + gridId).build();
+            ForecastUseCase.WeatherCondition wc = new ForecastUseCase.WeatherCondition(shortForecast, topForecast);
+
+            shortMap.put(gridId, shortForecast);
+            mountainMap.put(gridId, topForecast);
+            expected.put(gridId, wc);
+        }
+
+        when(forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.SHORT, dateTime)).thenReturn(shortMap);
+        when(forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.MOUNTAIN, dateTime)).thenReturn(mountainMap);
+
+        // when
+        Map<Integer, ForecastUseCase.WeatherCondition> result = target.findAllWeatherConditions(gridIds, dateTime);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+    }
+
 }
