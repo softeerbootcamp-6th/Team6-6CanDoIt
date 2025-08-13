@@ -3,7 +3,6 @@ package com.softeer.service.check;
 import com.softeer.error.ExceptionCreator;
 import com.softeer.exception.UserException;
 import com.softeer.repository.UserAdapter;
-import com.softeer.repository.impl.UserJpaRepository;
 import com.softeer.service.Check;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,17 +33,11 @@ public class LoginIdChecker implements Check {
         boolean hasDigit = false;
 
         for (char c : loginId.toCharArray()) {
-
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) hasEnglish = true;
             else if (Character.isDigit(c)) hasDigit = true;
             else return false;
-
-
-            if (hasEnglish && hasDigit) {
-                return true;
-            }
         }
 
-        return false;
+        return hasDigit && hasEnglish;
     }
 }

@@ -5,6 +5,8 @@ import com.softeer.repository.UserAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class UserAdapterImpl implements UserAdapter {
@@ -22,12 +24,12 @@ public class UserAdapterImpl implements UserAdapter {
     }
 
     @Override
-    public void save(String loginId, String nickname, String password) {
-        userJpaRepository.save(UserEntity.from(loginId, nickname, password));
+    public void save(String nickname, String loginId, String password) {
+        userJpaRepository.save(UserEntity.from(nickname, loginId, password));
     }
 
     @Override
-    public boolean existsByLoginIdAndPassword(String loginId, String password) {
-        return userJpaRepository.existsByLoginIdAndPassword(loginId, password);
+    public Optional<UserEntity> findByLoginIdAndPassword(String loginId, String password) {
+        return userJpaRepository.findByLoginIdAndPassword(loginId, password);
     }
 }
