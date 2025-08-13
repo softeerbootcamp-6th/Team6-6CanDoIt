@@ -2,12 +2,12 @@ import { getColor } from '../../../utils/utils.ts';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-interface propsState {
+interface PropsState {
     textColor?: string;
     children: React.ReactNode;
 }
 
-export default function ModalButton(props: propsState) {
+export default function ModalButton(props: PropsState) {
     const { textColor = 'grey-100', children } = props;
     return (
         <div css={buttonContainerStyle}>

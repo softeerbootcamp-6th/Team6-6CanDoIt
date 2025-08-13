@@ -1,12 +1,12 @@
 import { css } from '@emotion/react';
 import ModalButton from '../ModalButton/ModalButton.tsx';
 
-interface propsState {
+interface PropsState {
     firstButtonText: string;
     secondButtonText: string;
 }
 
-export default function ModalFooter(props: propsState) {
+export default function ModalFooter(props: PropsState) {
     const { firstButtonText, secondButtonText } = props;
     return (
         <div css={modalFooterStyle}>

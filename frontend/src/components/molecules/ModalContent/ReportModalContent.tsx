@@ -8,11 +8,11 @@ interface FilterColumn {
     title: string;
     filterLabels: string[];
 }
-interface Props {
+interface PropsState {
     filterColumns: FilterColumn[];
 }
 
-export default function ReportModalContent({ filterColumns }: Props) {
+export default function ReportModalContent({ filterColumns }: PropsState) {
     return (
         <div css={reportModalContentStyle}>
             <ImageInputField />

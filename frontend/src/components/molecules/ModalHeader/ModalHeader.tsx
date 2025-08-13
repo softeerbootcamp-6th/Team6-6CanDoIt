@@ -1,13 +1,13 @@
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
 
-interface propsState {
+interface PropsState {
     title: string;
     description: string;
     children?: React.ReactNode;
 }
 
-export default function ModalHeader(props: propsState) {
+export default function ModalHeader(props: PropsState) {
     const { title, description, children } = props;
 
     return (

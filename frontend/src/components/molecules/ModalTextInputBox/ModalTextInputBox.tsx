@@ -2,12 +2,12 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import { useState } from 'react';
 
-interface propsState {
+interface PropsState {
     placeholder?: string;
     maxLength?: number;
 }
 
-export default function ModalTextInputBox(props: propsState) {
+export default function ModalTextInputBox(props: PropsState) {
     const { placeholder = '', maxLength = 100 } = props;
     const [text, setText] = useState('');
 

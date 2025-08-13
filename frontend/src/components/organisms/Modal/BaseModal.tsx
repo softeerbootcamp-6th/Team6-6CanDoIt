@@ -3,7 +3,7 @@ import { theme } from '../../../theme/theme.ts';
 import ModalHeader from '../../molecules/ModalHeader/ModalHeader.tsx';
 import ModalFooter from '../../molecules/ModalFooter/ModalFooter.tsx';
 
-interface propsState {
+interface PropsState {
     title: string;
     description: string;
     width?: string;
@@ -13,7 +13,7 @@ interface propsState {
     children: React.ReactNode;
 }
 
-export default function BaseModal(props: propsState) {
+export default function BaseModal(props: PropsState) {
     const {
         title,
         description,

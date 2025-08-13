@@ -6,13 +6,13 @@ interface FilterColumn {
     filterLabels: string[];
 }
 
-interface propsState {
+interface PropsState {
     title: string;
     description: string;
     filterColumns: FilterColumn[];
 }
 
-export default function ReportModal(props: propsState) {
+export default function ReportModal(props: PropsState) {
     const { title, description, filterColumns } = props;
 
     return (
