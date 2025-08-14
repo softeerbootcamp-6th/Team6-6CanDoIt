@@ -19,3 +19,4 @@ include ':common-modules:exception'
 //external-layer
 include ':infrastructure-modules:querydsl-module'
 include ':infrastructure-modules:testcontainers-module'
+include 'infrastructure-modules:kma-adapter-module'
