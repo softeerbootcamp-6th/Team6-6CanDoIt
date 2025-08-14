@@ -1,7 +1,6 @@
 package com.softeer;
 
 import com.softeer.config.ForecastApiType;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.LinkedMultiValueMap;
@@ -33,6 +32,10 @@ public abstract class AbstractKmaApiCaller<T extends Record, R> implements KmaAp
 
     protected abstract String getApiPath();
 
+    @Override
+    public abstract Class<T> getRequestType();
+
+    @Override
     public ForecastApiType getForecastApiType() {
         return forecastApiType;
     }

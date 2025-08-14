@@ -15,10 +15,7 @@ public class ForecastApiService {
     private final KmaApiCallerFactory kmaApiCallerFactory;
 
     public <T extends Record> List<?> getForecast(ForecastApiType forecastApiType, T request) {
-        KmaApiCaller<?, ?> rawCaller = kmaApiCallerFactory.getApiCaller(forecastApiType);
-
-        @SuppressWarnings("unchecked")
-        KmaApiCaller<T, ?> typedCaller = (KmaApiCaller<T, ?>) rawCaller;
+        KmaApiCaller<T, ?> typedCaller = kmaApiCallerFactory.getApiCaller(forecastApiType, request);
 
         return typedCaller.call(request);
     }

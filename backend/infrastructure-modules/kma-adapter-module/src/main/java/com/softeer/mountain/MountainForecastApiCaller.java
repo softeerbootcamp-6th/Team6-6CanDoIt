@@ -34,6 +34,11 @@ public class MountainForecastApiCaller
     }
 
     @Override
+    public Class<Request> getRequestType() {
+        return Request.class;
+    }
+
+    @Override
     public List<MountainForecastApiResponse> call(Request request) {
         return super.call(request);
     }
