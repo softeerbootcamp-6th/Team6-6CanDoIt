@@ -21,7 +21,7 @@ public abstract class AbstractKmaApiCaller<T extends Record, R> implements KmaAp
 
     protected AbstractKmaApiCaller(
             RestClient restClient,
-            @Value("${kma.api.key}") String apiKey,
+            String apiKey,
             Class<R> responseClass,
             ForecastApiType forecastApiType
     ) {
