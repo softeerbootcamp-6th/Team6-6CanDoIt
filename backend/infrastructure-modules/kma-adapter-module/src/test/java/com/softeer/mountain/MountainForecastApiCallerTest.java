@@ -1,5 +1,6 @@
 package com.softeer.mountain;
 
+import com.softeer.mountain.dto.MountainForecastApiRequest;
 import com.softeer.mountain.dto.MountainForecastApiResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,22 +36,25 @@ class MountainForecastApiCallerTest {
 
     @BeforeEach
     void setUp() {
-        target = new MountainForecastApiCaller(restClient, "DUMMY_API_KEY");
+        target = new MountainForecastApiCaller(restClient);
     }
 
     @Test
     @DisplayName("산악 날씨 API를 성공적으로 호출하고 응답 데이터를 파싱해야 한다")
     void call_api_successfully_and_parse_response() {
         // given
-        MountainForecastApiCaller.Request request = new MountainForecastApiCaller.Request(
-                123,
-                "20250814",
-                "1300"
-        );
+        MountainForecastApiRequest request = MountainForecastApiRequestFixture.createDefault();
 
-        MountainForecastApiResponse mockResponseItem1 = MountainForecastApiFixture.create("TMP", "25");
-        MountainForecastApiResponse mockResponseItem2 = MountainForecastApiFixture.create("POP", "20");
-        List<MountainForecastApiResponse> expectedResponseList = List.of(mockResponseItem1, mockResponseItem2);
+        MountainForecastApiResponse apiResponse1 = MountainForecastApiResponseFixture.builder()
+                .category("TMP")
+                .forecastValue("25")
+                .build();
+        MountainForecastApiResponse apiResponse2 = MountainForecastApiResponseFixture.builder()
+                .category("POP")
+                .forecastValue("50")
+                .build();
+
+        List<MountainForecastApiResponse> expectedResponseList = List.of(apiResponse1, apiResponse2);
 
         when(restClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
