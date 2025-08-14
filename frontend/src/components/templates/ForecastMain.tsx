@@ -1,18 +1,15 @@
 import { css } from '@emotion/react';
 import MountainInfoPreview from '../molecules/Forecast/MountainInfoPreview.tsx';
-import Header from '../organisms/Common/Header.tsx';
-import SearchBar from '../organisms/Common/SearchBar.tsx';
 import { WeatherIndexLight } from '../atoms/Text/WeatherIndex.tsx';
 import CommonText from '../atoms/Text/CommonText';
 import Icon from '../atoms/Icon/Icons';
+import SearchBar from '../organisms/Common/SearchBar.tsx';
 
 export default function ForecastMain() {
     return (
         <div css={wrapperStyles}>
-            <Header />
             <SearchBar {...searchBarProps} />
             <MountainInfoPreview time='0401' dist={5} />
-
             <WeatherIndexLight type='매우좋음' />
             <div css={downStyles}>
                 <CommonText {...textProps}>
@@ -42,22 +39,16 @@ export default function ForecastMain() {
     );
 }
 
-const mountainCourseData = [
-    {
-        title: '산',
-        options: ['설악산', '한라산', '지리산'],
-    },
-    {
-        title: '코스',
-        options: ['코스1', '코스2', '코스3'],
-    },
-];
+const mountainData = ['설악산', '한라산', '지리산'];
+const courseData = ['코스1', '코스2', '코스3'];
 
 const searchBarProps = {
+    searchBarTitle: '어디 날씨를 확인해볼까요?',
     searchBarMessage: '를 오르는',
-    isHomePage: true,
-    mountainCourseData,
-};
+    pageName: 'main',
+    mountainData,
+    courseData,
+} as const;
 
 const textProps = {
     TextTag: 'p',

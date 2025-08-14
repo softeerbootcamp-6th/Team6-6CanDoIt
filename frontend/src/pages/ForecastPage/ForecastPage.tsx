@@ -5,53 +5,64 @@ import CommonText from '../../components/atoms/Text/CommonText';
 import { css, keyframes } from '@emotion/react';
 import bgImage from '../../assets/Bg-fixed.png';
 import cloudImage from '../../assets/Bg-scroll.png';
+import ForecastMain from '../../components/templates/ForecastMain.tsx';
 
 export default function ForecastPage() {
     return (
-        <div css={wrapperStyles}>
-            <div css={contentSectionStyles}>
-                <img src={cloudImage} css={animatedImageStyles} alt='cloud' />
-                <DisplayHeading HeadingTag='h1'>
-                    <span css={displayHeadingStyle}>
-                        오전 9시
-                        <CommonText
-                            TextTag='span'
-                            fontSize='display'
-                            fontWeight='regular'
-                            color='greyOpacityWhite-40'
-                        >
-                            에 출발하면
-                        </CommonText>
-                    </span>
-                    <span css={lineGroupStyle}>바람막이가 필요할 거에요</span>
-                </DisplayHeading>
-                <div css={weatherCardWrapperStyles}>
-                    <WeatherCard
-                        title='시작 지점'
-                        weatherInfo={{
-                            weatherIconName: 'rain',
-                            weatherIconText: '비옴',
-                            windSpeed: 2,
-                        }}
+        <div>
+            <ForecastMain />
+
+            <div css={wrapperStyles}>
+                <div css={contentSectionStyles}>
+                    <img
+                        src={cloudImage}
+                        css={animatedImageStyles}
+                        alt='cloud'
                     />
-                    <WeatherCard
-                        title='시작 지점'
-                        weatherInfo={{
-                            weatherIconName: 'rain',
-                            weatherIconText: '비옴',
-                            windSpeed: 2,
-                        }}
-                    />
-                    <WeatherCard
-                        title='시작 지점'
-                        weatherInfo={{
-                            weatherIconName: 'rain',
-                            weatherIconText: '비옴',
-                            windSpeed: 2,
-                        }}
-                    />
+                    <DisplayHeading HeadingTag='h1'>
+                        <span css={displayHeadingStyle}>
+                            오전 9시
+                            <CommonText
+                                TextTag='span'
+                                fontSize='display'
+                                fontWeight='regular'
+                                color='greyOpacityWhite-40'
+                            >
+                                에 출발하면
+                            </CommonText>
+                        </span>
+                        <span css={lineGroupStyle}>
+                            바람막이가 필요할 거에요
+                        </span>
+                    </DisplayHeading>
+                    <div css={weatherCardWrapperStyles}>
+                        <WeatherCard
+                            title='시작 지점'
+                            weatherInfo={{
+                                weatherIconName: 'rain',
+                                weatherIconText: '비옴',
+                                windSpeed: 2,
+                            }}
+                        />
+                        <WeatherCard
+                            title='시작 지점'
+                            weatherInfo={{
+                                weatherIconName: 'rain',
+                                weatherIconText: '비옴',
+                                windSpeed: 2,
+                            }}
+                        />
+                        <WeatherCard
+                            title='시작 지점'
+                            weatherInfo={{
+                                weatherIconName: 'rain',
+                                weatherIconText: '비옴',
+                                windSpeed: 2,
+                            }}
+                        />
+                    </div>
+                    <TimeSeletor />
                 </div>
-                <TimeSeletor />
             </div>
         </div>
     );
