@@ -1,4 +1,14 @@
 const validHandler = {
+    isValidIdLength(value: string): boolean {
+        return value.length >= 6 && value.length <= 20;
+    },
+
+    isAlphaNumeric(value: string): boolean {
+        const regex = /^[A-Za-z0-9]+$/;
+        return regex.test(value);
+    },
+
+    // 문자 검증: 영어 대소문자 + 숫자만 허용
     // 기존 회원 중복 체크를 진행 => 이미 등록된 아이디입니다.
     // 양식에 맞지 않는 아이디 작성시  => 양식에 맞지 않는 아이디입니다. 다시 한번 확인해주세요.
     // 비밀번호는 영문,숫자 포함 8자 이상=> 양식에 맞지 않는 비밀번호입니다. 다시 한번 확인해주세요.
