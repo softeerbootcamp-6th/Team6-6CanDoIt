@@ -1,4 +1,4 @@
-package com.softeer.batch.mountain.scheduler;
+package com.softeer.batch.forecast.mountain.scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
