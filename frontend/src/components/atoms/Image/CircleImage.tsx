@@ -1,12 +1,18 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-interface propsState {
+interface PropsState {
     size?: string;
+    src?: string;
+    alt?: string;
 }
 
-export default function CircleImage({ size = '2.5rem' }: propsState) {
-    return <div css={reporterStyle({ size })} />;
+export default function CircleImage({
+    size = '2.5rem',
+    src = '',
+    alt = '',
+}: PropsState) {
+    return <img src={src} alt={alt} css={reporterStyle({ size })} />;
 }
 
 const { colors } = theme;
