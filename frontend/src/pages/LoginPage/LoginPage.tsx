@@ -1,12 +1,10 @@
 import { css } from '@emotion/react';
 import LoginFormSection from '../../components/templates/Login/LoginFormSection.tsx';
-import RegisterFormSection from '../../components/templates/Register/RegisterFormSection.tsx';
 
 export default function LoginPage() {
     return (
         <div css={wrapperStyles}>
             <LoginFormSection />
-            <RegisterFormSection />
         </div>
     );
 }
