@@ -3,6 +3,7 @@ import FormButton from '../../atoms/Button/FormButton.tsx';
 import CheckBox from '../../atoms/Form/CheckBox.tsx';
 import TextInputWithIcon from '../../molecules/Input/TextInputWithIcon.tsx';
 import type { ColorValueType } from '../../../types/themeTypes';
+import { iconButtonHandler } from '../Register/utils.ts';
 
 export default function LoginForm() {
     return (
@@ -35,6 +36,7 @@ const inputFields = [
         icon: 'x-circle',
         label: '이메일 주소',
         type: 'text',
+        onIconClick: iconButtonHandler.clearTextByRef,
         iconAriaLabel: '이메일 지우기',
     },
     {
@@ -42,6 +44,7 @@ const inputFields = [
         icon: 'eye-off',
         label: '비밀번호',
         type: 'password',
+        onIconClick: iconButtonHandler.togglePasswordVisibility,
         iconAriaLabel: '패스워드 보이기/숨기기',
     },
 ] as const;
