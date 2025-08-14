@@ -4,11 +4,11 @@ import FormLabelText from '../../atoms/Text/FormLabelText.tsx';
 import TextInput from '../../atoms/Input/TextInput.tsx';
 import IconButton from '../../atoms/Button/IconButton.tsx';
 import WarningText from '../../atoms/Text/WarningText.tsx';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 const { colors } = theme;
 
-interface Props {
+interface PropsState {
     id: string;
     label: string;
     placeholder?: string;
@@ -16,8 +16,12 @@ interface Props {
     type?: InputType;
     iconAriaLabel: string;
     icon: string;
-    isValid?: boolean;
-    validationMessage?: string;
+    validations?: ValidationRule[];
+}
+
+interface ValidationRule {
+    check: (value: string) => boolean;
+    message: string;
 }
 
 type InputType = 'text' | 'password';
@@ -30,10 +34,22 @@ export default function TextInputWithIcon({
     type = 'text',
     icon,
     iconAriaLabel,
-    isValid = false,
-    validationMessage,
-}: Props) {
+    validations = [],
+}: PropsState) {
     const inputRef = useRef<null | HTMLInputElement>(null);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const handleChange = (text: string) => {
+        const newValue = text;
+
+        for (const rule of validations) {
+            if (!rule.check(newValue)) {
+                setErrorMessage(rule.message);
+                return;
+            }
+        }
+        setErrorMessage('');
+    };
 
     return (
         <div>
@@ -46,6 +62,7 @@ export default function TextInputWithIcon({
                         placeholder={placeholder}
                         type={type}
                         ref={inputRef}
+                        onChange={(text) => handleChange(text)}
                     />
                     <IconButton
                         iconName={icon}
@@ -54,7 +71,7 @@ export default function TextInputWithIcon({
                     />
                 </div>
             </label>
-            {!isValid && <WarningText>{validationMessage}</WarningText>}
+            {errorMessage && <WarningText>{errorMessage}</WarningText>}
         </div>
     );
 }
