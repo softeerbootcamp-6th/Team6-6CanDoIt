@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import FormButton from '../../atoms/Button/FormButton.tsx';
 import TextInputWithIcon from '../../molecules/Input/TextInputWithIcon.tsx';
 import RegisterCheckBoxes from '../Register/RegisterCheckBoxes.tsx';
+import { iconButtonHandler } from './utils.ts';
 
 export default function RegisterForm() {
     const inputFields = [
@@ -11,6 +12,7 @@ export default function RegisterForm() {
             label: '이메일 주소',
             type: 'text',
             iconAriaLabel: '이메일 지우기',
+            onIconClick: iconButtonHandler.clearTextByRef,
             validationMessage: '이메일 형식이 올바르지 않습니다.',
         },
         {
@@ -35,6 +37,7 @@ export default function RegisterForm() {
             label: '닉네임',
             type: 'text',
             iconAriaLabel: '닉네임 지우기',
+            onIconClick: iconButtonHandler.clearTextByRef,
             validationMessage: '닉네임을 입력해주세요.',
         },
     ] as const;
