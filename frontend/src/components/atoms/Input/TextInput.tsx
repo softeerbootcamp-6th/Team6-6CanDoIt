@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import { forwardRef } from 'react';
 
 const { colors, typography } = theme;
 
@@ -12,22 +13,22 @@ interface TextInputProps {
 
 type InputType = 'text' | 'password';
 
-export default function TextInput({
-    id,
-    ariaLabel,
-    placeholder,
-    type,
-}: TextInputProps) {
-    return (
-        <input
-            id={id}
-            aria-label={ariaLabel}
-            placeholder={placeholder}
-            css={inputStyles}
-            type={type}
-        />
-    );
-}
+const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
+    ({ id, ariaLabel, placeholder, type }, ref) => {
+        return (
+            <input
+                ref={ref}
+                id={id}
+                aria-label={ariaLabel}
+                placeholder={placeholder}
+                type={type}
+                css={inputStyles}
+            />
+        );
+    },
+);
+
+export default TextInput;
 
 const inputStyles = css`
     all: unset;

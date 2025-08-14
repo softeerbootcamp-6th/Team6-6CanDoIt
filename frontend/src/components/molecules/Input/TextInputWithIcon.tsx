@@ -4,6 +4,7 @@ import FormLabelText from '../../atoms/Text/FormLabelText.tsx';
 import TextInput from '../../atoms/Input/TextInput.tsx';
 import IconButton from '../../atoms/Button/IconButton.tsx';
 import WarningText from '../../atoms/Text/WarningText.tsx';
+import { useRef } from 'react';
 
 const { colors } = theme;
 
@@ -11,7 +12,7 @@ interface Props {
     id: string;
     label: string;
     placeholder?: string;
-    onIconClick?: () => void;
+    onIconClick?: (ref: React.RefObject<HTMLInputElement>) => void;
     type?: InputType;
     iconAriaLabel: string;
     icon: string;
@@ -32,6 +33,8 @@ export default function TextInputWithIcon({
     isValid = false,
     validationMessage,
 }: Props) {
+    const inputRef = useRef<null | HTMLInputElement>(null);
+
     return (
         <div>
             <label css={wrapperStyles} htmlFor={id}>
@@ -42,11 +45,12 @@ export default function TextInputWithIcon({
                         ariaLabel={label}
                         placeholder={placeholder}
                         type={type}
+                        ref={inputRef}
                     />
                     <IconButton
                         iconName={icon}
                         ariaLabel={iconAriaLabel}
-                        onClick={onIconClick}
+                        onClick={() => onIconClick?.(inputRef)}
                     />
                 </div>
             </label>
