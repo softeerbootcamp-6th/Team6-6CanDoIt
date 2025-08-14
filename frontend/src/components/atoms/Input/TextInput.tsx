@@ -4,17 +4,22 @@ import { forwardRef } from 'react';
 
 const { colors, typography } = theme;
 
-interface TextInputProps {
+interface PropsState {
     id?: string;
     ariaLabel?: string;
     placeholder?: string;
     type: InputType;
+    onChange?: (value: string) => void;
 }
 
 type InputType = 'text' | 'password';
 
-const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-    ({ id, ariaLabel, placeholder, type }, ref) => {
+const TextInput = forwardRef<HTMLInputElement, PropsState>(
+    ({ id, ariaLabel, placeholder, type, onChange }, ref) => {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(e.target.value);
+        };
+
         return (
             <input
                 ref={ref}
@@ -22,6 +27,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
                 aria-label={ariaLabel}
                 placeholder={placeholder}
                 type={type}
+                onChange={handleChange}
                 css={inputStyles}
             />
         );
