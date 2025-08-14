@@ -25,14 +25,18 @@ class KmaApiCallerFactoryTest {
     @BeforeEach
     void setUp() {
         when(mountainForecastApiCaller.getForecastApiType()).thenReturn(ForecastApiType.MOUNTAIN);
+        when(mountainForecastApiCaller.getRequestType()).thenReturn(MountainForecastApiCaller.Request.class);
         kmaApiCallerFactory = new KmaApiCallerFactory(Set.of(mountainForecastApiCaller));
     }
 
     @Test
     @DisplayName("Factory가 MOUNTAIN 타입에 맞는 ApiCaller를 정상적으로 반환한다.")
     void getApiCaller_success() {
+        // given
+        MountainForecastApiCaller.Request request = new MountainForecastApiCaller.Request(123, "20250814", "1300");
+
         // when
-        KmaApiCaller<?, ?> caller = kmaApiCallerFactory.getApiCaller(ForecastApiType.MOUNTAIN);
+        KmaApiCaller<?, ?> caller = kmaApiCallerFactory.getApiCaller(ForecastApiType.MOUNTAIN, request);
 
         // then
         assertThat(caller).isNotNull();
