@@ -1,0 +1,73 @@
+package com.softeer.mountain;
+
+import com.softeer.mountain.dto.MountainForecastApiResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
+import java.util.function.Function;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class MountainForecastApiCallerTest {
+
+    private MountainForecastApiCaller target;
+
+    @Mock
+    private RestClient restClient;
+
+    @Mock
+    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    @Mock
+    private RestClient.RequestHeadersSpec requestHeadersSpec;
+    @Mock
+    private RestClient.ResponseSpec responseSpec;
+
+    @BeforeEach
+    void setUp() {
+        target = new MountainForecastApiCaller(restClient, "DUMMY_API_KEY");
+    }
+
+    @Test
+    @DisplayName("산악 날씨 API를 성공적으로 호출하고 응답 데이터를 파싱해야 한다")
+    void call_api_successfully_and_parse_response() {
+        // given
+        MountainForecastApiCaller.Request request = new MountainForecastApiCaller.Request(
+                123,
+                "20250814",
+                "1300"
+        );
+
+        MountainForecastApiResponse mockResponseItem1 = MountainForecastApiFixture.create("TMP", "25");
+        MountainForecastApiResponse mockResponseItem2 = MountainForecastApiFixture.create("POP", "20");
+        List<MountainForecastApiResponse> expectedResponseList = List.of(mockResponseItem1, mockResponseItem2);
+
+        when(restClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(ArgumentMatchers.<ParameterizedTypeReference<List<MountainForecastApiResponse>>>any()))
+                .thenReturn(expectedResponseList);
+
+        // when
+        List<MountainForecastApiResponse> actualResponse = target.call(request);
+
+        // then
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse).hasSize(2);
+        assertThat(actualResponse).isEqualTo(expectedResponseList);
+
+        MountainForecastApiResponse firstItem = actualResponse.get(0);
+        assertThat(firstItem.forecastValue()).isEqualTo("25");
+        assertThat(firstItem.category()).isEqualTo("TMP");
+    }
+}
