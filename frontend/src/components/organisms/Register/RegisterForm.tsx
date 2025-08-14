@@ -21,6 +21,7 @@ export default function RegisterForm() {
             label: '비밀번호',
             type: 'password',
             iconAriaLabel: '비밀번호 보기',
+            onIconClick: iconButtonHandler.togglePasswordVisibility,
             validationMessage: '비밀번호 형식이 올바르지 않습니다.',
         },
         {
@@ -29,6 +30,7 @@ export default function RegisterForm() {
             label: '비밀번호 확인',
             type: 'password',
             iconAriaLabel: '비밀번호 보기',
+            onIconClick: iconButtonHandler.togglePasswordVisibility,
             validationMessage: '비밀번호가 일치하지 않습니다.',
         },
         {
