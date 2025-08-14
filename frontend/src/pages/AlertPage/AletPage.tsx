@@ -5,7 +5,6 @@ import Table from '../../components/organisms/Alert/Table.tsx';
 import CommonText from '../../components/atoms/Text/CommonText';
 import { theme } from '../../theme/theme';
 import SearchBar from '../../components/organisms/Common/SearchBar.tsx';
-import Header from '../../components/organisms/Common/Header.tsx';
 
 const data = [
     {
@@ -55,13 +54,11 @@ const { colors, typography } = theme;
 export default function AlertPage() {
     return (
         <div css={dummySteyls}>
-            <Header />
-            {/* 아직 SearchBar 구현이 덜되어있음 */}
             <SearchBar
                 searchBarTitle='어디 안전정보를 확인해볼까요?'
                 searchBarMessage='의 안전정보'
-                isHomePage={false}
-                mountainCourseData={mountainCourseData}
+                pageName='safety'
+                mountainData={mountainData}
             />
             <p css={pStyles}>
                 현재
@@ -104,13 +101,4 @@ const textProps = {
     fontSize: 'headline',
 } as const;
 
-const mountainCourseData = [
-    {
-        title: '산',
-        options: ['설악산', '한라산', '지리산'],
-    },
-    {
-        title: '코스',
-        options: ['코스1', '코스2', '코스3'],
-    },
-];
+const mountainData = ['설악산', '한라산', '지리산'];

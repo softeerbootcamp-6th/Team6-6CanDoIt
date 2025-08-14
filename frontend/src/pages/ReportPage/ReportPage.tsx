@@ -1,4 +1,3 @@
-import Header from '../../components/organisms/Common/Header.tsx';
 import { theme } from '../../theme/theme.ts';
 import ReportSearchSection from '../../components/templates/Report/ReportSearchSection.tsx';
 import ReportCardSection from '../../components/templates/Report/ReportCardSection.tsx';
@@ -6,7 +5,6 @@ import ReportCardSection from '../../components/templates/Report/ReportCardSecti
 export default function ReportPage() {
     return (
         <>
-            <Header />
             <ReportSearchSection />
             <ReportCardSection {...reportSectionWeatherProps} />
             <ReportCardSection {...reportSectionSafetyProps} />
