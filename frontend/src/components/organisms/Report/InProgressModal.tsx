@@ -11,11 +11,11 @@ interface alertTime {
 interface InProgressModalProps {
     title: string;
     description: string;
-    alertTimes: alertTime[];
+    alertTime: alertTime;
 }
 
 export default function InProgressModal(props: InProgressModalProps) {
-    const { title, description, alertTimes } = props;
+    const { title, description, alertTime } = props;
     return (
         <BaseModal
             title={title}
@@ -24,7 +24,7 @@ export default function InProgressModal(props: InProgressModalProps) {
             footerSecondButtonText='해제하기'
             modalHeaderChildren={modalHeaderChildren}
         >
-            <InProgressModalContent alertTimes={alertTimes} />
+            <InProgressModalContent alertTime={alertTime} />
         </BaseModal>
     );
 }

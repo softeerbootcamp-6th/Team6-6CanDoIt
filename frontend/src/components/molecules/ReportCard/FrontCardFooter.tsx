@@ -1,7 +1,7 @@
 import CircleImage from '../../atoms/Image/CircleImage.tsx';
 import TwoLinesEllipsis from '../../atoms/Text/TwoLinesEllipsis.tsx';
-import MinutesAgo from '../MinutesAgo_delete/MinutesAgo.tsx';
 import { css } from '@emotion/react';
+import CommonText from '../../atoms/Text/CommonText.tsx';
 
 interface propsState {
     minutesAgo: number;
@@ -13,10 +13,18 @@ export default function FrontCardFooter({ minutesAgo, comment }: propsState) {
         <div css={frontCardFooterStyle}>
             <CircleImage />
             <TwoLinesEllipsis>{comment}</TwoLinesEllipsis>
-            <MinutesAgo value={minutesAgo} />
+            <CommonText {...minutesAgoProps}>{`${minutesAgo}분전`}</CommonText>
         </div>
     );
 }
+
+const minutesAgoProps = {
+    TextTag: 'span',
+    fontSize: 'caption',
+    fontWeight: 'medium',
+    color: 'greyOpacityWhite-60',
+    lineHeight: 1.3,
+} as const;
 
 const frontCardFooterStyle = css`
     width: 23rem;

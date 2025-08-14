@@ -9,7 +9,9 @@ interface propsState {
 export default function HeartStat({ count }: propsState) {
     return (
         <div css={heartStyle}>
-            <Icon {...heartIconProps} />
+            <button css={buttonStyle}>
+                <Icon {...heartIconProps} />
+            </button>
             <CommonText TextTag='span' fontSize='body' fontWeight='bold'>
                 {count}
             </CommonText>
@@ -23,6 +25,16 @@ const heartIconProps = {
     height: 1.5,
     color: 'grey-100',
 };
+
+const buttonStyle = css`
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
 
 const heartStyle = css`
     width: 100%;
