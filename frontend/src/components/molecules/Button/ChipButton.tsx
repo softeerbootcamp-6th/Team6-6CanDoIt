@@ -23,6 +23,7 @@ const chipStyle = css`
     text-align: center;
     padding: 0.5rem 1.25rem;
     background-color: ${colors.grey[30]};
+    border: none;
     border-radius: 62.4375rem;
     cursor: pointer;
 `;
