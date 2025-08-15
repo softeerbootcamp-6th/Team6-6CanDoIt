@@ -8,6 +8,16 @@ const validHandler = {
         return regex.test(value);
     },
 
+    isPasswordMinLength(value: string): boolean {
+        return value.length >= 8;
+    },
+
+    hasNumberAndLetter(value: string): boolean {
+        const hasNumber = /\d/.test(value);
+        const hasLetter = /[a-zA-Z]/.test(value);
+        return hasNumber && hasLetter;
+    },
+
     // 문자 검증: 영어 대소문자 + 숫자만 허용
     // 기존 회원 중복 체크를 진행 => 이미 등록된 아이디입니다.
     // 양식에 맞지 않는 아이디 작성시  => 양식에 맞지 않는 아이디입니다. 다시 한번 확인해주세요.
