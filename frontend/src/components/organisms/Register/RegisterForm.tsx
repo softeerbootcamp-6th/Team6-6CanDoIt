@@ -60,6 +60,16 @@ const inputFields = [
         type: 'text',
         iconAriaLabel: '닉네임 지우기',
         onIconClick: iconButtonHandler.clearTextByRef,
+        validations: [
+            {
+                check: validHandler.isKoreanOnly,
+                message: '한글로 된 닉네임만 가능합니다.',
+            },
+            {
+                check: validHandler.isValidNicknameLength,
+                message: '닉네임는 2자 이상, 20자 이하이어야 합니다.',
+            },
+        ] as ValidationRule[],
     },
 ] as const;
 
