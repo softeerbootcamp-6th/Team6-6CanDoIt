@@ -71,7 +71,9 @@ export default function TextInputWithIcon({
                     />
                 </div>
             </label>
-            {errorMessage && <WarningText>{errorMessage}</WarningText>}
+            <div css={warningWrapperStyles}>
+                {errorMessage && <WarningText>{errorMessage}</WarningText>}
+            </div>
         </div>
     );
 }
@@ -90,4 +92,8 @@ const lineStyles = css`
     align-items: center;
     padding: 0.75rem 0.2rem;
     gap: 0.5rem;
+`;
+
+const warningWrapperStyles = css`
+    min-height: 1.3rem;
 `;
