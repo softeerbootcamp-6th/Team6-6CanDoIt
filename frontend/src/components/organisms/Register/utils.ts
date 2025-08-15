@@ -18,6 +18,14 @@ const validHandler = {
         return hasNumber && hasLetter;
     },
 
+    isValidNicknameLength(value: string): boolean {
+        return value.length >= 2 && value.length <= 20;
+    },
+
+    isKoreanOnly(value: string): boolean {
+        return !/[0-9a-zA-Z!@#$%^&*(),.?":{}|<>]/.test(value);
+    },
+
     // 문자 검증: 영어 대소문자 + 숫자만 허용
     // 기존 회원 중복 체크를 진행 => 이미 등록된 아이디입니다.
     // 양식에 맞지 않는 아이디 작성시  => 양식에 맞지 않는 아이디입니다. 다시 한번 확인해주세요.
