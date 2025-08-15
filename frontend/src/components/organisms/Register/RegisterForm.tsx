@@ -35,6 +35,15 @@ const inputFields = [
         type: 'password',
         iconAriaLabel: '비밀번호 보기',
         onIconClick: iconButtonHandler.togglePasswordVisibility,
+        validations: [
+            {
+                check: (value) =>
+                    validHandler.isPasswordMinLength(value) &&
+                    validHandler.hasNumberAndLetter(value),
+                message:
+                    '영문, 숫자를 포함한 8자 이상의 비밀번호를 입력해주세요.',
+            },
+        ] as ValidationRule[],
     },
     {
         id: 'password-confirm-input',
