@@ -7,8 +7,8 @@ import java.util.List;
 
 public abstract class AbstractKmaApiCaller<R> implements KmaApiCaller<R> {
 
-    private final RestClient restClient;
-    private final ForecastApiType forecastApiType;
+    protected final RestClient restClient;
+    protected final ForecastApiType forecastApiType;
 
     protected AbstractKmaApiCaller(
             RestClient restClient,
@@ -21,13 +21,5 @@ public abstract class AbstractKmaApiCaller<R> implements KmaApiCaller<R> {
     protected abstract String getApiPath();
 
     @Override
-    public <T extends ApiRequest> List<R> call(T request) {
-        return restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path(getApiPath())
-                        .query(request.queryString())
-                        .build())
-                .retrieve()
-                .body(forecastApiType.getResponseListType());
-    }
+    public abstract <T extends ApiRequest> List<R> call(T request);
 }
