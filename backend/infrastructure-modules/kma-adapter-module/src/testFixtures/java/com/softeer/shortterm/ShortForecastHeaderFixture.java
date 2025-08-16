@@ -6,9 +6,6 @@ public final class ShortForecastHeaderFixture {
 
     private ShortForecastHeaderFixture() {}
 
-    private String resultCode;
-    private String resultMsg;
-
     public static ShortForecastHeaderBuilder builder() {
         return new ShortForecastHeaderBuilder();
     }
