@@ -6,9 +6,9 @@ public record ShortForecastItem(
         @JsonProperty("baseDate") String baseDate,
         @JsonProperty("baseTime") String baseTime,
         @JsonProperty("category") String category,
-        @JsonProperty("fcstDate") String fcstDate,
-        @JsonProperty("fcstTime") String fcstTime,
-        @JsonProperty("fcstValue") String fcstValue,
+        @JsonProperty("fcstDate") String forecastDate,
+        @JsonProperty("fcstTime") String forecastTime,
+        @JsonProperty("fcstValue") String forecastValue,
         @JsonProperty("nx") int nx,
         @JsonProperty("ny") int ny
 ) {

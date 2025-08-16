@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ShortForecastBody(
         @JsonProperty("dataType") String dataType,
-        @JsonProperty("shortForecastItems") ShortForecastItems shortForecastItems,
+        @JsonProperty("items") ShortForecastItems shortForecastItems,
         @JsonProperty("pageNo") int pageNo,
         @JsonProperty("numOfRows") int numOfRows,
         @JsonProperty("totalCount") int totalCount
