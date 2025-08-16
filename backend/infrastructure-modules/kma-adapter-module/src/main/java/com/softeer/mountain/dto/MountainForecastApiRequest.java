@@ -1,6 +1,7 @@
 package com.softeer.mountain.dto;
 
 import com.softeer.common.ApiRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.StringJoiner;
 
@@ -13,13 +14,12 @@ public record MountainForecastApiRequest(
 
     @Override
     public String queryString() {
-        StringJoiner joiner = new StringJoiner("&");
-
-        joiner.add("authKey=" + authKey);
-        joiner.add("mountainNum=" + mountainNum);
-        joiner.add("base_date=" + baseDate);
-        joiner.add("base_time=" + baseTime);
-
-        return joiner.toString();
+        return UriComponentsBuilder.newInstance()
+                .queryParam("authKey", this.authKey)
+                .queryParam("mountainNum", this.mountainNum)
+                .queryParam("base_date", this.baseDate)
+                .queryParam("base_time", this.baseTime)
+                .build()
+                .getQuery();
     }
 }
