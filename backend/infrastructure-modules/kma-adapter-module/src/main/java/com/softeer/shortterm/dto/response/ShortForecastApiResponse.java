@@ -3,15 +3,15 @@ package com.softeer.shortterm.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record ShortForecastApiResponse(
-        @JsonProperty("response") ShortResponse response
+        @JsonProperty("response") ShortForecastResponsePayload response
 ) {
 
-    public Header getHeader() {
-        return response.header();
+    public ShortForecastHeader getHeader() {
+        return response.shortForecastHeader();
     }
 
-    public Body getBody() {
-        return response.body();
+    public ShortForecastBody getBody() {
+        return response.shortForecastBody();
     }
 }
 

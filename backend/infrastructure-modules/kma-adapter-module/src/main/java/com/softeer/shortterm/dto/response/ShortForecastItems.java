@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record Items(
-        @JsonProperty("item") List<Item> itemList
+public record ShortForecastItems(
+        @JsonProperty("item") List<ShortForecastItem> shortForecastItemList
 ) {
 }

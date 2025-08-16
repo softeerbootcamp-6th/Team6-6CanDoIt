@@ -3,8 +3,8 @@ package com.softeer.shortterm;
 import com.softeer.common.AbstractKmaApiCaller;
 import com.softeer.common.ApiRequest;
 import com.softeer.config.ForecastApiType;
-import com.softeer.shortterm.dto.response.Body;
-import com.softeer.shortterm.dto.response.Item;
+import com.softeer.shortterm.dto.response.ShortForecastBody;
+import com.softeer.shortterm.dto.response.ShortForecastItem;
 import com.softeer.shortterm.dto.response.ShortForecastApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestClient;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class ShortForecastApiCaller extends AbstractKmaApiCaller<Item> {
+public class ShortForecastApiCaller extends AbstractKmaApiCaller<ShortForecastItem> {
 
     public ShortForecastApiCaller(RestClient restClient) {
         super(restClient, ForecastApiType.SHORT_TERM);
@@ -28,7 +28,7 @@ public class ShortForecastApiCaller extends AbstractKmaApiCaller<Item> {
     }
 
     @Override
-    public <T extends ApiRequest> List<Item> call(T request) {
+    public <T extends ApiRequest> List<ShortForecastItem> call(T request) {
         URI uri = UriComponentsBuilder
                 .fromPath(getApiPath())
                 .query(request.queryString())
@@ -43,7 +43,7 @@ public class ShortForecastApiCaller extends AbstractKmaApiCaller<Item> {
         if (response != null && response.getHeader() != null && "00".equals(response.getHeader().resultCode())) {
             return Optional.of(response)
                     .map(ShortForecastApiResponse::getBody)
-                    .map(Body::getItems)
+                    .map(ShortForecastBody::getItems)
                     .orElse(Collections.emptyList());
         } else {
             return Collections.emptyList();
