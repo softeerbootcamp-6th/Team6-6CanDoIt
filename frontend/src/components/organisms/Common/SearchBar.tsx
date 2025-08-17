@@ -1,58 +1,145 @@
-// URL을 보고 홈, 제보에 맞게 검색바를 다르게 렌더링
 import Dropdown from '../../molecules/Dropdown/Dropdown.tsx';
 import { LabelHeading } from '../../atoms/Heading/Heading.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
+import { useState } from 'react';
+import {
+    createHandleSubmit,
+    createHandleToggleDropdown,
+} from './utils/utils.ts';
 
-type pageName = 'main' | 'report' | 'safety';
+type PageName = 'main' | 'report' | 'safety';
+type DropdownType = 'mountain' | 'course' | 'weekday' | null;
 
-interface propsState {
-    searchBarTitle?: string;
-    searchBarMessage: string;
-    pageName?: pageName;
-    mountainData: string[];
-    courseData?: string[];
+interface Option {
+    id: string;
+    name: string;
 }
 
-export default function SearchBar(props: propsState) {
+interface PropsState {
+    searchBarTitle?: string;
+    searchBarMessage: string;
+    pageName?: PageName;
+    mountainOptions: Option[];
+    courseOptions: Option[];
+    weekdayOptions?: Option[];
+    onSubmit: (values: {
+        mountain: Option;
+        course?: Option;
+        weekday?: Option;
+    }) => void;
+    onMountainChange: (mountain: Option) => void;
+}
+
+export default function SearchBar(props: PropsState) {
     const {
         searchBarTitle,
         searchBarMessage,
         pageName = 'main',
-        mountainData,
-        courseData,
+        mountainOptions,
+        courseOptions,
+        weekdayOptions,
+        onSubmit,
+        onMountainChange,
     } = props;
+
+    const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
+    const [selectedMountain, setSelectedMountain] =
+        useState<Option>(defaultMountain);
+    const [selectedCourse, setSelectedCourse] = useState<Option>(defaultCourse);
+    const [selectedWeekday, setSelectedWeekday] =
+        useState<Option>(defaultWeekday);
 
     const isMainPage = pageName === 'main';
     const isReportPage = pageName === 'report';
     const isSafetyPage = pageName === 'safety';
 
+    const handleToggleDropdown = createHandleToggleDropdown({
+        setOpenDropdown,
+        openDropdown,
+    });
+    const handleSubmit = createHandleSubmit({
+        isMainPage,
+        isReportPage,
+        selectedMountain,
+        selectedCourse,
+        selectedWeekday,
+        onSubmit,
+    });
+
+    const dropdownProps = {
+        mountain: createDropdownProps({
+            title: '산',
+            options: mountainOptions,
+            dropdownType: 'mountain',
+            openDropdown,
+            handleToggleDropdown,
+            onSelectValue: (selected: Option) => {
+                setSelectedMountain(selected);
+                onMountainChange(selected);
+            },
+        }),
+        course: createDropdownProps({
+            title: '코스',
+            options: courseOptions,
+            dropdownType: 'course',
+            openDropdown,
+            handleToggleDropdown,
+            onSelectValue: setSelectedCourse,
+        }),
+        weekday: createDropdownProps({
+            title: weekdayData.title,
+            options: weekdayOptions ?? weekdayData.options,
+            dropdownType: 'weekday',
+            openDropdown,
+            handleToggleDropdown,
+            onSelectValue: setSelectedWeekday,
+        }),
+    };
+
     return (
         <div css={searchBarContainerStyle}>
             <LabelHeading HeadingTag='h2'>{searchBarTitle}</LabelHeading>
-            <div css={searchBarStyle}>
-                <Dropdown title='산' options={mountainData} />
+            <form css={searchBarStyle} onSubmit={handleSubmit}>
+                <Dropdown {...dropdownProps.mountain} />
                 {(isMainPage || isReportPage) && (
-                    <Dropdown title='코스' options={courseData || []} />
+                    <Dropdown {...dropdownProps.course} />
                 )}
                 <SearchBarText>{searchBarMessage}</SearchBarText>
-                {isMainPage && (
-                    <Dropdown
-                        title={weekdayData.title}
-                        options={weekdayData.options}
-                    />
-                )}
+                {isMainPage && <Dropdown {...dropdownProps.weekday} />}
                 {(isMainPage || isSafetyPage) && (
-                    <button css={searchButtonStyle}>
+                    <button type='submit' css={searchButtonStyle}>
                         <Icon {...searchButtonIconProps} />
                     </button>
                 )}
-            </div>
+            </form>
         </div>
     );
 }
+
+const createDropdownProps = ({
+    title,
+    options,
+    dropdownType,
+    openDropdown,
+    handleToggleDropdown,
+    onSelectValue,
+}: {
+    title: string;
+    options: Option[];
+    dropdownType: DropdownType;
+    openDropdown: DropdownType;
+    handleToggleDropdown: (dropdown: DropdownType) => void;
+    onSelectValue: (selected: Option) => void;
+}) => ({
+    title,
+    options,
+    isOpenOptions: openDropdown === dropdownType,
+    onToggle: () => handleToggleDropdown(dropdownType),
+    onSelect: onSelectValue,
+});
 
 const searchButtonIconProps = {
     name: 'search-sm',
@@ -95,12 +182,12 @@ const searchButtonStyle = css`
 const weekdayData = {
     title: '요일은?',
     options: [
-        '월요일',
-        '화요일',
-        '수요일',
-        '목요일',
-        '금요일',
-        '토요일',
-        '일요일',
+        { id: 'today', name: '오늘' },
+        { id: 'tomorrow', name: '내일' },
+        { id: 'dayaftertomorrow', name: '글피' },
     ],
 };
+
+const defaultMountain: Option = { id: '0', name: '산' };
+const defaultCourse: Option = { id: '0', name: '코스' };
+const defaultWeekday: Option = { id: '0', name: '요일은?' };
