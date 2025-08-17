@@ -1,0 +1,15 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation("com.bucket4j:bucket4j_jdk17-core:8.14.0")
+    implementation("com.bucket4j:bucket4j_jdk17-redis:8.14.0")
+    implementation 'com.bucket4j:bucket4j_jdk17-lettuce:8.14.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+}
+
+jar {
+    enabled = true
+}
+
+bootJar {
+    enabled = false
+}
