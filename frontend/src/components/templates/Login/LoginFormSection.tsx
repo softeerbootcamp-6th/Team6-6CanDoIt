@@ -3,6 +3,7 @@ import mainImg from '../../../assets/mainImg.png';
 import LoginForm from '../../organisms/Login/LoginForm.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
+import { NavLink } from 'react-router-dom';
 
 const { colors, typography } = theme;
 
@@ -21,9 +22,9 @@ export default function LoginFormSection() {
                 국립공원을 오르는 오늘을 위한 기상 예보
             </CommonText>
             <LoginForm />
-            <a href='#' css={LinkStyles}>
-                이메일 가입
-            </a>
+            <NavLink to='/register' css={LinkStyles}>
+                회원 가입
+            </NavLink>
         </>
     );
 }
