@@ -4,6 +4,7 @@ import com.softeer.domain.Course;
 import com.softeer.domain.CoursePlan;
 import com.softeer.domain.Grid;
 import com.softeer.domain.Mountain;
+import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
@@ -35,6 +36,14 @@ public class WeatherCardService {
         return forecastUseCase.findForecastsFromStartDateTime(mountain.grid(), startBaseDateTime)
                 .stream()
                 .map((HourlyWeatherResponse::new))
+                .toList();
+    }
+
+    public List<CourseInfoResponse> findCoursesByMountainId(long mountainId) {
+        List<Course> courses = mountainUseCase.getCoursesByMountainId(mountainId);
+
+        return courses.stream()
+                .map(CourseInfoResponse::new)
                 .toList();
     }
 
