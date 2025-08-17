@@ -1,6 +1,7 @@
 package com.softeer.service;
 
 import com.softeer.domain.*;
+import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
@@ -63,6 +64,7 @@ public class WeatherCardServiceTest {
         //then
         assertEquals(expected, result);
     }
+
     @Test
     @DisplayName("createMountainCards: baseTime 기준 Grid 날씨조건으로 MountainCardResponse 리스트 생성")
     void createMountainCards_success() {
@@ -102,6 +104,24 @@ public class WeatherCardServiceTest {
         Assertions.assertEquals(expectedResponses, responses);
     }
 
+    @Test
+    void findCoursesByMountainId_success() {
+        long mountainId = 7L;
+        Course course_1 = CourseFixture.builder().id(1).name("test_course_1").build();
+        Course course_2 = CourseFixture.builder().id(2).name("test_course_2").build();
+
+        List<Course> courses = List.of(course_1, course_2);
+
+        when(mountainUseCase.getCoursesByMountainId(eq(mountainId))).thenReturn(courses);
+
+        List<CourseInfoResponse> expected = courses.stream().map(CourseInfoResponse::new).toList();
+
+        //when
+        List<CourseInfoResponse> result = target.findCoursesByMountainId(mountainId);
+
+        //then
+        assertEquals(expected, result);
+    }
 
     @Test
     @DisplayName("createCourseCard: 주어진 courseId와 dateTime으로 CoursePlan 조회 후 Grid 날씨조건으로 카드 생성")
