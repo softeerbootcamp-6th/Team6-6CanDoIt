@@ -91,7 +91,7 @@ export default function RegisterForm() {
     return (
         <form css={formWrapperStyles}>
             <TextInputWithIcon {...inputFields[0]} />
-            <FormButton text='로그인' />
+            <FormButton type='button' text='아이디 중복확인' />
 
             {inputFields.slice(1).map((field) => (
                 <TextInputWithIcon key={field.id} {...field} />
