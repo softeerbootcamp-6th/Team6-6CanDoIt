@@ -1,40 +1,85 @@
-import MountainCard from '../../components/organisms/Main/MountainCard.tsx';
+import { type Dispatch, type SetStateAction, useState } from 'react';
+import MainSearchSection from '../../components/templates/Main/MainSearchSection.tsx';
+import MountainCardSection from '../../components/templates/Main/MountainCardSection.tsx';
+import Loading from '../../components/organisms/Loading/Loading.tsx';
 import { css } from '@emotion/react';
-import SearchBar from '../../components/organisms/Common/SearchBar.tsx';
+import type {
+    MountainData,
+    SelectedMountainData,
+} from '../../types/mountainTypes';
+import { createFormValidChange, createStartLoading } from './utils/utils.ts';
 
 export default function MainPage() {
-    const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        event.currentTarget.scrollLeft += Number(event.deltaY);
-    };
+    const [isOpen, setIsOpen] = useState(false);
+    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
+    const [selectedMountain, setSelectedMountain] =
+        useState<SelectedMountainData | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const isOpen = false;
+    const handleStartLoading = createStartLoading({
+        setSelectedMountain,
+        setIsLoading,
+    });
+    const handleFormValidChange = createFormValidChange({ setIsOpen });
+
+    const mainSearchSectionProps = createMainSearchSectionProps({
+        mountainsData,
+        onSearchClick: handleStartLoading,
+        onFormValidChange: handleFormValidChange,
+    });
+    const mountainCardSectionProps = createMountainCardSectionProps({
+        mountainsData,
+        setMountainsData,
+        onCardClick: handleStartLoading,
+    });
+
+    if (isLoading) {
+        return <Loading {...loadingProps(selectedMountain!)} />;
+    }
 
     return (
         <>
             {isOpen && <div css={backgroundStyle} />}
             <div css={overBackgroundStyle}>
-                <SearchBar {...searchBarProps} />
+                <MainSearchSection {...mainSearchSectionProps} />
             </div>
-            <div css={mountainCardContainerStyle} onWheel={handleWheel}>
-                {data.map((mountain) => (
-                    <MountainCard {...mountain} />
-                ))}
-            </div>
+            <MountainCardSection {...mountainCardSectionProps} />
         </>
     );
 }
 
-const mountainData = ['설악산', '한라산', '지리산'];
-const courseData = ['코스1', '코스2', '코스3'];
+const createMountainCardSectionProps = ({
+    mountainsData,
+    setMountainsData,
+    onCardClick,
+}: {
+    mountainsData: MountainData[];
+    setMountainsData: Dispatch<SetStateAction<MountainData[]>>;
+    onCardClick: (data: SelectedMountainData) => void;
+}) => ({
+    mountainsData,
+    setMountainsData,
+    onCardClick,
+});
 
-const searchBarProps = {
-    searchBarTitle: '어디 날씨를 확인해볼까요?',
-    searchBarMessage: '를 오르는',
-    pageName: 'main',
-    mountainData,
-    courseData,
-} as const;
+const createMainSearchSectionProps = ({
+    mountainsData,
+    onSearchClick,
+    onFormValidChange,
+}: {
+    mountainsData: MountainData[];
+    onSearchClick: (data: SelectedMountainData) => void;
+    onFormValidChange: (isValid: boolean) => void;
+}) => ({
+    mountainsData,
+    onSearchClick,
+    onFormValidChange,
+});
+
+const loadingProps = (selectedMountain: SelectedMountainData) => ({
+    mountainTitle: selectedMountain.mountainName,
+    mountainDescription: selectedMountain.mountainDescription,
+});
 
 const backgroundStyle = css`
     position: absolute;
@@ -56,59 +101,3 @@ const overBackgroundStyle = css`
 
     margin-bottom: 2rem;
 `;
-
-const mountainCardContainerStyle = css`
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    overflow-x: auto;
-    padding: 1.5rem 2rem;
-    width: 100%;
-    box-sizing: border-box;
-
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-`;
-
-const data = [
-    {
-        mountainName: '설악산',
-        weatherIconName: 'clear-day',
-        surfaceTemperature: 20,
-        summitTemperature: 15,
-    },
-    {
-        mountainName: '한라산',
-        weatherIconName: 'partly-cloudy-day',
-        surfaceTemperature: 25,
-        summitTemperature: 20,
-    },
-    {
-        mountainName: '지리산',
-        weatherIconName: 'rain',
-        surfaceTemperature: 22,
-        summitTemperature: 18,
-    },
-    {
-        mountainName: '오대산',
-        weatherIconName: 'snow',
-        surfaceTemperature: 19,
-        summitTemperature: 14,
-    },
-    {
-        mountainName: '태백산',
-        weatherIconName: 'thunderstorm',
-        surfaceTemperature: 21,
-        summitTemperature: 16,
-    },
-    {
-        mountainName: '덕유산',
-        weatherIconName: 'yellow-dust',
-        surfaceTemperature: 23,
-        summitTemperature: 17,
-    },
-];
