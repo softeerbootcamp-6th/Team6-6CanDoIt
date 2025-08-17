@@ -9,6 +9,8 @@ interface ValidationRule {
     message: string;
 }
 
+const passwordRef = { current: '' };
+
 const inputFields = [
     {
         id: 'email-input',
@@ -37,9 +39,14 @@ const inputFields = [
         onIconClick: iconButtonHandler.togglePasswordVisibility,
         validations: [
             {
-                check: (value) =>
-                    validHandler.isPasswordMinLength(value) &&
-                    validHandler.hasNumberAndLetter(value),
+                check: (value) => {
+                    passwordRef.current = value;
+                    return (
+                        validHandler.isPasswordMinLength(value) &&
+                        validHandler.hasNumberAndLetter(value)
+                    );
+                },
+
                 message:
                     '영문, 숫자를 포함한 8자 이상의 비밀번호를 입력해주세요.',
             },
@@ -51,6 +58,13 @@ const inputFields = [
         label: '비밀번호 확인',
         type: 'password',
         iconAriaLabel: '비밀번호 보기',
+        validations: [
+            {
+                check: (value) => value === passwordRef.current,
+                message: '비밀번호가 일치하지 않습니다.',
+            },
+        ] as ValidationRule[],
+
         onIconClick: iconButtonHandler.togglePasswordVisibility,
     },
     {
