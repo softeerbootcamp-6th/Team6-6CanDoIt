@@ -1,5 +1,6 @@
 package com.softeer.presentation.impl;
 
+import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
@@ -22,6 +23,11 @@ public class WeatherCardController implements WeatherCardApi {
     @Override
     public ResponseEntity<List<MountainCardResponse>> mountainCards() {
         return ResponseEntity.ok(weatherCardService.createMountainCards());
+    }
+
+    @Override
+    public ResponseEntity<List<CourseInfoResponse>> courseInfos(long mountainId) {
+        return null;
     }
 
     @Override
