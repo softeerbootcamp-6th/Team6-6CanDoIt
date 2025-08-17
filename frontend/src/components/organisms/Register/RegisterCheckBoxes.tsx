@@ -3,6 +3,8 @@ import CheckBox from '../../atoms/Form/CheckBox.tsx';
 import type { ColorValueType } from '../../../types/themeTypes';
 import { useState } from 'react';
 import { theme } from '../../../theme/theme.ts';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import { privacyInfo, termsInfo } from '../../../constants/privacy.ts';
 
 interface CheckBoxItem {
     id: string;
@@ -70,7 +72,11 @@ export default function RegisterCheckBoxes() {
                                 내용 보기
                             </button>
                         )}
-                        {openModalId === box.id && box.Modal}
+                        {openModalId === box.id && (
+                            <Modal onClose={() => setOpenModalId(null)}>
+                                {box.Modal}
+                            </Modal>
+                        )}
                     </div>
                 ))}
             </div>
@@ -92,13 +98,23 @@ const checkBoxes: CheckBoxItem[] = [
         id: 'terms',
         text: '[필수] 이용약관 동의',
         required: true,
-        Modal: <div>check</div>,
+        Modal: (
+            <div>
+                <h2>{termsInfo.title}</h2>
+                <pre>{termsInfo.content}</pre>
+            </div>
+        ),
     },
     {
         id: 'privacy',
         text: '[선택] 개인정보 마케팅 활용 동의',
         required: false,
-        Modal: '[내용보기]',
+        Modal: (
+            <div>
+                <h2>{privacyInfo.title}</h2>
+                <pre>{privacyInfo.content}</pre>
+            </div>
+        ),
     },
     {
         id: 'event',
