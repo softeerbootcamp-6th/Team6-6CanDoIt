@@ -29,6 +29,7 @@ public interface WeatherCardApi {
     ---
     
     **📌 Response 필드 설명**
+    - **mountainId**: 산 아이디
     - **mountainName**: 산 이름  
     - **mountainImageUrl**: 산 대표 이미지 URL  
     - **mountainDescription**: 산 설명 문구  
@@ -44,6 +45,7 @@ public interface WeatherCardApi {
     ```json
     [  
       {  
+        "mountainId": 1,
         "mountainName": "태백산",  
         "mountainImageUrl": "https://cdn.example.com/images/taebaek.png",  
         "mountainDescription": "한겨울 설경이 아름다운 산입니다.",  
@@ -69,7 +71,7 @@ public interface WeatherCardApi {
     ```
     """
     )
-    @GetMapping("/mountains")
+    @GetMapping("/mountain")
     ResponseEntity<List<MountainCardResponse>> mountainCards();
 
 
