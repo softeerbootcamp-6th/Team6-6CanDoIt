@@ -1,15 +1,14 @@
 package com.softeer.config;
 
-import com.softeer.mountain.dto.MountainForecastApiRequest;
 import com.softeer.mountain.dto.MountainForecastApiResponse;
+import com.softeer.shortterm.dto.response.ShortForecastApiResponse;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.List;
 
 public enum ForecastApiType {
     MOUNTAIN(new ParameterizedTypeReference<List<MountainForecastApiResponse>>() {}),
-//    SHORT_TERM(),
-//    ULTRA_SHORT_TERM()
+    SHORT_TERM(new ParameterizedTypeReference<List<ShortForecastApiResponse>>() {}),
     ;
 
     private final ParameterizedTypeReference<?> responseListType;
