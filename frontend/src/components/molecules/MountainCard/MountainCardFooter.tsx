@@ -4,11 +4,11 @@ import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import { HeadlineHeading } from '../../atoms/Heading/Heading.tsx';
 
-export default function MountainCardFooter({
-    mountainName,
-}: {
+interface PropsState {
     mountainName: string;
-}) {
+}
+
+export default function MountainCardFooter({ mountainName }: PropsState) {
     return (
         <div>
             <HeadlineHeading HeadingTag='h3'>{mountainName}</HeadlineHeading>

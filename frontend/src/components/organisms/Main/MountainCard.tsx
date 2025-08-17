@@ -1,27 +1,34 @@
-// 산 이름, 날씨 정보를 받고 렌더링
 import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import MountainCardFooter from '../../molecules/MountainCard/MountainCardFooter.tsx';
 import MountainCardHeader from '../../molecules/MountainCard/MountainCardHeader.tsx';
+import type { SelectedMountainData } from '../../../types/mountainTypes';
 
-interface propsState {
+interface PropsState {
     mountainName: string;
+    mountainDescription: string;
     weatherIconName: string;
     surfaceTemperature: number;
     summitTemperature: number;
+    onClick: (data: SelectedMountainData) => void;
 }
 
-export default function MountainCard(props: propsState) {
+export default function MountainCard(props: PropsState) {
     const {
         mountainName,
+        mountainDescription,
         weatherIconName,
         surfaceTemperature,
         summitTemperature,
+        onClick,
     } = props;
 
     return (
-        <div css={cardStyle}>
+        <div
+            css={cardStyle}
+            onClick={() => onClick({ mountainName, mountainDescription })}
+        >
             <MountainCardHeader
                 weatherIconName={weatherIconName}
                 surfaceTemperature={surfaceTemperature}
