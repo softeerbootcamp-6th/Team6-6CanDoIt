@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import { LabelHeading } from '../../atoms/Heading/Heading';
 import CommonText from '../../atoms/Text/CommonText';
+import { NavLink } from 'react-router-dom';
 const { colors, typography } = theme;
 
 export default function RegisterHeader() {
@@ -12,7 +13,9 @@ export default function RegisterHeader() {
                 <CommonText TextTag='p' fontSize='caption' fontWeight='medium'>
                     이미 아이디가 있으신가요?
                 </CommonText>
-                <a css={LinkStyles}>로그인</a>
+                <NavLink to='/login' css={LinkStyles}>
+                    로그인
+                </NavLink>
             </div>
         </div>
     );
