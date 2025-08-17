@@ -1,5 +1,6 @@
 package com.softeer.presentation;
 
+import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
@@ -29,6 +30,7 @@ public interface WeatherCardApi {
     ---
     
     **📌 Response 필드 설명**
+    - **mountainId**: 산 아이디
     - **mountainName**: 산 이름  
     - **mountainImageUrl**: 산 대표 이미지 URL  
     - **mountainDescription**: 산 설명 문구  
@@ -44,6 +46,7 @@ public interface WeatherCardApi {
     ```json
     [  
       {  
+        "mountainId": 1,
         "mountainName": "태백산",  
         "mountainImageUrl": "https://cdn.example.com/images/taebaek.png",  
         "mountainDescription": "한겨울 설경이 아름다운 산입니다.",  
@@ -55,6 +58,7 @@ public interface WeatherCardApi {
         }  
       },  
       {  
+        "mountainId": 2,
         "mountainName": "지리산",  
         "mountainImageUrl": "https://cdn.example.com/images/jiri.png",  
         "mountainDescription": "한국에서 두 번째로 높은 산입니다.",  
@@ -69,9 +73,42 @@ public interface WeatherCardApi {
     ```
     """
     )
-    @GetMapping("/mountains")
+    @GetMapping("/mountain")
     ResponseEntity<List<MountainCardResponse>> mountainCards();
 
+    @Operation(
+            summary = "산별 코스 정보 조회",
+            description = """
+    ### 🥾 **산별 코스 정보 응답**
+
+    해당 API는 특정 산에 속한 **등산 코스 목록**을 반환합니다.  
+    각 코스는 ID와 이름만 포함된 간단한 형태이며, **리스트로 제공**됩니다.
+
+    ---
+
+    #### 📌 **응답 필드 설명 (CourseInfoResponse)**
+    - **courseId**: 코스 ID (long)  
+    - **courseName**: 코스 이름 (string)
+
+    ---
+
+    #### ✅ **성공 응답 예시 (HTTP 200)**
+    ```json
+    [
+      {
+        "courseId": 1,
+        "courseName": "천제단 코스"
+      },
+      {
+        "courseId": 2,
+        "courseName": "망경대 코스"
+      }
+    ]
+    ```
+    """
+    )
+    @GetMapping("/mountain/{mountainId}")
+    ResponseEntity<List<CourseInfoResponse>> courseInfos(@PathVariable("mountainId") long mountainId);
 
     @Operation(
             summary = "코스 카드 정보 조회",
@@ -236,6 +273,4 @@ public interface WeatherCardApi {
     )
     @GetMapping("/mountain/{mountainId}/forecast")
     ResponseEntity<List<HourlyWeatherResponse>> hourlyWeatherForecasts(@PathVariable Long mountainId, @RequestParam LocalDateTime startDateTime);
-
-
 }
