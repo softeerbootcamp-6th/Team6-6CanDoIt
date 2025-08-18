@@ -5,9 +5,9 @@ import MainPage from './pages/MainPage/MainPage';
 import ForecastPage from './pages/ForecastPage/ForecastPage';
 import AlertPage from './pages/AlertPage/AletPage';
 import ReportPage from './pages/ReportPage/ReportPage';
-import MyPage from './pages/LoginPage/MyPage';
 import Header from './components/organisms/Common/Header';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
+import MyPage from './pages/MyPage/MyPage';
 
 function App() {
     return (
