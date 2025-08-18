@@ -1,27 +1,24 @@
 import MountainCard from '../../organisms/Main/MountainCard.tsx';
 import { css } from '@emotion/react';
-import { useEffect } from 'react';
-import type {
-    MountainData,
-    SelectedMountainData,
-} from '../../../types/mountainTypes';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { refactorMountainsData } from './utils/utils.ts';
+import type { MountainData } from '../../../types/mountainTypes';
 
-interface PropsState {
-    mountainsData: MountainData[];
-    setMountainsData: (data: MountainData[]) => void;
-    onCardClick: (data: SelectedMountainData) => void;
-}
-
-export default function MountainCardSection(props: PropsState) {
-    const { mountainsData, setMountainsData, onCardClick } = props;
-
+export default function MountainCardSection() {
+    const navigate = useNavigate();
+    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
     useEffect(() => {
         setMountainsData(MountainsData);
-    });
+    }, []);
 
     const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
         event.currentTarget.scrollLeft += Number(event.deltaY);
+    };
+    const handleCardClick = (mountainId: string) => {
+        navigate(
+            `/forecast?mountainid=${mountainId}&courseId=null&weekdayId=null`,
+        );
     };
 
     const data = refactorMountainsData(mountainsData);
@@ -32,10 +29,7 @@ export default function MountainCardSection(props: PropsState) {
                 <MountainCard
                     key={mountain.mountainName}
                     onClick={() => {
-                        onCardClick({
-                            mountainName: mountain.mountainName,
-                            mountainDescription: mountain.mountainDescription,
-                        });
+                        handleCardClick(mountain.mountainId);
                     }}
                     {...mountain}
                 />
@@ -63,6 +57,7 @@ const mountainCardContainerStyle = css`
 
 const MountainsData = [
     {
+        mountainId: '1',
         mountainName: '태백산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -74,6 +69,7 @@ const MountainsData = [
         },
     },
     {
+        mountainId: '2',
         mountainName: '지리산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -85,6 +81,7 @@ const MountainsData = [
         },
     },
     {
+        mountainId: '3',
         mountainName: '백두산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -96,6 +93,7 @@ const MountainsData = [
         },
     },
     {
+        mountainId: '4',
         mountainName: '한라산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -107,6 +105,7 @@ const MountainsData = [
         },
     },
     {
+        mountainId: '5',
         mountainName: '설악산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -118,6 +117,7 @@ const MountainsData = [
         },
     },
     {
+        mountainId: '6',
         mountainName: '가야산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
