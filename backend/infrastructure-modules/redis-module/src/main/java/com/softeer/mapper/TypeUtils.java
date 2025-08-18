@@ -1,5 +1,8 @@
 package com.softeer.mapper;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public final class TypeUtils {
     private TypeUtils() {}
 
@@ -70,6 +73,18 @@ public final class TypeUtils {
 
         String enumName = src.toString().trim();
         return Enum.valueOf((Class<Enum>) targetType, enumName);
+    }
+
+    public static Object convertToLocalDateTime(Object src, Class<?> targetType) {
+        if (src instanceof LocalDateTime time) {
+            return time;
+        }
+
+        try {
+            return LocalDateTime.parse(src.toString().trim(), DateTimeFormatter.ISO_DATE_TIME);
+        } catch (Exception e) {
+            throw createTypeMismatchException(src, targetType);
+        }
     }
 
     private static IllegalArgumentException createTypeMismatchException(Object value, Class<?> targetType) {
