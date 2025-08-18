@@ -18,6 +18,7 @@ export default function MultiLocationTemperature({
         <div>
             {data.map(({ location, temperature }, idx) => (
                 <LocationTemperatureItem
+                    key={`${location}-${temperature}`}
                     location={location}
                     temperature={temperature}
                     isLast={idx === data.length - 1}

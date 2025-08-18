@@ -4,21 +4,42 @@ import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
+import { useState, useEffect } from 'react';
 
-// 드롭다운의 제목, 옵션 리스트를 받고 렌더링
-interface propsState {
-    title: string;
-    options: string[];
-    isOpenOptions?: boolean;
+interface Option {
+    id: string;
+    name: string;
 }
 
-export default function Dropdown(props: propsState) {
-    const { title, options, isOpenOptions = 'false' } = props;
+interface PropsState {
+    title: string;
+    options: Option[];
+    isOpenOptions?: boolean;
+    onToggle: () => void;
+    onSelect?: (option: Option) => void;
+}
+
+export default function Dropdown(props: PropsState) {
+    const { title, options, isOpenOptions = false, onToggle, onSelect } = props;
+
+    const [selector, setSelector] = useState({ id: '0', name: title });
+
+    useEffect(() => {
+        if (onSelect && selector.name !== title) {
+            onSelect(selector);
+        }
+    }, [selector, title, onSelect]);
+
+    const optionListProps = createOptionListProps({
+        options,
+        setSelector,
+        onToggle,
+    });
 
     return (
         <div css={dropdownStyle}>
-            <div css={selectorTitleStyle}>
-                <SearchBarText>{title}</SearchBarText>
+            <div css={selectorTitleStyle} onClick={onToggle}>
+                <SearchBarText>{selector.name}</SearchBarText>
                 <div css={selectorChevronButtonStyle}>
                     <Icon {...chevronIconProps} />
                 </div>
@@ -32,14 +53,35 @@ export default function Dropdown(props: propsState) {
                         </div>
                     </div>
                     <ul>
-                        {options.map((option) => (
-                            <TextLi>{option}</TextLi>
+                        {optionListProps.map((liProps) => (
+                            <TextLi {...liProps} />
                         ))}
                     </ul>
                 </div>
             )}
         </div>
     );
+}
+
+function createOptionListProps({
+    options,
+    setSelector,
+    onToggle,
+}: {
+    options: Option[];
+    setSelector: React.Dispatch<
+        React.SetStateAction<{ id: string; name: string }>
+    >;
+    onToggle: () => void;
+}) {
+    return options.map((option) => ({
+        key: option.id,
+        onClick: () => {
+            setSelector({ id: option.id, name: option.name });
+            onToggle();
+        },
+        children: option.name,
+    }));
 }
 
 const chevronIconProps = {
@@ -54,6 +96,7 @@ const { colors } = theme;
 const dropdownStyle = css`
     position: relative;
     width: max-content;
+    cursor: pointer;
 `;
 
 const chevronButtonStyle = css`

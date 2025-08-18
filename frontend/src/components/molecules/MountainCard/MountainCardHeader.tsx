@@ -4,13 +4,13 @@ import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 
-interface propsState {
+interface PropsState {
     weatherIconName: string;
     surfaceTemperature: number;
     summitTemperature: number;
 }
 
-export default function MountainCardHeader(props: propsState) {
+export default function MountainCardHeader(props: PropsState) {
     const { weatherIconName, surfaceTemperature, summitTemperature } = props;
 
     const weatherData = createWeatherData({
