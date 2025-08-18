@@ -3,6 +3,16 @@ import FormButton from '../../atoms/Button/FormButton.tsx';
 import TextInputWithIcon from '../../molecules/Input/TextInputWithIcon.tsx';
 import RegisterCheckBoxes from '../Register/RegisterCheckBoxes.tsx';
 import { iconButtonHandler, validHandler } from './utils.ts';
+import { type RefObject } from 'react';
+
+interface PropsState {
+    refs: {
+        idRef: RefObject<HTMLInputElement>;
+        passwordRef: RefObject<HTMLInputElement>;
+        passwordConfirmRef: RefObject<HTMLInputElement>;
+        nicknameRef: RefObject<HTMLInputElement>;
+    };
+}
 
 interface ValidationRule {
     check: (value: string) => boolean;
@@ -10,6 +20,29 @@ interface ValidationRule {
 }
 
 const passwordRef = { current: '' };
+
+export default function RegisterForm({ refs }: PropsState) {
+    const inputFieldsWithRef = [
+        { ...inputFields[0], inputRef: refs.idRef },
+        { ...inputFields[1], inputRef: refs.passwordRef },
+        { ...inputFields[2], inputRef: refs.passwordConfirmRef },
+        { ...inputFields[3], inputRef: refs.nicknameRef },
+    ];
+
+    return (
+        <form css={formWrapperStyles}>
+            <TextInputWithIcon {...inputFieldsWithRef[0]} />
+            <FormButton type='button' text='아이디 중복확인' />
+
+            {inputFieldsWithRef.slice(1).map((field) => (
+                <TextInputWithIcon key={field.id} {...field} />
+            ))}
+            <FormButton type='button' text='닉네임 중복확인' />
+            <RegisterCheckBoxes />
+            <FormButton text='회원가입하기' />
+        </form>
+    );
+}
 
 const inputFields = [
     {
@@ -86,21 +119,6 @@ const inputFields = [
         ] as ValidationRule[],
     },
 ] as const;
-
-export default function RegisterForm() {
-    return (
-        <form css={formWrapperStyles}>
-            <TextInputWithIcon {...inputFields[0]} />
-            <FormButton type='button' text='아이디 중복확인' />
-
-            {inputFields.slice(1).map((field) => (
-                <TextInputWithIcon key={field.id} {...field} />
-            ))}
-            <RegisterCheckBoxes />
-            <FormButton text='회원가입하기' />
-        </form>
-    );
-}
 
 const formWrapperStyles = css`
     display: flex;
