@@ -3,3 +3,15 @@ management:
     web:
       exposure:
         include: "health,info"
+
+forecast:
+  mapping:
+    sky:
+      "1.0": "SUNNY"
+      "3.0": "CLOUDY"
+      "4.0": "OVERCAST"
+    precipitation-type:
+      "0": "NONE"
+      "1": "RAIN"
+      "2": "RAIN_SNOW"
+      "3": "SNOW"
