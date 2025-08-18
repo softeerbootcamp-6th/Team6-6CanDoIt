@@ -7,3 +7,8 @@ jwt:
   access-token-expiration-ms: 10800000
   secret-key: qweiofjqewmiofqe3mifo130i2jen1390kf123r3efdf13f341f134f
 
+# MySQL Setting
+spring:
+  redis:
+    host: localhost
+    port: 6379
