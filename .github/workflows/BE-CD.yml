@@ -84,6 +84,7 @@ jobs:
 
           export REDIS_HOST=${{ secrets.REDIS_HOST }}
           export REDIS_PORT=${{ secrets.REDIS_PORT }}
+          export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
 
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           export JWT_EXPIRATION_MS=${{ secrets.JWT_EXPIRATION_MS }}
