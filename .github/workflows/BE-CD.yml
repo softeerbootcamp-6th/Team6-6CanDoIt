@@ -95,6 +95,9 @@ jobs:
           export DB_USER=${{ secrets.DB_USER }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
+          export REDIS_HOST=${{ secrets.REDIS_HOST }}
+          export REDIS_PORT=${{ secrets.REDIS_PORT }}
+
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           export JWT_EXPIRATION_MS=${{ secrets.JWT_EXPIRATION_MS }}
           EOF

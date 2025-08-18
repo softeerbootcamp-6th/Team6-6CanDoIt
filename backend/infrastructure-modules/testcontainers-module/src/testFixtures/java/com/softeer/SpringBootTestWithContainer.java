@@ -1,7 +1,6 @@
 package com.softeer;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -16,6 +15,6 @@ import java.lang.annotation.Target;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = TestcontainersConfiguration.class)
+@ContextConfiguration(initializers = {TestcontainersConfiguration.class, RedisContainerContainer.class})
 public @interface SpringBootTestWithContainer {
 }
