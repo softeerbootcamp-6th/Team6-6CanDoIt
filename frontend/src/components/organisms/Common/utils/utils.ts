@@ -1,8 +1,4 @@
 type DropdownType = 'mountain' | 'course' | 'weekday' | null;
-interface Option {
-    id: string;
-    name: string;
-}
 export const createHandleToggleDropdown =
     ({
         setOpenDropdown,
@@ -15,31 +11,29 @@ export const createHandleToggleDropdown =
         setOpenDropdown(openDropdown === dropdown ? null : dropdown);
     };
 
+interface createHandleSubmitProps {
+    isMainPage: boolean;
+    isReportPage: boolean;
+    selectedMountainId: string;
+    selectedCourseId?: string;
+    selectedWeekdayId?: string;
+    onSubmit: (values: {
+        mountainId: string;
+        courseId?: string;
+        weekdayId?: string;
+    }) => void;
+}
 export const createHandleSubmit =
     ({
-        isMainPage,
-        isReportPage,
-        selectedMountain,
-        selectedCourse,
-        selectedWeekday,
+        selectedMountainId,
+        selectedCourseId = 'null',
+        selectedWeekdayId = 'null',
         onSubmit,
-    }: {
-        isMainPage: boolean;
-        isReportPage: boolean;
-        selectedMountain: Option;
-        selectedCourse: Option;
-        selectedWeekday: Option;
-        onSubmit: (values: {
-            mountain: Option;
-            course?: Option;
-            weekday?: Option;
-        }) => void;
-    }) =>
-    (e: React.FormEvent) => {
-        e.preventDefault();
+    }: createHandleSubmitProps) =>
+    () => {
         onSubmit({
-            mountain: selectedMountain,
-            course: isMainPage || isReportPage ? selectedCourse : undefined,
-            weekday: isMainPage ? selectedWeekday : undefined,
+            mountainId: selectedMountainId,
+            courseId: selectedCourseId,
+            weekdayId: selectedWeekdayId,
         });
     };
