@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.RecordComponent;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -48,5 +50,25 @@ public class RecordMapper {
         } catch (Exception e) {
             throw new RuntimeException("Failed to create record instance", e);
         }
+    }
+
+    public <T extends Record> Map<String, Object> toMap(T record) {
+        if (!record.getClass().isRecord()) {
+            throw new IllegalArgumentException("Provided object is not a record: " + record.getClass());
+        }
+
+        Map<String, Object> map = new HashMap<>();
+
+        for (RecordComponent component : record.getClass().getRecordComponents()) {
+            try {
+                Method accessor = component.getAccessor();
+                Object value = accessor.invoke(record);
+                map.put(component.getName(), value);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Failed to access record component: " + component.getName(), e);
+            }
+        }
+
+        return map;
     }
 }
