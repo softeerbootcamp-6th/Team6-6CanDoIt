@@ -1,85 +1,24 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { useState } from 'react';
+import { css } from '@emotion/react';
 import MainSearchSection from '../../components/templates/Main/MainSearchSection.tsx';
 import MountainCardSection from '../../components/templates/Main/MountainCardSection.tsx';
-import Loading from '../../components/organisms/Loading/Loading.tsx';
-import { css } from '@emotion/react';
-import type {
-    MountainData,
-    SelectedMountainData,
-} from '../../types/mountainTypes';
-import { createFormValidChange, createStartLoading } from './utils/utils.ts';
+import { formValidChange } from './utils/utils.ts';
 
 export default function MainPage() {
     const [isOpen, setIsOpen] = useState(false);
-    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
-    const [selectedMountain, setSelectedMountain] =
-        useState<SelectedMountainData | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleStartLoading = createStartLoading({
-        setSelectedMountain,
-        setIsLoading,
-    });
-    const handleFormValidChange = createFormValidChange({ setIsOpen });
-
-    const mainSearchSectionProps = createMainSearchSectionProps({
-        mountainsData,
-        onSearchClick: handleStartLoading,
-        onFormValidChange: handleFormValidChange,
-    });
-    const mountainCardSectionProps = createMountainCardSectionProps({
-        mountainsData,
-        setMountainsData,
-        onCardClick: handleStartLoading,
-    });
-
-    if (isLoading) {
-        return <Loading {...loadingProps(selectedMountain!)} />;
-    }
 
     return (
         <>
             {isOpen && <div css={backgroundStyle} />}
             <div css={overBackgroundStyle}>
-                <MainSearchSection {...mainSearchSectionProps} />
+                <MainSearchSection
+                    onFormValidChange={formValidChange({ setIsOpen })}
+                />
             </div>
-            <MountainCardSection {...mountainCardSectionProps} />
+            <MountainCardSection />
         </>
     );
 }
-
-const createMountainCardSectionProps = ({
-    mountainsData,
-    setMountainsData,
-    onCardClick,
-}: {
-    mountainsData: MountainData[];
-    setMountainsData: Dispatch<SetStateAction<MountainData[]>>;
-    onCardClick: (data: SelectedMountainData) => void;
-}) => ({
-    mountainsData,
-    setMountainsData,
-    onCardClick,
-});
-
-const createMainSearchSectionProps = ({
-    mountainsData,
-    onSearchClick,
-    onFormValidChange,
-}: {
-    mountainsData: MountainData[];
-    onSearchClick: (data: SelectedMountainData) => void;
-    onFormValidChange: (isValid: boolean) => void;
-}) => ({
-    mountainsData,
-    onSearchClick,
-    onFormValidChange,
-});
-
-const loadingProps = (selectedMountain: SelectedMountainData) => ({
-    mountainTitle: selectedMountain.mountainName,
-    mountainDescription: selectedMountain.mountainDescription,
-});
 
 const backgroundStyle = css`
     position: absolute;
