@@ -29,7 +29,7 @@ public class RedisSupporter {
             List<T> result = redisLoader.load();
             if (result == null || result.isEmpty()) {
                 log.warn("[RedisSupporter] Redis returned empty list. Falling back to adapter.");
-                throw new RuntimeException();
+                throw new RuntimeException("Redis returned empty list");
             }
             return result;
         } catch (Exception e) {
