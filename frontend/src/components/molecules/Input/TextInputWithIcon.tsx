@@ -4,7 +4,8 @@ import FormLabelText from '../../atoms/Text/FormLabelText.tsx';
 import TextInput from '../../atoms/Input/TextInput.tsx';
 import IconButton from '../../atoms/Button/IconButton.tsx';
 import WarningText from '../../atoms/Text/WarningText.tsx';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { type RefObject } from 'react';
 
 const { colors } = theme;
 
@@ -17,6 +18,7 @@ interface PropsState {
     iconAriaLabel: string;
     icon: string;
     validations?: ValidationRule[];
+    inputRef: RefObject<HTMLInputElement>;
 }
 
 interface ValidationRule {
@@ -35,8 +37,8 @@ export default function TextInputWithIcon({
     icon,
     iconAriaLabel,
     validations = [],
+    inputRef,
 }: PropsState) {
-    const inputRef = useRef<null | HTMLInputElement>(null);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     const handleChange = (text: string) => {
@@ -84,7 +86,6 @@ const wrapperStyles = css`
     align-items: flex-start;
     border-bottom: 1px solid ${colors.grey[60]};
     width: fit-content;
-    gap: 0.5rem;
 `;
 
 const lineStyles = css`
