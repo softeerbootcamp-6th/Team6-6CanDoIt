@@ -4,3 +4,9 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+kma:
+  api:
+    key:
+      mountain: ${secrets.KMA_API_KEY_MOUNTAIN}
+      short: ${secrets.KMA_API_KEY_SHORT}
