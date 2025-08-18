@@ -3,46 +3,35 @@ os: linux
 
 files:
   - source: /
-    destination: /opt/backend-app
-    overwrite: yes
-    file_exists_behavior: OVERWRITE
+    destination: /home/ubuntu/deploy
+    overwrite: true
 
 permissions:
-  - object: /opt/backend-app
+  - object: /home/ubuntu/deploy/scripts
     pattern: "**"
+    mode: 755
     owner: ubuntu
     group: ubuntu
-    mode: 755
-  - object: /opt/backend-app
-    pattern: "**/*.sh"
-    owner: ubuntu
-    group: ubuntu
-    mode: 755
 
 hooks:
   BeforeInstall:
-    - location: before_install.sh
+    - location: scripts/before_install.sh
       timeout: 300
-      runas: ubuntu
+      runas: root
 
   ApplicationStop:
-    - location: stop_application.sh
-      timeout: 300
+    - location: scripts/stop_application.sh
+      timeout: 60
       runas: ubuntu
-
+  
   ApplicationStart:
-    - location: manage_images_entry.sh
-      timeout: 600
+    - location: scripts/start_application.sh
+      timeout: 120
       runas: ubuntu
-    - location: start_application.sh
+  
+  ValidateService:
+    - location: scripts/validate_service.sh
       timeout: 300
       runas: ubuntu
 
-  ValidateService:
-    - location: validate_service.sh
-      timeout: 300
-      runas: ubuntu
-    - location: cleanup_s3.sh
-      timeout: 300
-      runas: ubuntu
 
