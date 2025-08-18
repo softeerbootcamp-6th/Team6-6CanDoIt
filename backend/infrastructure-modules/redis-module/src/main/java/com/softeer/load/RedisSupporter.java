@@ -43,7 +43,8 @@ public class RedisSupporter {
             Map<T, R> result = redisLoader.load();
             if (result == null || result.isEmpty()) {
                 log.warn("[RedisSupporter] Redis returned empty list. Falling back to adapter.");
-                throw new RuntimeException();
+                log.warn("[RedisSupporter] Redis returned empty map. Falling back to adapter.");
+                throw new RuntimeException("Redis returned empty map");
             }
             return result;
         } catch (Exception e) {
