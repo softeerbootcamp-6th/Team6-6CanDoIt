@@ -5,11 +5,19 @@ interface PropsState {
     text: string;
     onClick?: () => void;
     margin?: string;
+    type?: ButtonType;
 }
+
+type ButtonType = 'button' | 'submit';
 
 const { colors, typography } = theme;
 
-export default function FormButton({ text, onClick, margin }: PropsState) {
+export default function FormButton({
+    text,
+    onClick,
+    margin,
+    type = 'submit',
+}: PropsState) {
     const dynamicStyles = css`
         margin: ${margin};
     `;
@@ -18,7 +26,7 @@ export default function FormButton({ text, onClick, margin }: PropsState) {
         <button
             css={[buttonStyles, dynamicStyles]}
             onClick={onClick}
-            type='submit'
+            type={type}
         >
             {text}
         </button>

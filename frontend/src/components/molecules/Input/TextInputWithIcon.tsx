@@ -4,19 +4,24 @@ import FormLabelText from '../../atoms/Text/FormLabelText.tsx';
 import TextInput from '../../atoms/Input/TextInput.tsx';
 import IconButton from '../../atoms/Button/IconButton.tsx';
 import WarningText from '../../atoms/Text/WarningText.tsx';
+import { useRef, useState } from 'react';
 
 const { colors } = theme;
 
-interface Props {
+interface PropsState {
     id: string;
     label: string;
     placeholder?: string;
-    onIconClick?: () => void;
+    onIconClick?: (ref: React.RefObject<HTMLInputElement>) => void;
     type?: InputType;
     iconAriaLabel: string;
     icon: string;
-    isValid?: boolean;
-    validationMessage?: string;
+    validations?: ValidationRule[];
+}
+
+interface ValidationRule {
+    check: (value: string) => boolean;
+    message: string;
 }
 
 type InputType = 'text' | 'password';
@@ -29,9 +34,23 @@ export default function TextInputWithIcon({
     type = 'text',
     icon,
     iconAriaLabel,
-    isValid = false,
-    validationMessage,
-}: Props) {
+    validations = [],
+}: PropsState) {
+    const inputRef = useRef<null | HTMLInputElement>(null);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const handleChange = (text: string) => {
+        const newValue = text;
+
+        for (const rule of validations) {
+            if (!rule.check(newValue)) {
+                setErrorMessage(rule.message);
+                return;
+            }
+        }
+        setErrorMessage('');
+    };
+
     return (
         <div>
             <label css={wrapperStyles} htmlFor={id}>
@@ -42,15 +61,19 @@ export default function TextInputWithIcon({
                         ariaLabel={label}
                         placeholder={placeholder}
                         type={type}
+                        ref={inputRef}
+                        onChange={(text) => handleChange(text)}
                     />
                     <IconButton
                         iconName={icon}
                         ariaLabel={iconAriaLabel}
-                        onClick={onIconClick}
+                        onClick={() => onIconClick?.(inputRef)}
                     />
                 </div>
             </label>
-            {!isValid && <WarningText>{validationMessage}</WarningText>}
+            <div css={warningWrapperStyles}>
+                {errorMessage && <WarningText>{errorMessage}</WarningText>}
+            </div>
         </div>
     );
 }
@@ -69,4 +92,8 @@ const lineStyles = css`
     align-items: center;
     padding: 0.75rem 0.2rem;
     gap: 0.5rem;
+`;
+
+const warningWrapperStyles = css`
+    min-height: 1.3rem;
 `;

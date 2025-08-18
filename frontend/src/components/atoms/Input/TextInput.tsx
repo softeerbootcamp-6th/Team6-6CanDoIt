@@ -1,33 +1,40 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import { forwardRef } from 'react';
 
 const { colors, typography } = theme;
 
-interface TextInputProps {
+interface PropsState {
     id?: string;
     ariaLabel?: string;
     placeholder?: string;
     type: InputType;
+    onChange?: (value: string) => void;
 }
 
 type InputType = 'text' | 'password';
 
-export default function TextInput({
-    id,
-    ariaLabel,
-    placeholder,
-    type,
-}: TextInputProps) {
-    return (
-        <input
-            id={id}
-            aria-label={ariaLabel}
-            placeholder={placeholder}
-            css={inputStyles}
-            type={type}
-        />
-    );
-}
+const TextInput = forwardRef<HTMLInputElement, PropsState>(
+    ({ id, ariaLabel, placeholder, type, onChange }, ref) => {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange?.(e.target.value);
+        };
+
+        return (
+            <input
+                ref={ref}
+                id={id}
+                aria-label={ariaLabel}
+                placeholder={placeholder}
+                type={type}
+                onChange={handleChange}
+                css={inputStyles}
+            />
+        );
+    },
+);
+
+export default TextInput;
 
 const inputStyles = css`
     all: unset;

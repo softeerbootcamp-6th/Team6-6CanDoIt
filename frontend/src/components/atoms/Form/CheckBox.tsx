@@ -7,6 +7,8 @@ interface PropsState {
     text: string;
     subTitle?: string;
     grey?: ColorValueType;
+    checked?: boolean;
+    onChange?: () => void;
 }
 
 const { colors, typography } = theme;
@@ -16,6 +18,8 @@ export default function CheckBox({
     text,
     subTitle,
     grey = 90 as ColorValueType,
+    checked,
+    onChange,
 }: PropsState) {
     const dynamicColorStyles = css`
         color: ${colors.grey[grey]};
@@ -23,7 +27,13 @@ export default function CheckBox({
 
     return (
         <label htmlFor={id} css={wrapperStyles}>
-            <input id={id} type='checkbox' css={hiddenInput} />
+            <input
+                id={id}
+                type='checkbox'
+                css={hiddenInput}
+                onChange={onChange}
+                checked={checked}
+            />
             <span css={boxStyles} />
             <div css={labelBoxStyles}>
                 <span css={[labelStyles, dynamicColorStyles]}>{text}</span>
