@@ -15,22 +15,22 @@ permissions:
 
 hooks:
   BeforeInstall:
-    - location: scripts/before_install.sh
+    - location: deploy/scripts/before_install.sh
       timeout: 300
       runas: root
 
   ApplicationStop:
-    - location: scripts/stop_application.sh
+    - location: deploy/scripts/stop_application.sh
       timeout: 60
       runas: ubuntu
   
   ApplicationStart:
-    - location: scripts/start_application.sh
+    - location: deploy/scripts/start_application.sh
       timeout: 120
       runas: ubuntu
   
   ValidateService:
-    - location: scripts/validate_service.sh
+    - location: deploy/scripts/validate_service.sh
       timeout: 300
       runas: ubuntu
 
