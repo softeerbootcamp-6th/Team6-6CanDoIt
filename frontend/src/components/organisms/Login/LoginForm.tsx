@@ -19,7 +19,7 @@ export default function LoginForm() {
             if (typeof data === 'string') {
                 alert(`서버 응답: ${data}`);
             } else {
-                alert(`회원가입 성공: ${data.message}`);
+                alert(`로그인 성공: ${data.message}`);
             }
         },
         onError: (error: Error) => alert(`로그인 실패: ${error.message}`),
