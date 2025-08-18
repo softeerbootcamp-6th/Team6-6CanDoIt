@@ -8,14 +8,15 @@ import com.softeer.entity.enums.ForecastType;
 import com.softeer.error.CustomException;
 import com.softeer.error.ExceptionCreator;
 import com.softeer.exception.ForecastException;
+import com.softeer.load.RedisSupporter;
 import com.softeer.repository.ForecastAdapter;
+import com.softeer.service.impl.ForecastRedisQueryService;
 import com.softeer.service.impl.ForecastUseCaseImpl;
 import com.softeer.time.HikingTime;
 import com.softeer.time.TimeUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,17 +31,46 @@ class ForecastUseCaseTest {
 
     private ForecastUseCase target;
     private ForecastAdapter forecastAdapter;
+    private ForecastRedisQueryService redisQueryService;
 
     @BeforeEach
     void setUp() {
         forecastAdapter = mock(ForecastAdapter.class);
-        target = new ForecastUseCaseImpl(forecastAdapter);
+        RedisSupporter redisSupporter = new RedisSupporter();
+        redisQueryService = mock(ForecastRedisQueryService.class);
+        target = new ForecastUseCaseImpl(redisSupporter, forecastAdapter, redisQueryService);
     }
 
 
     @Test
-    @DisplayName("현재 기준 base time으로 어댑터를 호출하고 그대로 반환한다")
-    void findForecastsFromStartDateTime_success() {
+    @DisplayName("레디스를 호출하고 그대로 반환한다")
+    void findForecastsFromStartDateTime_redis_success() {
+        // given
+        Grid grid = GridFixture.createDefault();
+
+        LocalDateTime startDateTime = TimeUtil.getBaseTime(LocalDateTime.of(2025, 8, 1, 10, 20));
+
+        int hour = 50;
+        List<Forecast> expected = new ArrayList<>(hour);
+
+        for(int i = 0; i < 50; i++) {
+            expected.add(ForecastFixture.builder().id(i + 1).dateTime(startDateTime.plusHours(i)).build());
+        }
+
+        when(redisQueryService.findShortForecasts(grid.id())).thenReturn(expected);
+        // when
+        List<Forecast> result = target.findForecastsFromStartDateTime(grid, startDateTime);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+
+        verify(redisQueryService, times(1)).findShortForecasts(any(Integer.class));
+        verify(forecastAdapter, times(0)).findForecastsBetweenDateTime(any(Integer.class), any(LocalDateTime.class), any(LocalDateTime.class));
+    }
+
+    @Test
+    @DisplayName("레디스는 실패하고 현재 기준 base time으로 어댑터를 호출하고 그대로 반환한다")
+    void findForecastsFromStartDateTime_redis_failure() {
         // given
         Grid grid = GridFixture.createDefault();
 
@@ -54,20 +84,18 @@ class ForecastUseCaseTest {
             expected.add(ForecastFixture.builder().id(i + 1).dateTime(startDateTime.plusHours(i)).build());
         }
 
-        when(forecastAdapter.findForecastsBetweenDateTime(grid.id(), startDateTime, endDateTime)).thenReturn(expected);
-
+        when(redisQueryService.findShortForecasts(eq(grid.id()))).thenThrow(RuntimeException.class);
+        when(forecastAdapter.findForecastsBetweenDateTime(eq(grid.id()), any(LocalDateTime.class), any(LocalDateTime.class))).thenReturn(expected);
         // when
         List<Forecast> result = target.findForecastsFromStartDateTime(grid, startDateTime);
 
         // then
         assertThat(result).isEqualTo(expected);
 
-        ArgumentCaptor<LocalDateTime> timeCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
-        verify(forecastAdapter, times(1)).findForecastsBetweenDateTime(eq(grid.id()), timeCaptor.capture(), eq(endDateTime));
-
-        LocalDateTime captured = timeCaptor.getValue();
-        assertThat(startDateTime).isEqualTo(captured);
+        verify(redisQueryService, times(1)).findShortForecasts(any(Integer.class));
+        verify(forecastAdapter, times(1)).findForecastsBetweenDateTime(any(Integer.class), any(LocalDateTime.class), any(LocalDateTime.class));
     }
+
 
     @Test
     @DisplayName("출발/정상/하산 시간별 예보를 조회해 CourseForecast를 반환한다")
@@ -86,9 +114,9 @@ class ForecastUseCaseTest {
         Forecast arrivalForecast = ForecastFixture.builder().id(2L).forecastType(ForecastType.MOUNTAIN).dateTime(hikingTime.arrivalTime()).build();
         Forecast descentForecast = ForecastFixture.builder().id(3L).forecastType(ForecastType.SHORT).dateTime(hikingTime.descentTime()).build();
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.of(descentForecast));
+        when(redisQueryService.findForecastByGridIdAndTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(startForecast);
+        when(redisQueryService.findForecastByGridIdAndTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(arrivalForecast);
+        when(redisQueryService.findForecastByGridIdAndTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(descentForecast);
 
 
         ForecastUseCase.CourseForecast expected = new ForecastUseCase.CourseForecast(startForecast, arrivalForecast, descentForecast);
@@ -98,9 +126,9 @@ class ForecastUseCaseTest {
 
         // then
         assertThat(result).isEqualTo(expected);
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
-        verify(forecastAdapter, times(1)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime());
+        verify(forecastAdapter, times(0)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime());
+        verify(forecastAdapter, times(0)).findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime());
+        verify(forecastAdapter, times(0)).findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime());
     }
 
     @Test
@@ -118,6 +146,8 @@ class ForecastUseCaseTest {
 
         CustomException expected = ExceptionCreator.create(ForecastException.NOT_FOUND);
 
+
+        when(redisQueryService.findShortForecasts(any(Integer.class))).thenThrow(RuntimeException.class);
         when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.empty());
 
         // when
@@ -145,6 +175,7 @@ class ForecastUseCaseTest {
 
         Forecast startForecast = ForecastFixture.builder().id(1L).forecastType(ForecastType.SHORT).dateTime(hikingTime.startTime()).build();
 
+        when(redisQueryService.findShortForecasts(any(Integer.class))).thenThrow(RuntimeException.class);
         when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
         when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.empty());
 
@@ -174,6 +205,7 @@ class ForecastUseCaseTest {
         Forecast arrivalForecast = ForecastFixture.builder().id(2L).forecastType(ForecastType.MOUNTAIN).dateTime(hikingTime.arrivalTime()).build();
 
 
+        when(redisQueryService.findShortForecasts(any(Integer.class))).thenThrow(RuntimeException.class);
         when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.startTime())).thenReturn(Optional.of(startForecast));
         when(forecastAdapter.findForecastByTypeAndDateTime(destinationGrid.id(), ForecastType.MOUNTAIN, hikingTime.arrivalTime())).thenReturn(Optional.of(arrivalForecast));
         when(forecastAdapter.findForecastByTypeAndDateTime(startGrid.id(), ForecastType.SHORT, hikingTime.descentTime())).thenReturn(Optional.empty());
@@ -199,8 +231,8 @@ class ForecastUseCaseTest {
         Forecast shortForecast = ForecastFixture.builder().forecastType(ForecastType.SHORT).dateTime(dateTime).build();
         Forecast topForecast = ForecastFixture.builder().forecastType(ForecastType.MOUNTAIN).dateTime(dateTime).build();
 
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.SHORT, dateTime)).thenReturn(Optional.of(shortForecast));
-        when(forecastAdapter.findForecastByTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, dateTime)).thenReturn(Optional.of(topForecast));
+        when(redisQueryService.findForecastByGridIdAndTypeAndDateTime(grid.id(), ForecastType.SHORT, dateTime)).thenReturn(shortForecast);
+        when(redisQueryService.findForecastByGridIdAndTypeAndDateTime(grid.id(), ForecastType.MOUNTAIN, dateTime)).thenReturn(shortForecast);
 
         ForecastUseCase.WeatherCondition weatherCondition = new ForecastUseCase.WeatherCondition(shortForecast, topForecast);
 
@@ -232,8 +264,8 @@ class ForecastUseCaseTest {
             expected.put(gridId, wc);
         }
 
-        when(forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.SHORT, dateTime)).thenReturn(shortMap);
-        when(forecastAdapter.findForecastsByTypeAndDateTime(gridIds, ForecastType.MOUNTAIN, dateTime)).thenReturn(mountainMap);
+        when(redisQueryService.findForecastsByGridIdAndTypeAndDateTime(gridIds, ForecastType.SHORT, dateTime)).thenReturn(shortMap);
+        when(redisQueryService.findForecastsByGridIdAndTypeAndDateTime(gridIds, ForecastType.MOUNTAIN, dateTime)).thenReturn(mountainMap);
 
         // when
         Map<Integer, ForecastUseCase.WeatherCondition> result = target.findAllWeatherConditions(gridIds, dateTime);
