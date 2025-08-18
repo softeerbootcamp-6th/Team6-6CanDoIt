@@ -8,3 +8,8 @@ spring:
 jwt:
   access-token-expiration-ms: ${JWT_EXPIRATION_MS}
   secret-key: ${JWT_SECRET_KEY}
+
+spring:
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
