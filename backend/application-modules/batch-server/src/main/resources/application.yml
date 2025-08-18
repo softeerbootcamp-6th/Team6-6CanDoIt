@@ -15,3 +15,8 @@ forecast:
       "1": "RAIN"
       "2": "RAIN_SNOW"
       "3": "SNOW"
+
+spring:
+  batch:
+    job:
+      enabled: false
