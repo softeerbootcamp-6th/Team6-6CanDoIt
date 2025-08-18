@@ -20,46 +20,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ARM64 빌드를 위한 QEMU + buildx
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Prepare output dir
-        run: mkdir -p backend/docker-images
-
-      # ARM64로 캐시 사용해서 빌드 → tar로 저장
-      - name: Build ${{ matrix.svc }} (ARM64)
-        uses: docker/build-push-action@v6
+      # 1. JDK 설정
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          context: ./backend
-          file: backend/application-modules/${{ matrix.svc }}/Dockerfile
-          platforms: linux/arm64
-          tags: ${{ matrix.svc }}:${{ github.sha }}
-          cache-from: type=gha,scope=${{ matrix.svc }}-arm64
-          cache-to:   type=gha,mode=max,scope=${{ matrix.svc }}-arm64
-          load: true  # 빌드한 이미지를 runner의 Docker daemon으로 로드
-          push: false # ECR로 푸시하지 않음 (outputs 옵션 제거)
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-      # 로드된 이미지를 'docker save' 명령어로 직접 .tar.gz 파일로 저장
-      - name: Save Docker image to .tar.gz
-        run: |
-          mkdir -p backend/docker-images
-          docker save ${{ matrix.svc }}:${{ github.sha }} | gzip > backend/docker-images/${{ matrix.svc }}.tar.gz
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./backend/gradlew
 
-      # 위에서 생성된 .tar.gz 파일을 S3에 업로드
+      - name: Build ${{ matrix.svc }} with Gradle
+        working-directory: ./backend
+        run: ./gradlew :application-modules:${{ matrix.svc }}:build -x test
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ secrets.AWS_BUCKET_REGION }}
           role-to-assume: ${{ secrets.OIDC_ROLE }}
 
-      - name: Upload to S3
+      - name: Upload JAR to S3
         run: |
-          aws s3 cp backend/docker-images/${{ matrix.svc }}.tar.gz \
-            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/docker-images/${{ github.sha }}/${{ matrix.svc }}.tar.gz \
+          # build/libs/ 경로에서 *-plain.jar가 아닌 실행 가능한 JAR 파일 찾기
+          JAR_FILE=$(find ./backend/application-modules/${{ matrix.svc }}/build/libs -name "*.jar" ! -name "*-plain.jar")
+          
+          # S3에 업로드 (서비스 이름.jar 로 통일하여 업로드)
+          aws s3 cp $JAR_FILE \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/artifacts/${{ github.sha }}/${{ matrix.svc }}.jar \
             --storage-class STANDARD_IA
 
   deploy:
@@ -84,10 +73,8 @@ jobs:
           cp appspec.yml deploy/
 
           cat > deploy/.env <<EOF
-          export IMAGE_TAG=${GITHUB_SHA}
+          export ARTIFACT_VERSION=${GITHUB_SHA}
           export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
-          export API_SERVER_IMAGE=api-server:${GITHUB_SHA}
-          export BATCH_SERVER_IMAGE=batch-server:${GITHUB_SHA}
 
           export DB_HOST=${{ secrets.DB_HOST }}
           export DB_PORT=3306
@@ -100,6 +87,9 @@ jobs:
 
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           export JWT_EXPIRATION_MS=${{ secrets.JWT_EXPIRATION_MS }}
+
+          export KMA_API_KEY_MOUNTAIN=${{ secrets.KMA_API_KEY_MOUNTAIN }}
+          export KMA_API_KEY_SHORT=${{ secrets.KMA_API_KEY_SHORT }}
           EOF
 
           # 실행 권한 부여
