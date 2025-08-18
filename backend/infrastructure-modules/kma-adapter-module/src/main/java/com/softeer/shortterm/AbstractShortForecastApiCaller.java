@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class AbstractShortForecastApiCaller extends AbstractKmaApiCaller<ShortForecastItem> {
+public abstract class AbstractShortForecastApiCaller extends AbstractKmaApiCaller<ShortForecastItem> {
 
     protected AbstractShortForecastApiCaller(RestClient restClient) {
         super(restClient, ForecastApiType.SHORT_TERM);
