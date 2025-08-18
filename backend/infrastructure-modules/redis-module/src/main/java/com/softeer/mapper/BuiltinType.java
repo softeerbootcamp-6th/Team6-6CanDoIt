@@ -1,5 +1,6 @@
 package com.softeer.mapper;
 
+import java.time.LocalDateTime;
 import java.util.function.BiFunction;
 
 public enum BuiltinType implements Type {
@@ -16,7 +17,8 @@ public enum BuiltinType implements Type {
         public boolean supports(Class<?> target) {
             return target.isEnum();
         }
-    };
+    },
+    LOCAL_DATE_TIME(LocalDateTime.class, TypeUtils::convertToLocalDateTime);
 
     private final Class<?>[] handledTypes;
     private final BiFunction<Object, Class<?>, Object> converter;

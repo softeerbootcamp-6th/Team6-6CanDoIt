@@ -1,10 +1,11 @@
 dependencies {
     implementation project(':domain-modules:grid-domain')
     implementation project(':common-modules:util')
+    implementation project(':infrastructure-modules:redis-module')
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     testImplementation(testFixtures(project(':domain-modules:grid-domain')))
     testImplementation(testFixtures(project(':domain-modules:forecast-domain')))
-
 }
 
 bootJar {
