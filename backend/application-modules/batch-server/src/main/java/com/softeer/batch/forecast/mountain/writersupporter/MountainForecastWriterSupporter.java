@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.mountain.repository;
+package com.softeer.batch.forecast.mountain.writersupporter;
 
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.domain.Forecast;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Repository
 @StepScope
 @RequiredArgsConstructor
-public class ForecastBatchRepository {
+public class MountainForecastWriterSupporter {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
