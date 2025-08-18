@@ -15,7 +15,7 @@ public class RedisSupporter {
             T result = redisLoader.load();
             if (result == null) {
                 log.warn("[RedisSupporter] Redis returned empty list. Falling back to adapter.");
-                throw new RuntimeException();
+                throw new RuntimeException("Redis returned null result");
             }
             return result;
         } catch (Exception e) {
