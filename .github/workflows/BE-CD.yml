@@ -97,6 +97,9 @@ jobs:
 
           export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
           export JWT_EXPIRATION_MS=${{ secrets.JWT_EXPIRATION_MS }}
+
+          export KMA_API_KEY_MOUNTAIN=${{ secrets.KMA_API_KEY_MOUNTAIN }}
+          export KMA_API_KEY_SHORT=${{ secrets.KMA_API_KEY_SHORT }}
           EOF
 
           # 실행 권한 부여
