@@ -55,7 +55,7 @@ export default function RegisterCheckBoxes() {
             />
             <div css={checkBoxStyles}>
                 {checkBoxes.map((box) => (
-                    <div css={checkLineWrapper}>
+                    <div key={box.id} css={checkLineWrapper}>
                         <CheckBox
                             key={box.id}
                             id={box.id}
