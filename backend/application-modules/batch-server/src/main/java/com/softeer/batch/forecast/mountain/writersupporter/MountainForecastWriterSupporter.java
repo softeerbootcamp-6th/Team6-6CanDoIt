@@ -7,11 +7,11 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-@Repository
+@Component
 @StepScope
 @RequiredArgsConstructor
 public class MountainForecastWriterSupporter {
