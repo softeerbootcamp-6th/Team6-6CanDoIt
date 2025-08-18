@@ -1,4 +1,5 @@
 export interface MountainData {
+    mountainId: string;
     mountainName: string;
     mountainImageUrl: string;
     mountainDescription: string;
@@ -8,13 +9,6 @@ export interface MountainData {
         surfaceTemperature: number;
         topTemperature: number;
     };
-}
-
-export interface SelectedMountainData {
-    mountainName: string;
-    mountainDescription: string;
-    course?: string;
-    timeToGo?: string;
 }
 
 export interface MountainCourse {
