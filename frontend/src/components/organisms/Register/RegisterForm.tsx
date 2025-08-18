@@ -12,6 +12,7 @@ interface PropsState {
         passwordConfirmRef: RefObject<HTMLInputElement>;
         nicknameRef: RefObject<HTMLInputElement>;
     };
+    onClickRegister: () => void;
 }
 
 interface ValidationRule {
@@ -21,7 +22,7 @@ interface ValidationRule {
 
 const passwordRef = { current: '' };
 
-export default function RegisterForm({ refs }: PropsState) {
+export default function RegisterForm({ refs, onClickRegister }: PropsState) {
     const inputFieldsWithRef = [
         { ...inputFields[0], inputRef: refs.idRef },
         { ...inputFields[1], inputRef: refs.passwordRef },
@@ -39,7 +40,7 @@ export default function RegisterForm({ refs }: PropsState) {
             ))}
             <FormButton type='button' text='닉네임 중복확인' />
             <RegisterCheckBoxes />
-            <FormButton text='회원가입하기' />
+            <FormButton onClick={onClickRegister} text='회원가입하기' />
         </form>
     );
 }
