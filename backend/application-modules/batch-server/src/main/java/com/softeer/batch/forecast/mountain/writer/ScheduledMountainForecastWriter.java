@@ -25,7 +25,6 @@ public class ScheduledMountainForecastWriter extends AbstractMountainForecastWri
         final LocalDateTime rawThreeDaysLater = now.plusDays(3).withHour(0);
         final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
 
-        TimeUtil.getBaseTime(now);
         return forecasts.stream()
                 .filter(hourly -> hourly.dateTime().isAfter(sixHoursLater) && !hourly.dateTime().isAfter(threeDaysLater))
                 .collect(Collectors.toList());
