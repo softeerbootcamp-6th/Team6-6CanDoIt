@@ -46,9 +46,6 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
 
     @Override
     public MountainDailyForecast process(MountainIdentifier identifier) {
-
-        log.info(">>>>> Processing forecast for mountain ID: {}", identifier.id());
-
         ApiTime apiTime = ApiTimeUtil.getShortBaseTime(LocalDateTime.now());
 
         MountainForecastApiRequest request = new MountainForecastApiRequest(
