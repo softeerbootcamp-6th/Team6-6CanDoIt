@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -40,6 +42,7 @@ public class MountainForecastJobConfig {
     private final StartUpMountainForecastWriter startupWriter;
 
     @Bean(name = STARTUP_MOUNTAIN_FORECAST_JOB)
+    @JobScope
     public Job startupForecastJob() {
         return new JobBuilder(STARTUP_MOUNTAIN_FORECAST_JOB, jobRepository)
                 .start(startupForecastStep())
@@ -47,11 +50,13 @@ public class MountainForecastJobConfig {
     }
 
     @Bean(name = STARTUP_MOUNTAIN_FORECAST_STEP)
+    @StepScope
     public Step startupForecastStep() {
         return createForecastStep(STARTUP_MOUNTAIN_FORECAST_STEP, startupWriter);
     }
 
     @Bean(name = SCHEDULED_MOUNTAIN_FORECAST_JOB)
+    @JobScope
     public Job scheduledForecastJob() {
         return new JobBuilder(SCHEDULED_MOUNTAIN_FORECAST_JOB, jobRepository)
                 .start(scheduledForecastStep())
@@ -59,6 +64,7 @@ public class MountainForecastJobConfig {
     }
 
     @Bean(name = SCHEDULED_MOUNTAIN_FORECAST_STEP)
+    @StepScope
     public Step scheduledForecastStep() {
         return createForecastStep(SCHEDULED_MOUNTAIN_FORECAST_STEP, scheduledWriter);
     }
