@@ -1,8 +1,7 @@
 package com.softeer.batch.forecast.mountain.scheduler;
 
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -14,9 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Component
 public class MountainForecastJobScheduler {
-    private static final Logger log = LoggerFactory.getLogger(MountainForecastJobScheduler.class);
 
     private final JobLauncher jobLauncher;
     private final Job startupJob;
