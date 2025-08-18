@@ -3,21 +3,18 @@ import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import MountainCardFooter from '../../molecules/MountainCard/MountainCardFooter.tsx';
 import MountainCardHeader from '../../molecules/MountainCard/MountainCardHeader.tsx';
-import type { SelectedMountainData } from '../../../types/mountainTypes';
 
 interface PropsState {
     mountainName: string;
-    mountainDescription: string;
     weatherIconName: string;
     surfaceTemperature: number;
     summitTemperature: number;
-    onClick: (data: SelectedMountainData) => void;
+    onClick: () => void;
 }
 
 export default function MountainCard(props: PropsState) {
     const {
         mountainName,
-        mountainDescription,
         weatherIconName,
         surfaceTemperature,
         summitTemperature,
@@ -25,10 +22,7 @@ export default function MountainCard(props: PropsState) {
     } = props;
 
     return (
-        <div
-            css={cardStyle}
-            onClick={() => onClick({ mountainName, mountainDescription })}
-        >
+        <div css={cardStyle} onClick={() => onClick()}>
             <MountainCardHeader
                 weatherIconName={weatherIconName}
                 surfaceTemperature={surfaceTemperature}
