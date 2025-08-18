@@ -35,3 +35,25 @@ export function createTextStyle({
         line-height: ${lineHeight};
     `;
 }
+
+export function convertToIconName({
+    precipitationType,
+    sky,
+}: {
+    precipitationType: string;
+    sky: string;
+}) {
+    if (precipitationType === 'NONE') {
+        if (sky === 'SUNNY') return 'clear-day';
+        if (sky === 'CLOUDY') return 'partly-cloudy-day';
+        if (sky === 'OVERCAST') return 'cloudy';
+    }
+    if (precipitationType === 'RAIN' || precipitationType === 'SLEET')
+        return 'rain';
+    if (precipitationType === 'SNOW') return 'snow';
+    if (precipitationType === 'SHOWER') return 'shower-rain';
+    if (precipitationType === 'DRIZZLE' || precipitationType === 'DRIZZLE_SNOW')
+        return 'occasional-rain';
+    if (precipitationType === 'SNOW_FLURRY') return 'occasional-snow';
+    return '';
+}

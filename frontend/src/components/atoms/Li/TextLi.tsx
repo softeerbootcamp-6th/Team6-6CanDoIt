@@ -3,9 +3,14 @@ import { theme } from '../../../theme/theme';
 
 interface PropsState {
     children: string;
+    onClick?: () => void;
 }
-export default function TextLi({ children }: PropsState) {
-    return <li css={textStyles}>{children}</li>;
+export default function TextLi({ children, onClick }: PropsState) {
+    return (
+        <li css={textStyles} onClick={onClick}>
+            {children}
+        </li>
+    );
 }
 
 const { colors, typography } = theme;
