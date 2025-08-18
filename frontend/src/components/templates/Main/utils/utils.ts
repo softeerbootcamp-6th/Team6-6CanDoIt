@@ -1,12 +1,12 @@
 import type {
     MountainCourse,
     MountainData,
-    SelectedMountainData,
 } from '../../../../types/mountainTypes';
 import { convertToIconName } from '../../../../utils/utils.ts';
 
 export function refactorMountainsData(data: MountainData[]) {
     return data.map((mountain) => ({
+        mountainId: mountain.mountainId,
         mountainName: mountain.mountainName,
         mountainDescription: mountain.mountainDescription,
         weatherIconName: convertToIconName({
@@ -25,8 +25,8 @@ interface Option {
 export function refactorMountainDataToOptions(
     mountainsData: MountainData[],
 ): Option[] {
-    return mountainsData.map((mountain, index) => ({
-        id: index.toString(),
+    return mountainsData.map((mountain) => ({
+        id: mountain.mountainId,
         name: mountain.mountainName,
     }));
 }
@@ -41,30 +41,31 @@ export function refactorCoursesDataToOptions(
 }
 
 export function validate(values: {
-    mountain: Option;
-    course?: Option;
-    weekday?: Option;
+    mountainId: string;
+    courseId?: string;
+    weekdayId?: string;
 }) {
-    if (values.mountain.id === '0') return '산을 선택해주세요';
-    if (values.course?.id === '0') return '코스를 선택해주세요';
-    if (values.weekday?.id === '0') return '요일을 선택해주세요';
+    const { mountainId, courseId = '0', weekdayId = '0' } = values;
+    if (mountainId === '0' || mountainId === 'null') return '산을 선택해주세요';
+    if (courseId === '0' || courseId === 'null') return '코스를 선택해주세요';
+    if (weekdayId === '0' || weekdayId === 'null') return '요일을 선택해주세요';
     return null;
 }
 
 export function createHandleSubmit({
-    mountainsData,
-    onSearchClick,
     onFormValidChange,
+    navigate,
 }: {
-    mountainsData: MountainData[];
-    onSearchClick: (data: SelectedMountainData) => void;
     onFormValidChange: (isValid: boolean) => void;
+    navigate: (path: string) => void;
 }) {
     return (values: {
-        mountain: Option;
-        course?: Option;
-        weekday?: Option;
+        mountainId: string;
+        courseId?: string;
+        weekdayId?: string;
     }) => {
+        const { mountainId, courseId = 'null', weekdayId = 'null' } = values;
+
         const error = validate(values);
         if (error) {
             alert(error);
@@ -73,19 +74,8 @@ export function createHandleSubmit({
         }
 
         onFormValidChange(true);
-
-        const mountain = mountainsData.find(
-            (mountain) => mountain.mountainName === values.mountain.name,
+        navigate(
+            `/forecast?mountainid=${mountainId}&courseid=${courseId}&weekdayid=${weekdayId}`,
         );
-        if (!mountain) return;
-
-        const payload: SelectedMountainData = {
-            mountainName: mountain.mountainName,
-            mountainDescription: mountain.mountainDescription,
-            course: values.course?.name,
-            timeToGo: values.weekday?.name,
-        };
-
-        onSearchClick(payload);
     };
 }
