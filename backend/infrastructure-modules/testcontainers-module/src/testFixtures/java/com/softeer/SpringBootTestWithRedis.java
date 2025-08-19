@@ -15,6 +15,6 @@ import java.lang.annotation.Target;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-@ContextConfiguration(initializers = RedisContainerContainer.class)
+@ContextConfiguration(initializers = RedisContainer.class)
 public @interface SpringBootTestWithRedis {
 }

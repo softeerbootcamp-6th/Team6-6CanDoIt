@@ -7,6 +7,9 @@ spring:
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
+    username: ${REDIS_USERNAME}
+    password: ${REDIS_PASSWORD}
+    ssl: false
 jwt:
   access-token-expiration-ms: ${JWT_EXPIRATION_MS}
   secret-key: ${JWT_SECRET_KEY}

@@ -9,8 +9,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration.LettuceClientConfigurationBuilder;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -27,18 +29,28 @@ public class RedisConfiguration {
 
     @Bean
     public RedisClient redisClient(RedisProperties props) {
-        return RedisClient.create("redis://" + props.host() + ":" + props.port());
+        String scheme = props.ssl() ? "rediss" : "redis";
+        String uri = String.format("%s://%s:%s@%s:%d",
+                scheme, props.username(), props.password(), props.host(), props.port());
+        return RedisClient.create(uri);
     }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisProperties.host(), redisProperties.port());
 
-        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder()
-                .commandTimeout(Duration.ofSeconds(3))
-                .build();
+        config.setUsername(redisProperties.username());
+        config.setPassword(RedisPassword.of(redisProperties.password()));
 
-        return new LettuceConnectionFactory(config, lettuceClientConfiguration);
+        LettuceClientConfigurationBuilder builder =
+                LettuceClientConfiguration.builder()
+                        .commandTimeout(Duration.ofSeconds(3));
+
+        if (redisProperties.ssl()) {
+            builder.useSsl();
+        }
+
+        return new LettuceConnectionFactory(config, builder.build());
     }
 
     @Bean

@@ -1,28 +1,59 @@
 #!/bin/bash
+# CodeDeploy Hook: ApplicationStart
+# This script downloads the JAR files from S3 and starts the Spring Boot applications.
+
 set -e
 
-echo "=== Starting application services using Docker Compose ==="
+echo "=== ApplicationStart: Starting application ==="
 
-# .env 파일이 있는 배포 루트 디렉터리로 이동
-cd /opt/backend-app
+DEPLOY_DIR="/home/ubuntu/deploy"
+APP_DIR="/home/ubuntu/app"
+LOG_DIR="$APP_DIR/logs"
 
-# .env 파일 로드 (docker-compose가 자동으로 읽지만, 명시적으로 로드할 수도 있음)
-if [ -f .env ]; then
-    source .env
-    echo "Loaded .env file."
+# Create log directory if it doesn't exist
+mkdir -p "$LOG_DIR"
+
+# Load environment variables from .env file created by GitHub Actions
+if [ -f "$DEPLOY_DIR/.env" ]; then
+    echo "Loading environment variables from .env file."
+    source "$DEPLOY_DIR/.env"
 else
-    echo "Error: .env file not found!"
+    echo "Error: .env file not found in $DEPLOY_DIR!"
     exit 1
 fi
 
-# docker-compose.yml 파일을 이용해 모든 서비스를 백그라운드에서 실행
-# --detach(-d): 백그라운드 실행
-# --force-recreate: 기존 컨테이너가 있어도 강제로 다시 만듦
-echo "Starting services defined in docker-compose.yml..."
-docker-compose -f docker-compose.yml up --detach --force-recreate
+# Define services and their properties
+declare -A services
+services=(
+    ["api-server"]="8080"
+    ["batch-server"]="8081"
+)
 
-echo "=== Application services started ==="
+# Download and start each service
+for svc in "${!services[@]}"; do
+    port=${services[$svc]}
+    JAR_NAME="$svc.jar"
+    S3_PATH="s3://${S3_BUCKET}/artifacts/${ARTIFACT_VERSION}/${JAR_NAME}"
+    LOCAL_PATH="$APP_DIR/${JAR_NAME}"
+    LOG_FILE="$LOG_DIR/${svc}.log"
 
-# 실행 중인 컨테이너 목록 표시
-echo "Running containers:"
-docker-compose ps
+    echo "--- Processing service: $svc ---"
+
+    # 1. Download the JAR file from S3
+    echo "Downloading $JAR_NAME from $S3_PATH..."
+    aws s3 cp "$S3_PATH" "$LOCAL_PATH"
+
+    # 2. Start the application using java -jar
+    echo "Starting $svc on port $port..."
+    
+    # The environment variables sourced from .env will be available to the Java process.
+    nohup java -jar \
+        -Dspring.profiles.active=prod \
+        -Dserver.port=${port} \
+        "$LOCAL_PATH" > "$LOG_FILE" 2>&1 &
+
+    echo "$svc started successfully. Log file: $LOG_FILE"
+    sleep 5 # Give a moment for the process to initialize
+done
+
+echo "=== ApplicationStart completed successfully ==="
