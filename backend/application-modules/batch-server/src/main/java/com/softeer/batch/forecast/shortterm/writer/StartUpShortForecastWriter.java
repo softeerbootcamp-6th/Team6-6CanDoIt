@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.mountain.writer;
+package com.softeer.batch.forecast.shortterm.writer;
 
 import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
 import com.softeer.domain.Forecast;
@@ -12,21 +12,20 @@ import java.util.stream.Collectors;
 
 @Component
 @StepScope
-public class ScheduledMountainForecastWriter extends AbstractMountainForecastWriter {
+public class StartUpShortForecastWriter extends AbstractShortForecastWriter{
 
-    public ScheduledMountainForecastWriter(ForecastWriterSupporter forecastWriterSupporter) {
+    public StartUpShortForecastWriter(ForecastWriterSupporter forecastWriterSupporter) {
         super(forecastWriterSupporter);
     }
 
     @Override
     protected List<Forecast> filterForecasts(List<Forecast> forecasts) {
         final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime sixHoursLater = now.plusHours(6);
         final LocalDateTime rawThreeDaysLater = now.plusDays(3).withHour(0);
         final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
 
         return forecasts.stream()
-                .filter(hourly -> hourly.dateTime().isAfter(sixHoursLater) && !hourly.dateTime().isAfter(threeDaysLater))
+                .filter(hourly -> !hourly.dateTime().isAfter(threeDaysLater))
                 .collect(Collectors.toList());
     }
 }

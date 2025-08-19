@@ -30,7 +30,7 @@ public class MountainForecastJobConfig {
     public static final String SCHEDULED_MOUNTAIN_FORECAST_JOB = "scheduledMountainForecastJob";
     public static final String SCHEDULED_MOUNTAIN_FORECAST_STEP = "scheduledMountainForecastStep";
 
-    private static final int CHUNK_SIZE = 10;
+    private static final int CHUNK_SIZE = 20;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -72,7 +72,7 @@ public class MountainForecastJobConfig {
                 .reader(mountainIdentifierReader)
                 .processor(mountainForecastProcessor)
                 .writer(writer)
-                .taskExecutor(new SimpleAsyncTaskExecutor())
+//                .taskExecutor(new SimpleAsyncTaskExecutor())
                 .build();
     }
 }

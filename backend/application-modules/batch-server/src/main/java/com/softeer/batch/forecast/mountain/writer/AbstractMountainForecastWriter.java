@@ -1,7 +1,7 @@
 package com.softeer.batch.forecast.mountain.writer;
 
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
-import com.softeer.batch.forecast.mountain.writersupporter.MountainForecastWriterSupporter;
+import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public abstract class AbstractMountainForecastWriter implements ItemWriter<MountainDailyForecast> {
 
-    protected final MountainForecastWriterSupporter mountainForecastWriterSupporter;
+    protected final ForecastWriterSupporter forecastWriterSupporter;
 
     @Override
     public void write(Chunk<? extends MountainDailyForecast> chunk) {
@@ -27,14 +27,14 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
     private void writeSunTime(Chunk<? extends MountainDailyForecast> chunk) {
         SqlParameterSource[] sunTimeParams = chunk.getItems().stream()
                 .filter(item -> item.sunTime() != null && item.sunTime().sunrise() != null)
-                .map(mountainForecastWriterSupporter::createSunTimeParams)
+                .map(forecastWriterSupporter::createSunTimeParams)
                 .toArray(SqlParameterSource[]::new);
 
-        mountainForecastWriterSupporter.batchUpdateSunTime(sunTimeParams);
+        forecastWriterSupporter.batchUpdateSunTime(sunTimeParams);
     }
 
     private void writeForecast(Chunk<? extends MountainDailyForecast> chunk) {
-        Map<Long, List<Forecast>> forecastsByGridId = chunk.getItems().stream()
+        Map<Integer, List<Forecast>> forecastsByGridId = chunk.getItems().stream()
                 .collect(Collectors.toMap(
                         MountainDailyForecast::gridId,
                         MountainDailyForecast::hourlyForecasts
@@ -42,17 +42,17 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
 
         List<SqlParameterSource> paramsToInsert = new ArrayList<>();
 
-        for (Map.Entry<Long, List<Forecast>> entry : forecastsByGridId.entrySet()) {
-            Long gridId = entry.getKey();
+        for (Map.Entry<Integer, List<Forecast>> entry : forecastsByGridId.entrySet()) {
+            int gridId = entry.getKey();
             List<Forecast> forecasts = filterForecasts(entry.getValue());
 
             forecasts.stream()
-                    .map(hourly -> mountainForecastWriterSupporter.mapForecastToSqlParams(hourly, gridId))
+                    .map(hourly -> forecastWriterSupporter.mapForecastToSqlParams(hourly, gridId))
                     .forEach(paramsToInsert::add);
         }
 
         if (!paramsToInsert.isEmpty()) {
-            mountainForecastWriterSupporter.batchUpdateForecast(paramsToInsert.toArray(new SqlParameterSource[0]));
+            forecastWriterSupporter.batchUpdateForecast(paramsToInsert.toArray(new SqlParameterSource[0]));
         }
     }
 
