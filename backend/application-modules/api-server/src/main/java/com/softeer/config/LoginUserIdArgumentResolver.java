@@ -1,8 +1,8 @@
-package com.softeer.security;
+package com.softeer.config;
 
 import com.softeer.entity.Role;
 import com.softeer.error.ExceptionCreator;
-import com.softeer.security.auth.JwtResolver;
+import com.softeer.config.auth.JwtResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

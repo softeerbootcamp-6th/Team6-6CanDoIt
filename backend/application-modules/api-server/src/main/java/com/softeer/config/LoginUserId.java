@@ -1,4 +1,4 @@
-package com.softeer.security;
+package com.softeer.config;
 
 import com.softeer.entity.Role;
 import io.swagger.v3.oas.annotations.Hidden;
