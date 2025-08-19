@@ -1,9 +1,9 @@
 package com.softeer.service.auth;
 
-import com.softeer.security.auth.JwtGenerator;
-import com.softeer.security.auth.JwtProperties;
-import com.softeer.security.auth.JwtResolver;
-import com.softeer.security.auth.Token;
+import com.softeer.config.auth.JwtGenerator;
+import com.softeer.config.auth.JwtProperties;
+import com.softeer.config.auth.JwtResolver;
+import com.softeer.config.auth.Token;
 import com.softeer.entity.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
