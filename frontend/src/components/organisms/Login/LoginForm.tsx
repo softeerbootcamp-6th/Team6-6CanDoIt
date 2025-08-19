@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export default function LoginForm() {
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
-    const autoLoginRef = useRef<boolean>(false);
+    const autoLoginRef = useRef<null | HTMLInputElement>(null);
     const navigate = useNavigate();
 
     const mutation = useApiMutation<{ loginId: string; password: string }, any>(
@@ -19,7 +19,7 @@ export default function LoginForm() {
         'POST',
         {
             onSuccess: (data) => {
-                const storage = autoLoginRef.current
+                const storage = autoLoginRef.current?.checked
                     ? localStorage
                     : sessionStorage;
                 storage.setItem('accessToken', data.value);
@@ -58,6 +58,7 @@ export default function LoginForm() {
                 ))}
             </div>
             <CheckBox
+                inputRef={autoLoginRef}
                 id='login-button'
                 text='자동 로그인'
                 grey={60 as ColorValueType}
