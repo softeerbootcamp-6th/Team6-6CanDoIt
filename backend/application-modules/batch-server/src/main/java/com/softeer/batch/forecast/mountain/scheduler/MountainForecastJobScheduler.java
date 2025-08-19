@@ -1,6 +1,5 @@
 package com.softeer.batch.forecast.mountain.scheduler;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -8,6 +7,9 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,14 +31,15 @@ public class MountainForecastJobScheduler {
         this.scheduledJob = scheduledJob;
     }
 
-    @PostConstruct
+    @Order(1)
+    @EventListener(ApplicationReadyEvent.class)
     public void runJobOnStartup() {
         try {
             log.info("Running startupForecastJob on application startup...");
             JobParameters params = new JobParametersBuilder()
                     .addString("startupAt", LocalDateTime.now().toString())
                     .toJobParameters();
-            JobExecution execution = jobLauncher.run(startupJob, params); // <<< 시작용 Job 실행
+            JobExecution execution = jobLauncher.run(startupJob, params);
             log.info("Startup job finished with status={}", execution.getStatus());
         } catch (Exception e) {
             log.error("Failed to run startupForecastJob on startup", e);

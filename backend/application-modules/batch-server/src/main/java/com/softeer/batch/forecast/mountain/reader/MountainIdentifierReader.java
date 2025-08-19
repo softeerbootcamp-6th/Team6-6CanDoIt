@@ -27,7 +27,7 @@ public class MountainIdentifierReader extends JdbcPagingItemReader<MountainIdent
         super.setRowMapper((rs, rowNum) -> new MountainIdentifier(
                 rs.getLong("id"),
                 rs.getInt("code"),
-                rs.getLong("gridId")
+                rs.getInt("gridId")
         ));
 
         try {
