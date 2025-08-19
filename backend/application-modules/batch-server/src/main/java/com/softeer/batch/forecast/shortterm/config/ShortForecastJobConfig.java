@@ -41,14 +41,14 @@ public class ShortForecastJobConfig {
 
     @Bean(name = START_UP_SHORT_FORECAST_JOB)
     public Job startupForecastJob() {
-        return new JobBuilder(START_UP_SHORT_FORECAST_JOB, jobRepository)
-                .start(stattupShortForecastStep())
+        return new JobBuilder(START_UP_SHORT_FORECAST_STEP, jobRepository)
+                .start(startupShortForecastStep())
                 .build();
     }
 
     @Bean(name = START_UP_SHORT_FORECAST_STEP)
     @JobScope
-    public Step stattupShortForecastStep() {
+    public Step startupShortForecastStep() {
         return createForecastStep(START_UP_SHORT_FORECAST_STEP, startShortForecastWriter);
     }
 
