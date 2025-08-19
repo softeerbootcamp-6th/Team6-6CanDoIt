@@ -16,28 +16,33 @@ export function validateRegisterInput({
     password,
     passwordConfirm,
     checkBox,
-}: ValidationParams): string[] {
-    const errors: string[] = [];
+}: ValidationParams): string {
+    let errors: string;
 
     if (loginId !== confirmedId || !confirmedId) {
-        errors.push('아이디 중복 확인이 필요합니다.');
+        errors = '아이디 중복 확인이 필요합니다.';
+        return errors;
     }
 
     if (nickname !== confirmedNickname || !confirmedNickname) {
-        errors.push('닉네임 중복 확인이 필요합니다.');
+        errors = '닉네임 중복 확인이 필요합니다.';
+        return errors;
     }
 
     if (!password) {
-        errors.push('비밀번호를 입력해주세요.');
+        errors = '비밀번호를 입력해주세요.';
+        return errors;
     }
 
     if (password !== passwordConfirm) {
-        errors.push('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        errors = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';
+        return errors;
     }
 
     if (!checkBox) {
-        errors.push('필수 체크 항목을 확인해주세요.');
+        errors = '필수 체크 항목을 확인해주세요.';
+        return errors;
     }
 
-    return errors;
+    return '';
 }
