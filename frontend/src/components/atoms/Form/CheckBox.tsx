@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import type { ColorValueType } from '../../../types/themeTypes';
+import { type RefObject } from 'react';
 
 interface PropsState {
     id: string;
@@ -9,6 +10,7 @@ interface PropsState {
     grey?: ColorValueType;
     checked?: boolean;
     onChange?: () => void;
+    inputRef?: RefObject<HTMLInputElement>;
 }
 
 const { colors, typography } = theme;
@@ -20,6 +22,7 @@ export default function CheckBox({
     grey = 90 as ColorValueType,
     checked,
     onChange,
+    inputRef,
 }: PropsState) {
     const dynamicColorStyles = css`
         color: ${colors.grey[grey]};
@@ -33,6 +36,7 @@ export default function CheckBox({
                 css={hiddenInput}
                 onChange={onChange}
                 checked={checked}
+                ref={inputRef ?? undefined}
             />
             <span css={boxStyles} />
             <div css={labelBoxStyles}>

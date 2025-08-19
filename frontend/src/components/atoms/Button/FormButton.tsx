@@ -25,7 +25,10 @@ export default function FormButton({
     return (
         <button
             css={[buttonStyles, dynamicStyles]}
-            onClick={onClick}
+            onClick={(e) => {
+                e.preventDefault();
+                onClick?.();
+            }}
             type={type}
         >
             {text}
@@ -38,7 +41,7 @@ const buttonStyles = css`
     color: ${colors.grey[20]};
     background: ${colors.grey[98]};
     width: 28rem;
-    height: 3.5rem;
+    height: 3rem;
     padding: 0.5rem 1.25rem;
 
     font-size: ${typography.fontSize.caption};

@@ -6,6 +6,10 @@ import { theme } from '../../../theme/theme.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { privacyInfo, termsInfo } from '../../../constants/privacy.ts';
 
+interface PropsState {
+    onCheckStatusChange: (isValid: boolean) => void;
+}
+
 interface CheckBoxItem {
     id: string;
     text: string;
@@ -13,7 +17,9 @@ interface CheckBoxItem {
     Modal?: React.ReactNode;
 }
 
-export default function RegisterCheckBoxes() {
+export default function RegisterCheckBoxes({
+    onCheckStatusChange,
+}: PropsState) {
     const initialCheckedItems: Record<string, boolean> = {};
     checkBoxes.forEach((box) => {
         initialCheckedItems[box.id] = false;
@@ -32,6 +38,8 @@ export default function RegisterCheckBoxes() {
 
         setCheckedItems(updatedItems);
         setAllChecked(newState);
+
+        if (onCheckStatusChange) onCheckStatusChange(newState);
     };
 
     const handleIndividualCheck = (id: string) => {
@@ -40,6 +48,13 @@ export default function RegisterCheckBoxes() {
 
         setCheckedItems(updatedItems);
         setAllChecked(allAreChecked);
+
+        if (onCheckStatusChange) {
+            const requiredChecked = checkBoxes
+                .filter((box) => box.required)
+                .every((box) => updatedItems[box.id]);
+            onCheckStatusChange(requiredChecked);
+        }
     };
 
     const handleModalToggle = (id: string) => {
@@ -55,7 +70,7 @@ export default function RegisterCheckBoxes() {
             />
             <div css={checkBoxStyles}>
                 {checkBoxes.map((box) => (
-                    <div css={checkLineWrapper}>
+                    <div key={box.id} css={checkLineWrapper}>
                         <CheckBox
                             key={box.id}
                             id={box.id}
@@ -92,6 +107,11 @@ const allCheckBoxProps = {
     required: false,
 };
 
+const modalContent = css`
+    width: 40rem;
+    height: 38rem;
+`;
+
 const checkBoxes: CheckBoxItem[] = [
     { id: 'age', text: '[필수] 만 14세 이상입니다', required: true },
     {
@@ -99,7 +119,7 @@ const checkBoxes: CheckBoxItem[] = [
         text: '[필수] 이용약관 동의',
         required: true,
         Modal: (
-            <div>
+            <div css={modalContent}>
                 <h2>{termsInfo.title}</h2>
                 <pre>{termsInfo.content}</pre>
             </div>
@@ -110,7 +130,7 @@ const checkBoxes: CheckBoxItem[] = [
         text: '[선택] 개인정보 마케팅 활용 동의',
         required: false,
         Modal: (
-            <div>
+            <div css={modalContent}>
                 <h2>{privacyInfo.title}</h2>
                 <pre>{privacyInfo.content}</pre>
             </div>
