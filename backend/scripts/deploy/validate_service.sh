@@ -9,7 +9,7 @@ echo "=== Validating deployed services ==="
 check_service() {
     local service_name=$1
     local port=$2
-    local max_attempts=30
+    local max_attempts=5
     local attempt=1
 
     echo "Checking $service_name on port $port..."
