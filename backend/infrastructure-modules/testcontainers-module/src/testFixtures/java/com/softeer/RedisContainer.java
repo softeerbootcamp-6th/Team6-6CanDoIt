@@ -7,7 +7,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
-public class RedisContainerContainer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class RedisContainer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     private static final String REDIS_DOCKER_IMAGE = "redis:7.0.3-alpine";
 
