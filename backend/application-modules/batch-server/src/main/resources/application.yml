@@ -8,8 +8,11 @@ forecast:
   mapping:
     sky:
       "1.0": "SUNNY"
+      "1": "SUNNY"
       "3.0": "CLOUDY"
+      "3": "CLOUDY"
       "4.0": "OVERCAST"
+      "4": "OVERCAST"
     precipitation-type:
       "0": "NONE"
       "1": "RAIN"
