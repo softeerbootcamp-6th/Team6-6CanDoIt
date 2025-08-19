@@ -15,6 +15,7 @@ interface PropsState {
     onClickRegister: () => void;
     onClickCheckId: () => void;
     onClickCheckNickName: () => void;
+    onCheckStatusChange: (isValid: boolean) => void;
 }
 
 interface ValidationRule {
@@ -27,6 +28,7 @@ export default function RegisterForm({
     onClickRegister,
     onClickCheckId,
     onClickCheckNickName,
+    onCheckStatusChange,
 }: PropsState) {
     const inputFieldsWithRef = [
         { ...inputFields[0], inputRef: refs.idRef },
@@ -72,7 +74,7 @@ export default function RegisterForm({
                 type='button'
                 text='닉네임 중복확인'
             />
-            <RegisterCheckBoxes />
+            <RegisterCheckBoxes onCheckStatusChange={onCheckStatusChange} />
             <FormButton onClick={onClickRegister} text='회원가입하기' />
         </form>
     );

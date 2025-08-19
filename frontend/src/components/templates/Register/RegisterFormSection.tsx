@@ -21,6 +21,7 @@ export default function RegisterFormSection() {
     const passwordRef = useRef<null | HTMLInputElement>(null);
     const passwordConfirmRef = useRef<null | HTMLInputElement>(null);
     const nicknameRef = useRef<null | HTMLInputElement>(null);
+    const checkBoxValid = useRef<boolean>(false);
 
     const confirmedIdRef = useRef('');
     const confirmedNicknameRef = useRef('');
@@ -45,7 +46,7 @@ export default function RegisterFormSection() {
         const nickname = nicknameRef.current?.value ?? '';
         const password = passwordRef.current?.value ?? '';
         const passwordConfirm = passwordConfirmRef.current?.value ?? '';
-
+        const checkBox = checkBoxValid.current;
         const errors = validateRegisterInput({
             loginId,
             confirmedId: confirmedIdRef.current,
@@ -53,6 +54,7 @@ export default function RegisterFormSection() {
             confirmedNickname: confirmedNicknameRef.current,
             password,
             passwordConfirm,
+            checkBox,
         });
 
         if (errors.length > 0) {
@@ -115,6 +117,10 @@ export default function RegisterFormSection() {
         }
     };
 
+    const checkCheckBoxValid = (isValid: boolean) => {
+        checkBoxValid.current = isValid;
+    };
+
     return (
         <div css={wrapperStyles}>
             <RegisterHeader />
@@ -128,6 +134,9 @@ export default function RegisterFormSection() {
                 onClickRegister={clickRegisterHandler}
                 onClickCheckId={clickCheckIdHandler}
                 onClickCheckNickName={clickCheckNicknameHandler}
+                onCheckStatusChange={(isValid: boolean) =>
+                    checkCheckBoxValid(isValid)
+                }
             />
         </div>
     );

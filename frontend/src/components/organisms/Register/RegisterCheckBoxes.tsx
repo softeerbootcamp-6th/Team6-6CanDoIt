@@ -6,6 +6,10 @@ import { theme } from '../../../theme/theme.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { privacyInfo, termsInfo } from '../../../constants/privacy.ts';
 
+interface PropsState {
+    onCheckStatusChange: (isValid: boolean) => void;
+}
+
 interface CheckBoxItem {
     id: string;
     text: string;
@@ -13,7 +17,9 @@ interface CheckBoxItem {
     Modal?: React.ReactNode;
 }
 
-export default function RegisterCheckBoxes() {
+export default function RegisterCheckBoxes({
+    onCheckStatusChange,
+}: PropsState) {
     const initialCheckedItems: Record<string, boolean> = {};
     checkBoxes.forEach((box) => {
         initialCheckedItems[box.id] = false;
@@ -32,6 +38,8 @@ export default function RegisterCheckBoxes() {
 
         setCheckedItems(updatedItems);
         setAllChecked(newState);
+
+        if (onCheckStatusChange) onCheckStatusChange(newState);
     };
 
     const handleIndividualCheck = (id: string) => {
@@ -40,6 +48,13 @@ export default function RegisterCheckBoxes() {
 
         setCheckedItems(updatedItems);
         setAllChecked(allAreChecked);
+
+        if (onCheckStatusChange) {
+            const requiredChecked = checkBoxes
+                .filter((box) => box.required)
+                .every((box) => updatedItems[box.id]);
+            onCheckStatusChange(requiredChecked);
+        }
     };
 
     const handleModalToggle = (id: string) => {
