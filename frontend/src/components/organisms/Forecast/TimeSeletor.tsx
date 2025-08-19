@@ -43,12 +43,19 @@ export default function TimeSeletor() {
                 </div>
                 <div>
                     <SelectorTitleText>고도 보정하기</SelectorTitleText>
-                    <Icon
-                        name='info-circle'
-                        width={1.5}
-                        height={1.5}
-                        color='grey-100'
-                    />
+                    <div css={tooltipWrapper}>
+                        <Icon
+                            name='info-circle'
+                            width={1.5}
+                            height={1.5}
+                            color='grey-100'
+                        />
+                        <span>
+                            {
+                                '코스의 정상 고도를 반영해,\n기온과 풍속을 알려드려요.'
+                            }
+                        </span>
+                    </div>
                     <ToggleButton />
                 </div>
             </div>
@@ -156,4 +163,34 @@ const contentWrapperStyles = css`
     display: flex;
     flex-direction: column;
     gap: 1rem;
+`;
+
+const tooltipWrapper = css`
+    position: relative;
+    display: inline-block;
+
+    & span {
+        visibility: hidden;
+        opacity: 0;
+        width: 12rem;
+        background-color: ${colors.grey[100]};
+        color: ${colors.grey[0]};
+        text-align: center;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        position: absolute;
+        z-index: 99;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: opacity 0.3s;
+        font-size: ${typography.fontSize.caption};
+        white-space: pre-wrap;
+        line-height: 1.4;
+    }
+
+    &:hover span {
+        visibility: visible;
+        opacity: 1;
+    }
 `;
