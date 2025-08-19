@@ -2,6 +2,8 @@ package com.softeer.service.impl;
 
 import com.softeer.domain.Report;
 import com.softeer.entity.enums.ReportType;
+import com.softeer.error.ExceptionCreator;
+import com.softeer.exception.ReportException;
 import com.softeer.repository.report.ReportQueryAdapter;
 import com.softeer.repository.support.filter.KeywordFilter;
 import com.softeer.repository.support.pageable.ReportPageable;
@@ -10,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,8 @@ public class ReportQueryUseCaseImpl  implements ReportQueryUseCase {
 
     @Override
     public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType) {
+        if (Objects.isNull(reportType)) throw ExceptionCreator.create(ReportException.NO_REPORT_TYPE);
+
         return reportQueryAdapter.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType);
     }
 
