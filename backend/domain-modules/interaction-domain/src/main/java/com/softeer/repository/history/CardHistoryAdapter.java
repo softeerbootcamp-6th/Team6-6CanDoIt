@@ -1,4 +1,4 @@
-package com.softeer.repository.hisotry;
+package com.softeer.repository.history;
 
 import com.softeer.domain.CardHistory;
 import com.softeer.repository.support.pageable.CardHistoryPageable;
