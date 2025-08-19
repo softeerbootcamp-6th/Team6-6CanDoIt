@@ -117,8 +117,8 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
                         (value1, value2) -> value1
                 ));
 
-        String pcpValue = forecastData.getOrDefault("PCP", "강수없음");
-        String snoValue = forecastData.getOrDefault("SNO", "적설없음");
+        String pcpValue = getValueOrDefault(forecastData, "PCP", "강수없음");
+        String snoValue = getValueOrDefault(forecastData, "SNO", "적설없음");
         String skyCode = forecastData.getOrDefault("SKY", "3");
         String vecCode = forecastData.getOrDefault("VEC", "0");
 
@@ -142,6 +142,14 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
 
     private boolean isActualForecast(List<MountainForecastApiResponse> hourlyItems) {
         return hourlyItems.stream().anyMatch(item -> "TMP".equals(item.category()));
+    }
+
+    private String getValueOrDefault(Map<String, String> map, String key, String defaultValue) {
+        String value = map.get(key);
+        if (value == null || value.trim().equals("0") || value.trim().equals("0.0")) {
+            return defaultValue;
+        }
+        return value;
     }
 
     private double safeParseDouble(String value) {
