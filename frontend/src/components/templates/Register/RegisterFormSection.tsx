@@ -67,6 +67,29 @@ export default function RegisterFormSection() {
         }
     };
 
+    const clickCheckNicknameHandler = async () => {
+        const nickname = nicknameRef.current?.value ?? '';
+
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/user/nickname?nickname=${encodeURIComponent(nickname)}`,
+            );
+
+            if (!res.ok) {
+                const text = await res.text();
+                try {
+                    const errorData = JSON.parse(text);
+                    alert(`사용 불가: ${errorData.message}`);
+                } catch {
+                    alert(`닉네임 확인 실패: ${text}`);
+                }
+                return;
+            }
+        } catch (err) {
+            alert(`닉네임 확인 실패: ${(err as Error).message}`);
+        }
+    };
+
     return (
         <div css={wrapperStyles}>
             <RegisterHeader />
@@ -79,6 +102,7 @@ export default function RegisterFormSection() {
                 }}
                 onClickRegister={clickRegisterHandler}
                 onClickCheckId={clickCheckIdHandler}
+                onClickCheckNickName={clickCheckNicknameHandler}
             />
         </div>
     );
