@@ -1,4 +1,4 @@
-package com.softeer.security.auth;
+package com.softeer.config.auth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

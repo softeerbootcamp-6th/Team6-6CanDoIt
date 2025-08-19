@@ -1,7 +1,11 @@
 package com.softeer.repository.report;
 
+import com.softeer.domain.Keyword;
 import com.softeer.domain.Report;
 import com.softeer.entity.enums.ReportType;
+import com.softeer.entity.keyword.EtceteraKeywordEntity;
+import com.softeer.entity.keyword.RainKeywordEntity;
+import com.softeer.entity.keyword.WeatherKeywordEntity;
 import com.softeer.repository.support.filter.KeywordFilter;
 import com.softeer.repository.support.pageable.ReportPageable;
 
@@ -13,4 +17,8 @@ public interface ReportQueryAdapter {
                                               long courseId, ReportType reportType);
     List<Report> findMyReports(ReportPageable reportPageable, long userId);
     List<Report> findLikedReports(ReportPageable reportPageable, long userId);
+
+    List<WeatherKeywordEntity> findAllWeatherKeywords();
+    List<RainKeywordEntity> findAllRainKeywords();
+    List<EtceteraKeywordEntity> findAllEtceteraKeywords();
 }

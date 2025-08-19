@@ -1,5 +1,5 @@
 package com.softeer.entity.enums;
 
-public interface Keyword {
+public interface KeywordInterface {
     String getDescription();
 }

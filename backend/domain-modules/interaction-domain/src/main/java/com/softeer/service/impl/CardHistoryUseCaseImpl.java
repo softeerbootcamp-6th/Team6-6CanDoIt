@@ -1,7 +1,7 @@
 package com.softeer.service.impl;
 
 import com.softeer.domain.CardHistory;
-import com.softeer.repository.hisotry.CardHistoryAdapter;
+import com.softeer.repository.history.CardHistoryAdapter;
 import com.softeer.repository.support.pageable.CardHistoryPageable;
 import com.softeer.service.CardHistoryUseCase;
 import lombok.RequiredArgsConstructor;
