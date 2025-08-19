@@ -1,6 +1,6 @@
 package com.softeer.entity.enums;
 
-public enum EtceteraKeyword implements Keyword{
+public enum EtceteraKeyword implements KeywordInterface {
 
     FOGGY("안개가 껴요"),
     DUSTY("미세먼지가 많아요"),
