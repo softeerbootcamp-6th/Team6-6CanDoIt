@@ -105,7 +105,7 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
             }
         }
 
-        hourlyForecasts.sort(Comparator.comparing(Forecast::dateTime));
+        hourlyForecasts.sort(Comparator.comparing(Forecast::id));
         return new MountainDailyForecast(identifier.id(), identifier.gridId(), sunriseTime, sunsetTime, hourlyForecasts);
     }
 

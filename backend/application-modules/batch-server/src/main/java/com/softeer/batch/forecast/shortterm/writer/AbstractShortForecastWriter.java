@@ -17,7 +17,7 @@ public abstract class AbstractShortForecastWriter implements ItemWriter<ShortFor
 
 
     @Override
-    public synchronized void write(Chunk<? extends ShortForecastList> chunk) throws Exception {
+    public void write(Chunk<? extends ShortForecastList> chunk) throws Exception {
         MapSqlParameterSource[] batch = chunk.getItems().stream()
                 .flatMap(item -> {
                     List<Forecast> filtered = filterForecasts(item.forecasts());

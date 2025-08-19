@@ -30,7 +30,7 @@ public class ShortForecastJobConfig {
     public static final String SCHEDULED_SHORT_FORECAST_JOB = "ScheduledShortForecastJob";
     public static final String SCHEDULED_SHORT_FORECAST_STEP = "ScheduledShortForecastStep";
 
-    private static final int CHUNK_SIZE = 10;
+    private static final int CHUNK_SIZE = 20;
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
@@ -71,7 +71,7 @@ public class ShortForecastJobConfig {
                 .reader(shortForecastReader)
                 .processor(shortForecastProcessor)
                 .writer(writer)
-                .taskExecutor(new SimpleAsyncTaskExecutor())
+//                .taskExecutor(new SimpleAsyncTaskExecutor())
                 .build();
     }
 }

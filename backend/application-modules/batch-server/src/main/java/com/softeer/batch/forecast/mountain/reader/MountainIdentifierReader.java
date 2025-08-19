@@ -15,7 +15,7 @@ import java.util.Map;
 @StepScope
 public class MountainIdentifierReader extends JdbcPagingItemReader<MountainIdentifier> {
 
-    private static final int PAGE_SIZE = 100;
+    private static final int PAGE_SIZE = 20;
 
     public MountainIdentifierReader(DataSource dataSource) {
         super();
