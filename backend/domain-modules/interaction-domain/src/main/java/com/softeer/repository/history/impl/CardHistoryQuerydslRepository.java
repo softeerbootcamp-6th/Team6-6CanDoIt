@@ -1,4 +1,4 @@
-package com.softeer.repository.hisotry.impl;
+package com.softeer.repository.history.impl;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

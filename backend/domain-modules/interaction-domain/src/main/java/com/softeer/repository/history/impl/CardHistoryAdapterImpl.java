@@ -1,7 +1,7 @@
-package com.softeer.repository.hisotry.impl;
+package com.softeer.repository.history.impl;
 
 import com.softeer.domain.CardHistory;
-import com.softeer.repository.hisotry.CardHistoryAdapter;
+import com.softeer.repository.history.CardHistoryAdapter;
 import com.softeer.repository.support.pageable.CardHistoryPageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
