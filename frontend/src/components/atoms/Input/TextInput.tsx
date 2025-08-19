@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
-import { forwardRef } from 'react';
+import { forwardRef, useRef } from 'react';
 
 const { colors, typography } = theme;
 
@@ -16,8 +16,17 @@ type InputType = 'text' | 'password';
 
 const TextInput = forwardRef<HTMLInputElement, PropsState>(
     ({ id, ariaLabel, placeholder, type, onInput }, ref) => {
+        const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+        const debounceMs = 300;
+
         const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
-            onInput?.((e.target as HTMLInputElement).value);
+            const value = (e.target as HTMLInputElement).value;
+
+            if (timerRef.current) clearTimeout(timerRef.current);
+
+            timerRef.current = setTimeout(() => {
+                onInput?.(value);
+            }, debounceMs);
         };
 
         return (
