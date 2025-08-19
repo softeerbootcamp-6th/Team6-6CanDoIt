@@ -55,6 +55,6 @@ public class ReportQueryUseCaseImpl implements ReportQueryUseCase {
                 .map(keyword -> new Keyword(keyword.getId(), keyword.getKeyword()))
                 .toList();
 
-        return new  KeywordGroup(weatherKeywords, rainKeywords, etceteraKeywords);
+        return new KeywordGroup(weatherKeywords, rainKeywords, etceteraKeywords);
     }
 }

@@ -16,8 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InteractionQueryCardService {
 
-    private final ReportQueryUseCase  reportQueryUseCase;
-    private final CardHistoryUseCase  cardHistoryUseCase;
+    private final ReportQueryUseCase reportQueryUseCase;
+    private final CardHistoryUseCase cardHistoryUseCase;
 
     public List<ReportCardResponse> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType) {
         List<Report> reports = reportQueryUseCase.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType);
