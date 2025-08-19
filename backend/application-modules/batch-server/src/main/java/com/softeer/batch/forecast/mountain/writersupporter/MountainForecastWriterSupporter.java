@@ -50,7 +50,7 @@ public class MountainForecastWriterSupporter {
                         .addValue("mountainId", item.mountainId());
     }
 
-    public MapSqlParameterSource mapForecastToSqlParams(Forecast hourly, Long gridId) {
+    public MapSqlParameterSource mapForecastToSqlParams(Forecast hourly, int gridId) {
         return new MapSqlParameterSource()
                 .addValue("temperature", hourly.temperatureCondition().temperature())
                 .addValue("precipitation", hourly.precipitationCondition().precipitation())

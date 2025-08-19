@@ -34,7 +34,7 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
     }
 
     private void writeForecast(Chunk<? extends MountainDailyForecast> chunk) {
-        Map<Long, List<Forecast>> forecastsByGridId = chunk.getItems().stream()
+        Map<Integer, List<Forecast>> forecastsByGridId = chunk.getItems().stream()
                 .collect(Collectors.toMap(
                         MountainDailyForecast::gridId,
                         MountainDailyForecast::hourlyForecasts
@@ -42,8 +42,8 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
 
         List<SqlParameterSource> paramsToInsert = new ArrayList<>();
 
-        for (Map.Entry<Long, List<Forecast>> entry : forecastsByGridId.entrySet()) {
-            Long gridId = entry.getKey();
+        for (Map.Entry<Integer, List<Forecast>> entry : forecastsByGridId.entrySet()) {
+            int gridId = entry.getKey();
             List<Forecast> forecasts = filterForecasts(entry.getValue());
 
             forecasts.stream()
