@@ -19,26 +19,27 @@ interface SignUpResponse {
 }
 
 export default function RegisterFormSection() {
-    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [modalMessage, setModalMessage] = useState<string>('');
 
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
     const passwordConfirmRef = useRef<null | HTMLInputElement>(null);
     const nicknameRef = useRef<null | HTMLInputElement>(null);
     const checkBoxValid = useRef<boolean>(false);
-    const navigate = useNavigate();
 
     const confirmedIdRef = useRef('');
     const confirmedNicknameRef = useRef('');
+
+    const navigate = useNavigate();
 
     const mutation = useApiMutation<SignUpRequest, SignUpResponse>(
         '/user/sign-up',
         'POST',
         {
             onSuccess: () => {
-                navigate('/login');
+                setModalMessage('회원가입 되셨습니다.');
             },
-            onError: (error: Error) => setErrorMessage(error.message),
+            onError: (error: Error) => setModalMessage(error.message),
         },
     );
 
@@ -59,7 +60,7 @@ export default function RegisterFormSection() {
         });
 
         if (errors.length > 0) {
-            setErrorMessage(errors);
+            setModalMessage(errors);
             return;
         }
 
@@ -82,15 +83,15 @@ export default function RegisterFormSection() {
                 const text = await res.text();
                 try {
                     const errorData = JSON.parse(text);
-                    setErrorMessage(errorData.message);
+                    setModalMessage(errorData.message);
                 } catch {
-                    setErrorMessage(text);
+                    setModalMessage(text);
                 }
                 return;
             }
             confirmedIdRef.current = idRef.current?.value ?? '';
         } catch (err) {
-            setErrorMessage((err as Error).message);
+            setModalMessage((err as Error).message);
         }
     };
 
@@ -106,15 +107,15 @@ export default function RegisterFormSection() {
                 const text = await res.text();
                 try {
                     const errorData = JSON.parse(text);
-                    setErrorMessage(errorData.message);
+                    setModalMessage(errorData.message);
                 } catch {
-                    setErrorMessage(text);
+                    setModalMessage(text);
                 }
                 return;
             }
             confirmedNicknameRef.current = nicknameRef.current?.value ?? '';
         } catch (err) {
-            setErrorMessage((err as Error).message);
+            setModalMessage((err as Error).message);
         }
     };
 
@@ -139,9 +140,15 @@ export default function RegisterFormSection() {
                     checkCheckBoxValid(isValid)
                 }
             />
-            {errorMessage && (
-                <Modal onClose={() => setErrorMessage('')}>
-                    <div css={preStyles}>{errorMessage}</div>
+            {modalMessage && (
+                <Modal
+                    onClose={
+                        mutation.isSuccess
+                            ? () => navigate('/login')
+                            : () => setModalMessage('')
+                    }
+                >
+                    <div css={preStyles}>{modalMessage}</div>
                 </Modal>
             )}
         </div>
