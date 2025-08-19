@@ -4,6 +4,7 @@ import RegisterForm from '../../organisms/Register/RegisterForm.tsx';
 import { useRef } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import { validateRegisterInput } from './utils.ts';
+import { useNavigate } from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SignUpRequest {
@@ -22,6 +23,7 @@ export default function RegisterFormSection() {
     const passwordConfirmRef = useRef<null | HTMLInputElement>(null);
     const nicknameRef = useRef<null | HTMLInputElement>(null);
     const checkBoxValid = useRef<boolean>(false);
+    const navigate = useNavigate();
 
     const confirmedIdRef = useRef('');
     const confirmedNicknameRef = useRef('');
@@ -30,12 +32,8 @@ export default function RegisterFormSection() {
         '/user/sign-up',
         'POST',
         {
-            onSuccess: (data) => {
-                if (typeof data === 'string') {
-                    alert(`서버 응답: ${data}`);
-                } else {
-                    alert(`회원가입 성공: ${data.message}`);
-                }
+            onSuccess: () => {
+                navigate('/login');
             },
             onError: (error: Error) => alert(`회원가입 실패: ${error.message}`),
         },
