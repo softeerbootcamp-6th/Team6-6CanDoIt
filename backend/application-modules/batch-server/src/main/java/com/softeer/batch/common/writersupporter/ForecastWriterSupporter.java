@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.mountain.writersupporter;
+package com.softeer.batch.common.writersupporter;
 
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.domain.Forecast;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Component
 @StepScope
 @RequiredArgsConstructor
-public class MountainForecastWriterSupporter {
+public class ForecastWriterSupporter {
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -50,7 +50,7 @@ public class MountainForecastWriterSupporter {
                         .addValue("mountainId", item.mountainId());
     }
 
-    public MapSqlParameterSource mapForecastToSqlParams(Forecast hourly, Long gridId) {
+    public MapSqlParameterSource mapForecastToSqlParams(Forecast hourly, int gridId) {
         return new MapSqlParameterSource()
                 .addValue("temperature", hourly.temperatureCondition().temperature())
                 .addValue("precipitation", hourly.precipitationCondition().precipitation())

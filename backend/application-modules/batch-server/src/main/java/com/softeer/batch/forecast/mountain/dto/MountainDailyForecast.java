@@ -8,14 +8,14 @@ import java.util.List;
 
 public record MountainDailyForecast(
         long mountainId,
-        long gridId,
+        int gridId,
         SunTime sunTime,
         List<Forecast> hourlyForecasts
 ) {
 
     public MountainDailyForecast(
             long mountainId,
-            long gridId,
+            int gridId,
             LocalTime sunrise,
             LocalTime sunset,
             List<Forecast> hourlyForecasts

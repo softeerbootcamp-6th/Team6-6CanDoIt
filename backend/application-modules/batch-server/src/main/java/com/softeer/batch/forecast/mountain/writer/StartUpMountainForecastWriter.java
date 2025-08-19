@@ -1,6 +1,6 @@
 package com.softeer.batch.forecast.mountain.writer;
 
-import com.softeer.batch.forecast.mountain.writersupporter.MountainForecastWriterSupporter;
+import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
 import com.softeer.domain.Forecast;
 import com.softeer.time.TimeUtil;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @StepScope
 public class StartUpMountainForecastWriter extends AbstractMountainForecastWriter {
 
-    public StartUpMountainForecastWriter(MountainForecastWriterSupporter mountainForecastWriterSupporter) {
-        super(mountainForecastWriterSupporter);
+    public StartUpMountainForecastWriter(ForecastWriterSupporter forecastWriterSupporter) {
+        super(forecastWriterSupporter);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class StartUpMountainForecastWriter extends AbstractMountainForecastWrite
         final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
 
         return forecasts.stream()
-                .filter(hourly -> !hourly.dateTime().isBefore(now) && !hourly.dateTime().isAfter(threeDaysLater))
+                .filter(hourly -> !hourly.dateTime().isAfter(threeDaysLater))
                 .collect(Collectors.toList());
     }
 }

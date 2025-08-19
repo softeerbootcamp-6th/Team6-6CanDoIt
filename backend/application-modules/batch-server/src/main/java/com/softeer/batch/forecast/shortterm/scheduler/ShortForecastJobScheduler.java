@@ -1,5 +1,7 @@
-package com.softeer.batch.forecast.mountain.scheduler;
+package com.softeer.batch.forecast.shortterm.scheduler;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -14,32 +16,38 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
-public class MountainForecastJobScheduler {
+public class ShortForecastJobScheduler {
 
     private final JobLauncher jobLauncher;
     private final Job startupJob;
     private final Job scheduledJob;
 
-    public MountainForecastJobScheduler(JobLauncher jobLauncher,
-                                        @Qualifier("startupMountainForecastJob") Job startupJob,
-                                        @Qualifier("scheduledMountainForecastJob") Job scheduledJob) {
+    public ShortForecastJobScheduler(
+            JobLauncher jobLauncher,
+            @Qualifier("StartUpShortForecastJob") Job startupJob,
+            @Qualifier("ScheduledShortForecastJob") Job scheduledJob
+    ) {
         this.jobLauncher = jobLauncher;
         this.startupJob = startupJob;
         this.scheduledJob = scheduledJob;
     }
 
-    @Order(1)
+    @Order(0)
     @EventListener(ApplicationReadyEvent.class)
-    public void runJobOnStartup() {
+    public void startupForecastJob() {
         try {
             log.info("Running startupForecastJob on application startup...");
-            JobParameters params = new JobParametersBuilder()
-                    .addString("startupAt", LocalDateTime.now().toString())
-                    .toJobParameters();
-            JobExecution execution = jobLauncher.run(startupJob, params);
+            JobExecution execution = jobLauncher.run(
+                    startupJob,
+                    new JobParametersBuilder()
+                            .addString("startupAt", LocalDateTime.now().toString())
+                            .addLong("unique", System.currentTimeMillis()) // 항상 새 인스턴스
+                            .toJobParameters()
+            );
             log.info("Startup job finished with status={}", execution.getStatus());
         } catch (Exception e) {
             log.error("Failed to run startupForecastJob on startup", e);
@@ -58,7 +66,7 @@ public class MountainForecastJobScheduler {
                 .addLong("unique", System.currentTimeMillis())
                 .toJobParameters();
 
-        log.info("Launching mountainForecastJob at {}", now);
+        log.info("Launching shortForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
         log.info("Job finished with status={}", execution.getStatus());
     }
