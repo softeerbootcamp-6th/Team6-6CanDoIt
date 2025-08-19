@@ -21,6 +21,9 @@ export default function RegisterFormSection() {
     const passwordConfirmRef = useRef<null | HTMLInputElement>(null);
     const nicknameRef = useRef<null | HTMLInputElement>(null);
 
+    const confirmedIdRef = useRef('');
+    const confirmedNicknameRef = useRef('');
+
     const mutation = useApiMutation<SignUpRequest, SignUpResponse>(
         '/user/sign-up',
         'POST',
@@ -62,6 +65,7 @@ export default function RegisterFormSection() {
                 }
                 return;
             }
+            confirmedIdRef.current = idRef.current?.value ?? '';
         } catch (err) {
             alert(`아이디 확인 실패: ${(err as Error).message}`);
         }
@@ -85,6 +89,7 @@ export default function RegisterFormSection() {
                 }
                 return;
             }
+            confirmedNicknameRef.current = nicknameRef.current?.value ?? '';
         } catch (err) {
             alert(`닉네임 확인 실패: ${(err as Error).message}`);
         }
