@@ -3,6 +3,7 @@ import RegisterHeader from '../../molecules/Register/RegisterHeader.tsx';
 import RegisterForm from '../../organisms/Register/RegisterForm.tsx';
 import { useRef } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SignUpRequest {
     nickname: string;
@@ -43,6 +44,29 @@ export default function RegisterFormSection() {
         });
     };
 
+    const clickCheckIdHandler = async () => {
+        const loginId = idRef.current?.value ?? '';
+
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/user/login-id?loginId=${encodeURIComponent(loginId)}`,
+            );
+
+            if (!res.ok) {
+                const text = await res.text();
+                try {
+                    const errorData = JSON.parse(text);
+                    alert(`사용 불가: ${errorData.message}`);
+                } catch {
+                    alert(`아이디 확인 실패: ${text}`);
+                }
+                return;
+            }
+        } catch (err) {
+            alert(`아이디 확인 실패: ${(err as Error).message}`);
+        }
+    };
+
     return (
         <div css={wrapperStyles}>
             <RegisterHeader />
@@ -54,6 +78,7 @@ export default function RegisterFormSection() {
                     nicknameRef,
                 }}
                 onClickRegister={clickRegisterHandler}
+                onClickCheckId={clickCheckIdHandler}
             />
         </div>
     );
