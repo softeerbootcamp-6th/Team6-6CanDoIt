@@ -89,9 +89,11 @@ export default function RegisterFormSection() {
                 }
                 return;
             }
+            setModalMessage('id가 중복되지 않습니다.');
             confirmedIdRef.current = idRef.current?.value ?? '';
         } catch (err) {
             setModalMessage((err as Error).message);
+            return;
         }
     };
 
@@ -113,9 +115,11 @@ export default function RegisterFormSection() {
                 }
                 return;
             }
+            setModalMessage('닉네임이 중복되지 않습니다.');
             confirmedNicknameRef.current = nicknameRef.current?.value ?? '';
         } catch (err) {
             setModalMessage((err as Error).message);
+            return;
         }
     };
 
