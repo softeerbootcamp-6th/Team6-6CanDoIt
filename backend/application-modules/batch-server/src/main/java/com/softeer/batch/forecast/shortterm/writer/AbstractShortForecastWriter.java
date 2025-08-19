@@ -1,7 +1,7 @@
 package com.softeer.batch.forecast.shortterm.writer;
 
+import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
-import com.softeer.batch.forecast.shortterm.writersupporter.ShortForecastWriterSupporter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public abstract class AbstractShortForecastWriter implements ItemWriter<ShortForecastList> {
 
-    protected final ShortForecastWriterSupporter shortForecastWriterSupporter;
+    protected final ForecastWriterSupporter forecastWriterSupporter;
 
 
     @Override
@@ -23,13 +23,13 @@ public abstract class AbstractShortForecastWriter implements ItemWriter<ShortFor
                     List<Forecast> filtered = filterForecasts(item.forecasts());
 
                     return filtered.stream()
-                            .map(f -> shortForecastWriterSupporter
+                            .map(f -> forecastWriterSupporter
                                     .mapForecastToSqlParams(f, item.gridId()));
                 })
                 .toArray(MapSqlParameterSource[]::new);
 
         if (batch.length > 0) {
-            shortForecastWriterSupporter.batchUpdateForecast(batch);
+            forecastWriterSupporter.batchUpdateForecast(batch);
         }
     }
 
