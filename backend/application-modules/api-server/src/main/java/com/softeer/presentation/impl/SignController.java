@@ -3,7 +3,7 @@ package com.softeer.presentation.impl;
 import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
 import com.softeer.presentation.SignApi;
-import com.softeer.security.auth.Token;
+import com.softeer.config.auth.Token;
 import com.softeer.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

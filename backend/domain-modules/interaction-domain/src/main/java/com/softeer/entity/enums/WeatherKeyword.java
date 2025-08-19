@@ -1,6 +1,6 @@
 package com.softeer.entity.enums;
 
-public enum WeatherKeyword implements Keyword {
+public enum WeatherKeyword implements KeywordInterface {
     SUNNY("화창해요"),
     CLOUDY("구름이 많아요"),
     HOT("더워요"),

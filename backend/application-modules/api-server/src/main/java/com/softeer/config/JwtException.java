@@ -1,4 +1,4 @@
-package com.softeer.security;
+package com.softeer.config;
 
 import com.softeer.error.ExceptionInterface;
 import com.softeer.error.HttpStatus;

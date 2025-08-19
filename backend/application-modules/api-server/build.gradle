@@ -3,6 +3,7 @@ dependencies {
 	implementation project(':domain-modules:user-domain')
 	implementation project(':domain-modules:forecast-domain')
 	implementation project(':domain-modules:mountain-domain')
+	implementation project(':domain-modules:interaction-domain')
 
 	implementation project(':common-modules:exception')
 

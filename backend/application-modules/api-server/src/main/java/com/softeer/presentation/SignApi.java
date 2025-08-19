@@ -2,7 +2,7 @@ package com.softeer.presentation;
 
 import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
-import com.softeer.security.auth.Token;
+import com.softeer.config.auth.Token;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;

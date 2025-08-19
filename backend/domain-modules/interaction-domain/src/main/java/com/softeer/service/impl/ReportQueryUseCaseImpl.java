@@ -1,5 +1,6 @@
 package com.softeer.service.impl;
 
+import com.softeer.domain.Keyword;
 import com.softeer.domain.Report;
 import com.softeer.entity.enums.ReportType;
 import com.softeer.error.ExceptionCreator;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-public class ReportQueryUseCaseImpl  implements ReportQueryUseCase {
+public class ReportQueryUseCaseImpl implements ReportQueryUseCase {
 
     private final ReportQueryAdapter reportQueryAdapter;
 
@@ -35,5 +36,25 @@ public class ReportQueryUseCaseImpl  implements ReportQueryUseCase {
     @Override
     public List<Report> findLikedReports(ReportPageable reportPageable, long userId) {
         return reportQueryAdapter.findLikedReports(reportPageable, userId);
+    }
+
+    @Override
+    public KeywordGroup findAllKeywords() {
+        List<Keyword> weatherKeywords = reportQueryAdapter.findAllWeatherKeywords()
+                .stream()
+                .map(keyword -> new Keyword(keyword.getId(), keyword.getKeyword()))
+                .toList();
+
+        List<Keyword> rainKeywords = reportQueryAdapter.findAllRainKeywords()
+                .stream()
+                .map(keyword -> new Keyword(keyword.getId(), keyword.getKeyword()))
+                .toList();
+
+        List<Keyword> etceteraKeywords = reportQueryAdapter.findAllEtceteraKeywords()
+                .stream()
+                .map(keyword -> new Keyword(keyword.getId(), keyword.getKeyword()))
+                .toList();
+
+        return new KeywordGroup(weatherKeywords, rainKeywords, etceteraKeywords);
     }
 }

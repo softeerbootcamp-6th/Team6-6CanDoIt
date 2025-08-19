@@ -1,4 +1,4 @@
-package com.softeer.security.auth;
+package com.softeer.config.auth;
 
 import com.softeer.entity.Role;
 import io.jsonwebtoken.Jwts;
