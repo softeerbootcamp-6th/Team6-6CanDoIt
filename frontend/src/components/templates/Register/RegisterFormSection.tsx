@@ -1,10 +1,11 @@
 import { css } from '@emotion/react';
 import RegisterHeader from '../../molecules/Register/RegisterHeader.tsx';
 import RegisterForm from '../../organisms/Register/RegisterForm.tsx';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import { validateRegisterInput } from './utils.ts';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SignUpRequest {
@@ -18,6 +19,8 @@ interface SignUpResponse {
 }
 
 export default function RegisterFormSection() {
+    const [errorMessage, setErrorMessage] = useState<string>('');
+
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
     const passwordConfirmRef = useRef<null | HTMLInputElement>(null);
@@ -35,7 +38,7 @@ export default function RegisterFormSection() {
             onSuccess: () => {
                 navigate('/login');
             },
-            onError: (error: Error) => alert(`회원가입 실패: ${error.message}`),
+            onError: (error: Error) => setErrorMessage(error.message),
         },
     );
 
@@ -56,7 +59,7 @@ export default function RegisterFormSection() {
         });
 
         if (errors.length > 0) {
-            alert(errors.join('\n'));
+            setErrorMessage(errors);
             return;
         }
 
@@ -79,15 +82,15 @@ export default function RegisterFormSection() {
                 const text = await res.text();
                 try {
                     const errorData = JSON.parse(text);
-                    alert(`사용 불가: ${errorData.message}`);
+                    setErrorMessage(errorData.message);
                 } catch {
-                    alert(`아이디 확인 실패: ${text}`);
+                    setErrorMessage(text);
                 }
                 return;
             }
             confirmedIdRef.current = idRef.current?.value ?? '';
         } catch (err) {
-            alert(`아이디 확인 실패: ${(err as Error).message}`);
+            setErrorMessage((err as Error).message);
         }
     };
 
@@ -103,15 +106,15 @@ export default function RegisterFormSection() {
                 const text = await res.text();
                 try {
                     const errorData = JSON.parse(text);
-                    alert(`사용 불가: ${errorData.message}`);
+                    setErrorMessage(errorData.message);
                 } catch {
-                    alert(`닉네임 확인 실패: ${text}`);
+                    setErrorMessage(text);
                 }
                 return;
             }
             confirmedNicknameRef.current = nicknameRef.current?.value ?? '';
         } catch (err) {
-            alert(`닉네임 확인 실패: ${(err as Error).message}`);
+            setErrorMessage((err as Error).message);
         }
     };
 
@@ -136,6 +139,11 @@ export default function RegisterFormSection() {
                     checkCheckBoxValid(isValid)
                 }
             />
+            {errorMessage && (
+                <Modal onClose={() => setErrorMessage('')}>
+                    <div css={preStyles}>{errorMessage}</div>
+                </Modal>
+            )}
         </div>
     );
 }
@@ -145,4 +153,11 @@ const wrapperStyles = css`
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+`;
+
+const preStyles = css`
+    display: block;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    text-align: center;
 `;
