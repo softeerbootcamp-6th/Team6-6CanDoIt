@@ -25,7 +25,7 @@ public class StartUpMountainForecastWriter extends AbstractMountainForecastWrite
         final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
 
         return forecasts.stream()
-                .filter(hourly -> !hourly.dateTime().isBefore(now) && !hourly.dateTime().isAfter(threeDaysLater))
+                .filter(hourly -> !hourly.dateTime().isAfter(threeDaysLater))
                 .collect(Collectors.toList());
     }
 }

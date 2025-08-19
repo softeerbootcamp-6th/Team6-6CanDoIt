@@ -19,7 +19,7 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
     protected final MountainForecastWriterSupporter mountainForecastWriterSupporter;
 
     @Override
-    public void write(Chunk<? extends MountainDailyForecast> chunk) {
+    public synchronized void write(Chunk<? extends MountainDailyForecast> chunk) {
         writeSunTime(chunk);
         writeForecast(chunk);
     }
