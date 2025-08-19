@@ -3,6 +3,7 @@ import RegisterHeader from '../../molecules/Register/RegisterHeader.tsx';
 import RegisterForm from '../../organisms/Register/RegisterForm.tsx';
 import { useRef } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import { validateRegisterInput } from './utils.ts';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SignUpRequest {
@@ -40,6 +41,25 @@ export default function RegisterFormSection() {
     );
 
     const clickRegisterHandler = () => {
+        const loginId = idRef.current?.value ?? '';
+        const nickname = nicknameRef.current?.value ?? '';
+        const password = passwordRef.current?.value ?? '';
+        const passwordConfirm = passwordConfirmRef.current?.value ?? '';
+
+        const errors = validateRegisterInput({
+            loginId,
+            confirmedId: confirmedIdRef.current,
+            nickname,
+            confirmedNickname: confirmedNicknameRef.current,
+            password,
+            passwordConfirm,
+        });
+
+        if (errors.length > 0) {
+            alert(errors.join('\n'));
+            return;
+        }
+
         mutation.mutate({
             nickname: nicknameRef.current?.value ?? '',
             loginId: idRef.current?.value ?? '',
