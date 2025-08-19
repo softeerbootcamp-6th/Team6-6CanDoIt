@@ -6,24 +6,28 @@ import TextInputWithIcon from '../../molecules/Input/TextInputWithIcon.tsx';
 import type { ColorValueType } from '../../../types/themeTypes';
 import { iconButtonHandler } from '../Register/utils.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
+    const autoLoginRef = useRef<boolean>(false);
+    const navigate = useNavigate();
 
-    const mutation = useApiMutation<
-        { loginId: string; password: string },
-        { message: string }
-    >('/user/sign-in', 'POST', {
-        onSuccess: (data) => {
-            if (typeof data === 'string') {
-                alert(`서버 응답: ${data}`);
-            } else {
-                alert(`로그인 성공: ${data.message}`);
-            }
+    const mutation = useApiMutation<{ loginId: string; password: string }, any>(
+        '/user/sign-in',
+        'POST',
+        {
+            onSuccess: (data) => {
+                const storage = autoLoginRef.current
+                    ? localStorage
+                    : sessionStorage;
+                storage.setItem('accessToken', data.value);
+                navigate('/');
+            },
+            onError: (error: Error) => alert(`로그인 실패: ${error.message}`),
         },
-        onError: (error: Error) => alert(`로그인 실패: ${error.message}`),
-    });
+    );
 
     const clickSignInHandler = () => {
         mutation.mutate({
