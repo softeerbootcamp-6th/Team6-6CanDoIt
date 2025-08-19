@@ -41,7 +41,7 @@ public class ShortForecastJobConfig {
 
     @Bean(name = START_UP_SHORT_FORECAST_JOB)
     public Job startupForecastJob() {
-        return new JobBuilder(START_UP_SHORT_FORECAST_STEP, jobRepository)
+        return new JobBuilder(START_UP_SHORT_FORECAST_JOB, jobRepository)
                 .start(stattupShortForecastStep())
                 .build();
     }
