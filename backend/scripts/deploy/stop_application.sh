@@ -1,16 +1,28 @@
 #!/bin/bash
+# CodeDeploy Hook: ApplicationStop
+# This script stops the running Spring Boot applications.
+
 set -e
 
-echo "=== Stopping application services using Docker Compose ==="
+echo "=== ApplicationStop: Stopping application ==="
 
-# 배포된 애플리케이션 디렉터리로 이동
-cd /opt/backend-app
+# List of application JARs to stop
+JARS=("api-server.jar" "batch-server.jar")
 
-# docker-compose.yml 파일이 존재할 경우에만 down 명령 실행
-if [ -f docker-compose.yml ]; then
-    docker-compose -f docker-compose.yml down --volumes
-else
-    echo "docker-compose.yml not found. Nothing to stop with compose."
-fi
+for jar in "${JARS[@]}"; do
+    # Find the process ID (PID) of the running Java application
+    PID=$(pgrep -f "java -jar.*${jar}")
 
-echo "=== Application stopped ==="
+    if [ -n "$PID" ]; then
+        echo "Found running process for $jar with PID: $PID. Stopping it..."
+        # Send SIGTERM (15) for a graceful shutdown
+        kill -15 "$PID"
+        # Wait for the process to terminate
+        wait "$PID" 2>/dev/null
+        echo "$jar stopped successfully."
+    else
+        echo "No running process found for $jar. Nothing to stop."
+    fi
+done
+
+echo "=== ApplicationStop completed successfully ==="

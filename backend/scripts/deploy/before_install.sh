@@ -1,75 +1,37 @@
 #!/bin/bash
+# CodeDeploy Hook: BeforeInstall
+# This script prepares the EC2 instance for deployment.
 
-# deploy/before_install.sh
 set -e
 
-echo "=== Before Install: Setting up environment ==="
-
-# Create application directory (appspec.yml에서 /opt/backend-app으로 설정했으므로 통일)
-sudo mkdir -p /opt/backend-app
-sudo chown -R ubuntu:ubuntu /opt/backend-app
+echo "=== BeforeInstall: Setting up environment ==="
 
 # Update package list
 sudo apt-get update -y
 
-# Install Docker if not present
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release
-
-    # Add Docker's official GPG key
-    sudo mkdir -m 0755 -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-    # Set up repository
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    # Install Docker Engine
+# Install Java 17 (Temurin)
+if ! command -v java &>/dev/null || ! java -version 2>&1 | grep -q "17."; then
+    echo "Installing Java 17..."
+    sudo apt-get install -y wget apt-transport-https
+    wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | sudo gpg --dearmor -o /usr/share/keyrings/adoptium.gpg
+    echo "deb [signed-by=/usr/share/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/adoptium.list
     sudo apt-get update -y
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-    # Start and enable Docker
-    sudo systemctl start docker
-    sudo systemctl enable docker
-    sudo usermod -a -G docker ubuntu
-fi
-
-# Install Docker Compose standalone if not present
-if ! command -v docker-compose &> /dev/null; then
-    echo "Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-fi
-
-# Install unzip if not present (AWS CLI 설치에 필요)
-if ! command -v unzip &> /dev/null; then
-    echo "Installing unzip..."
-    sudo apt-get install -y unzip
+    sudo apt-get install -y temurin-17-jdk
 fi
 
 # Install AWS CLI if not present
 if ! command -v aws &> /dev/null; then
     echo "Installing AWS CLI..."
-    TEMP_DIR=$(mktemp -d)
-    cd "$TEMP_DIR"
-
-    # Detect architecture
-    ARCH=$(uname -m)
-    if [ "$ARCH" = "aarch64" ]; then
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip"
-    else
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    fi
-
+    sudo apt-get install -y unzip
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     sudo ./aws/install
-    cd -
-    rm -rf "$TEMP_DIR"
+    rm -rf awscliv2.zip aws
 fi
 
-# Start Docker service
-sudo systemctl start docker
+# Create application directory
+# This directory will store the running JARs and logs.
+sudo mkdir -p /home/ubuntu/app
+sudo chown -R ubuntu:ubuntu /home/ubuntu/app
 
-echo "=== Before Install completed ==="
+echo "=== BeforeInstall completed successfully ==="
