@@ -1,38 +1,29 @@
 import { css } from '@emotion/react';
-import CommonText from '../../atoms/Text/CommonText.tsx';
-import MultiLocationTemperature from '../Text/MultiLocationTemperature.tsx';
-import Icon from '../../atoms/Icon/Icons.tsx';
+import SunSchedule from './SunSchedule.tsx';
+import ClimbInfoText from './ClimbInfoText.tsx';
 
 interface PropsState {
-    time: string;
-    dist: number;
+    totalDuration: number;
+    totalDistance: number;
+    courseImageUrl: string;
 }
 
-export default function MountainInfoPreview({ time, dist }: PropsState) {
-    const weatherData = createWeatherData({
-        surfaceTemperature: 12,
-        summitTemperature: 20,
-    });
-
+export default function MountainInfoPreview({
+    totalDuration,
+    totalDistance,
+    courseImageUrl,
+}: PropsState) {
     return (
         <div css={wrapperStyles}>
-            <div css={dummySteyls} />
-
-            <p css={textWrapperStyles}>
-                <CommonText {...WhiteTextProps}>{`${time}`}</CommonText>
-                <CommonText {...TextProps}>동안</CommonText>
-                <CommonText {...WhiteTextProps}>{`${dist}km`}</CommonText>
-                <CommonText {...TextProps}>를 올라야해요</CommonText>
-            </p>
-            <div css={lineStyles}>
-                <Icon
-                    name='clear-day'
-                    color='grey-100'
-                    width={1.5}
-                    height={1.5}
-                />
-                <MultiLocationTemperature data={weatherData} />
+            <div css={dummySteyls}>
+                <img src={courseImageUrl} />
             </div>
+
+            <ClimbInfoText
+                totalDistance={totalDistance}
+                totalDuration={totalDuration}
+            />
+            <SunSchedule sunriseTime='05:22' sunsetTime='17:02' />
         </div>
     );
 }
@@ -47,21 +38,6 @@ const wrapperStyles = css`
     margin-top: 2%;
 `;
 
-const textWrapperStyles = css`
-    & :nth-of-type(-n + 3) {
-        margin-left: 0.4rem;
-    }
-`;
-
-const lineStyles = css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    & > svg {
-        margin-right: 0.5rem;
-    }
-`;
-
 const dummySteyls = css`
     width: 100%;
     flex-grow: 1;
@@ -69,36 +45,3 @@ const dummySteyls = css`
     justify-content: center;
     background: red;
 `;
-
-const WhiteTextProps = {
-    TextTag: 'span',
-    color: 'grey-100',
-    fontWeight: 'bold',
-    fontSize: 'body',
-} as const;
-
-const TextProps = {
-    TextTag: 'span',
-    color: 'grey-90',
-    fontWeight: 'bold',
-    fontSize: 'body',
-} as const;
-
-function createWeatherData({
-    surfaceTemperature,
-    summitTemperature,
-}: {
-    surfaceTemperature: number;
-    summitTemperature: number;
-}) {
-    return [
-        {
-            location: '지표면 온도',
-            temperature: surfaceTemperature,
-        },
-        {
-            location: '정상 온도',
-            temperature: summitTemperature,
-        },
-    ];
-}
