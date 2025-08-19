@@ -127,7 +127,7 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
     }
 
     private double safeParseDouble(String value) {
-        if (value == null || value.trim().isEmpty() || !Character.isDigit(value.charAt(0))) {
+        if (value == null || value.trim().isEmpty()) {
             return 0.0;
         }
         try {
