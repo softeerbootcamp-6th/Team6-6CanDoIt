@@ -19,6 +19,7 @@ interface PropsState {
     icon: string;
     validations?: ValidationRule[];
     inputRef: RefObject<HTMLInputElement>;
+    onInput?: () => void;
 }
 
 interface ValidationRule {
@@ -38,6 +39,7 @@ export default function TextInputWithIcon({
     iconAriaLabel,
     validations = [],
     inputRef,
+    onInput,
 }: PropsState) {
     const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -64,7 +66,10 @@ export default function TextInputWithIcon({
                         placeholder={placeholder}
                         type={type}
                         ref={inputRef}
-                        onChange={(text) => handleChange(text)}
+                        onInput={() => {
+                            handleChange(inputRef.current?.value ?? '');
+                            onInput?.();
+                        }}
                     />
                     <IconButton
                         iconName={icon}

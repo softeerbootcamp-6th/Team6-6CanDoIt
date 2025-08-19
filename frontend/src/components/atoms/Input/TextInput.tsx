@@ -9,15 +9,15 @@ interface PropsState {
     ariaLabel?: string;
     placeholder?: string;
     type: InputType;
-    onChange?: (value: string) => void;
+    onInput?: (value: string) => void;
 }
 
 type InputType = 'text' | 'password';
 
 const TextInput = forwardRef<HTMLInputElement, PropsState>(
-    ({ id, ariaLabel, placeholder, type, onChange }, ref) => {
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            onChange?.(e.target.value);
+    ({ id, ariaLabel, placeholder, type, onInput }, ref) => {
+        const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+            onInput?.((e.target as HTMLInputElement).value);
         };
 
         return (
@@ -27,7 +27,7 @@ const TextInput = forwardRef<HTMLInputElement, PropsState>(
                 aria-label={ariaLabel}
                 placeholder={placeholder}
                 type={type}
-                onChange={handleChange}
+                onInput={handleInput}
                 css={inputStyles}
             />
         );
