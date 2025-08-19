@@ -20,15 +20,21 @@ export default function useApiMutation<TRequest = any, TResponse = any>(
             body: JSON.stringify(body),
         });
 
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.message || 'API 요청 실패');
-        }
+        const text = await res.text();
 
+        if (!res.ok) {
+            let errorMessage = 'API 요청 실패';
+            try {
+                const errorData = JSON.parse(text);
+                errorMessage = errorData.message || errorMessage;
+            } catch {
+                errorMessage = text || errorMessage;
+            }
+            throw new Error(errorMessage);
+        }
         try {
-            return await res.json();
+            return JSON.parse(text);
         } catch {
-            const text = await res.text();
             return text;
         }
     };
