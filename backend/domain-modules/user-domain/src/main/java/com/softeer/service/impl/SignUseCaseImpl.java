@@ -41,7 +41,7 @@ public class SignUseCaseImpl implements SignUseCase {
         validateSignUpRequest(nickname, loginId, password);
 
         try {
-            userAdapter.save(loginId, nickname, password);
+            userAdapter.save(nickname, loginId, password);
         } catch (DataIntegrityViolationException e) {
             throw ExceptionCreator.create(UserException.DUPLICATED_NICKNAME_OR_LOGIN_ID, "nickname : " + nickname + " loginId : " + loginId);
         }

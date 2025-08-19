@@ -9,7 +9,7 @@ include ':domain-modules:grid-domain'
 include ':domain-modules:user-domain'
 include ':domain-modules:forecast-domain'
 include ':domain-modules:mountain-domain'
-include ':domain-modules:report-domain'
+include ':domain-modules:interaction-domain'
 
 ////common-layer
 include ':common-modules:util'
