@@ -39,8 +39,8 @@ const overlayStyles = css`
 const modalStyles = css`
     background: ${colors.grey[20]};
     border-radius: 1rem;
-    height: 38rem;
-    width: 40rem;
+    width: auto;
+    height: auto;
     display: flex;
     flex-direction: column;
 `;

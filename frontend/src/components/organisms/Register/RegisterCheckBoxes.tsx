@@ -107,6 +107,11 @@ const allCheckBoxProps = {
     required: false,
 };
 
+const modalContent = css`
+    width: 40rem;
+    height: 38rem;
+`;
+
 const checkBoxes: CheckBoxItem[] = [
     { id: 'age', text: '[필수] 만 14세 이상입니다', required: true },
     {
@@ -114,7 +119,7 @@ const checkBoxes: CheckBoxItem[] = [
         text: '[필수] 이용약관 동의',
         required: true,
         Modal: (
-            <div>
+            <div css={modalContent}>
                 <h2>{termsInfo.title}</h2>
                 <pre>{termsInfo.content}</pre>
             </div>
@@ -125,7 +130,7 @@ const checkBoxes: CheckBoxItem[] = [
         text: '[선택] 개인정보 마케팅 활용 동의',
         required: false,
         Modal: (
-            <div>
+            <div css={modalContent}>
                 <h2>{privacyInfo.title}</h2>
                 <pre>{privacyInfo.content}</pre>
             </div>
