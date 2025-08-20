@@ -1,5 +1,7 @@
 package com.softeer.mountain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.softeer.common.AbstractKmaApiCaller;
 import com.softeer.common.ApiRequest;
 import com.softeer.config.ForecastApiType;
@@ -10,8 +12,8 @@ import java.util.List;
 
 public class MountainForecastApiCaller extends AbstractKmaApiCaller<MountainForecastApiResponse> {
 
-    public MountainForecastApiCaller(RestClient restClient) {
-        super(restClient, ForecastApiType.MOUNTAIN);
+    public MountainForecastApiCaller(RestClient restClient, XmlMapper xmlMapper) {
+        super(restClient, ForecastApiType.MOUNTAIN, xmlMapper);
     }
 
     @Override
