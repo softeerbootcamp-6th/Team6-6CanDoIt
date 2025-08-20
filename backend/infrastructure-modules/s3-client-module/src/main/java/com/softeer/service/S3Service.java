@@ -1,5 +1,6 @@
 package com.softeer.service;
 
+import com.softeer.config.S3Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,15 +16,13 @@ import java.util.UUID;
 public class S3Service {
 
     private final S3Client s3Client;
+    private final S3Properties props;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
-
-    public String uploadFile(byte[] data, String filename, String contentType) throws IOException {
+    public String uploadFile(byte[] data, String filename, String contentType) {
         String key = "report/" + UUID.randomUUID() + "_" + filename;
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(props.bucket())
                 .key(key)
                 .contentType(contentType)
                 .build();
