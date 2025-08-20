@@ -40,7 +40,7 @@ public class UltraForecastV1JobConfig {
     }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V1_STEP)
-    @StepScope
+    @JobScope
     public Step scheduledShortForecastStep() {
         return new StepBuilder(SCHEDULED_ULTRA_FORECAST_V1_STEP, jobRepository)
                 .<Grid, UltraForecastResponseList>chunk(CHUNK_SIZE, transactionManager)
