@@ -1,6 +1,6 @@
 package com.softeer.batch.forecast.shortterm.writer;
 
-import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
+import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.domain.Forecast;
 import com.softeer.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 @StepScope
 public class ScheduledShortForecastWriter extends AbstractShortForecastWriter {
 
-    public ScheduledShortForecastWriter(ForecastWriterSupporter forecastWriterSupporter) {
-        super(forecastWriterSupporter);
+    public ScheduledShortForecastWriter(ForecastJdbcWriter forecastJdbcWriter) {
+        super(forecastJdbcWriter);
     }
 
     @Override
