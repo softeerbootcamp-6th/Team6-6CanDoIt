@@ -8,6 +8,8 @@ import { WeatherIndexLight } from '../../atoms/Text/WeatherIndex.tsx';
 import { useState } from 'react';
 import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.tsx';
 import { DummyWeatherData } from './dummy.ts';
+import Icon from '../../atoms/Icon/Icons.tsx';
+import { theme } from '../../../theme/theme.ts';
 
 const weatherDataList = [
     {
@@ -47,6 +49,14 @@ export default function DetailInfoSection() {
         <div css={wrapperStyles}>
             <div css={wholeWrapper}>
                 <div css={contentSectionStyles}>
+                    <button css={storeBtnStyles}>
+                        <Icon
+                            name='download-02'
+                            width={1.4}
+                            height={1.4}
+                            color='grey-100'
+                        />
+                    </button>
                     <img
                         src={cloudImage}
                         css={animatedImageStyles}
@@ -78,6 +88,8 @@ export default function DetailInfoSection() {
         </div>
     );
 }
+
+const { colors } = theme;
 
 const float = keyframes`
     0%, 100% {
@@ -147,7 +159,7 @@ const contentSectionStyles = css`
     margin: auto;
     padding: 2rem 0;
     box-sizing: border-box;
-    width: 75%;
+    width: 70%;
     max-width: 80%;
     background-image: url(${bgImage});
     background-size: cover;
@@ -161,4 +173,22 @@ const contentSectionStyles = css`
 const wholeWrapper = css`
     height: 100%;
     display: flex;
+    position: relative;
+`;
+
+const storeBtnStyles = css`
+    all: unset;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 3rem;
+    right: 5%;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+    background-color: ${colors.greyOpacityWhite[70]};
+    padding: 0 3px 5px 0;
+    box-sizing: border-box;
+    cursor: pointer;
 `;
