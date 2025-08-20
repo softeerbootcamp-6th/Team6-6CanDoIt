@@ -2,6 +2,7 @@ package com.softeer.batch.common.config;
 
 import com.softeer.mountain.MountainForecastApiCaller;
 import com.softeer.shortterm.ShortForecastApiCaller;
+import com.softeer.shortterm.UltraForecastApiCaller;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -24,5 +25,11 @@ public class ForecastApiCallerConfig {
     public ShortForecastApiCaller shortForecastApiCaller(
             @Qualifier("kmaPublicApiRestClient") RestClient restClient) {
         return new ShortForecastApiCaller(restClient);
+    }
+
+    @Bean
+    @StepScope
+    public UltraForecastApiCaller ultraForecastApiCaller(@Qualifier("kmaPublicApiRestClient") RestClient restClient) {
+        return new UltraForecastApiCaller(restClient);
     }
 }
