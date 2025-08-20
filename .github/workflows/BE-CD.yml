@@ -74,7 +74,7 @@ jobs:
 
           cat > deploy/.env <<EOF
           export ARTIFACT_VERSION=${GITHUB_SHA}
-          export S3_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
+          export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
 
           export DB_HOST=${{ secrets.DB_HOST }}
           export DB_PORT=3306

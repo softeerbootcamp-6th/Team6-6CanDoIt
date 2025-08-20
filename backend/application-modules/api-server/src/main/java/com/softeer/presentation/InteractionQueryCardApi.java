@@ -1,9 +1,9 @@
 package com.softeer.presentation;
 
+import com.softeer.config.LoginUserId;
 import com.softeer.domain.CardHistory;
 import com.softeer.dto.response.card.ReportCardResponse;
 import com.softeer.entity.enums.ReportType;
-import com.softeer.config.LoginUserId;
 import com.softeer.service.ReportQueryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -216,7 +216,7 @@ public interface InteractionQueryCardApi {
     ```
     """
     )
-    @GetMapping("/report/{courseId}/me")
+    @GetMapping("/report/me")
     ResponseEntity<List<ReportCardResponse>> myReports(@RequestParam(required = false) Integer pageSize,
                                                        @RequestParam(required = false) Long lastId,
                                                        @LoginUserId Long userId

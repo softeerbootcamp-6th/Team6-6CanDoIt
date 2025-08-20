@@ -79,7 +79,7 @@ public class WeatherCardService {
         Grid mountainGrid = coursePlan.mountain().grid();
         ForecastUseCase.WeatherCondition weatherCondition = forecastUseCase.findForecastWeatherCondition(mountainGrid, baseTime);
 
-        return new CourseCardResponse(coursePlan.course(), weatherCondition);
+        return new CourseCardResponse(coursePlan.course(), coursePlan.sunTime(), weatherCondition);
     }
 
     public ForecastCardResponse createForecastCard(long courseId, LocalDateTime startDateTime) {

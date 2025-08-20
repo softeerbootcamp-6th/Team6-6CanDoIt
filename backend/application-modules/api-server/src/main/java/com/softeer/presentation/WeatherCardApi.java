@@ -107,7 +107,7 @@ public interface WeatherCardApi {
     ```
     """
     )
-    @GetMapping("/mountain/{mountainId}")
+    @GetMapping("/mountain/{mountainId}/course")
     ResponseEntity<List<CourseInfoResponse>> courseInfos(@PathVariable("mountainId") long mountainId);
 
     @Operation(

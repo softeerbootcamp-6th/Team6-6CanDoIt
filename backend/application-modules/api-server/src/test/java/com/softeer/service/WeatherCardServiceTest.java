@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +138,7 @@ public class WeatherCardServiceTest {
         Grid destinationGrid = GridFixture.builder().id(2).build();
         Mountain mountain = MountainFixture.builder().id(mountainId).grid(destinationGrid).build();
         Course course = CourseFixture.builder().id(courseId).startGrid(startGrid).destinationGrid(destinationGrid).build();
+        SunTime sunTime = SunTimeFixture.builder().sunrise(LocalTime.of(6, 0)).sunset(LocalTime.of(18, 0)).build();
 
         CoursePlan coursePlan = CoursePlanFixture.builder().mountain(mountain).course(course).build();
 
@@ -148,7 +150,7 @@ public class WeatherCardServiceTest {
         when(mountainUseCase.getCoursePlan(eq(courseId), any(LocalDate.class))).thenReturn(coursePlan);
         when(forecastUseCase.findForecastWeatherCondition(eq(destinationGrid), eq(baseTime))).thenReturn(weatherCondition);
 
-        CourseCardResponse expected = new CourseCardResponse(course, weatherCondition);
+        CourseCardResponse expected = new CourseCardResponse(course, sunTime, weatherCondition);
 
         //when
         CourseCardResponse result = target.createCourseCard(courseId, dateTime);
