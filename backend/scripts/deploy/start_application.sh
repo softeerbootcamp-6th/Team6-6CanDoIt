@@ -33,7 +33,7 @@ services=(
 for svc in "${!services[@]}"; do
     port=${services[$svc]}
     JAR_NAME="$svc.jar"
-    S3_PATH="s3://${S3_BUCKET}/artifacts/${ARTIFACT_VERSION}/${JAR_NAME}"
+    S3_PATH="s3://${S3_DEPLOY_BUCKET}/artifacts/${ARTIFACT_VERSION}/${JAR_NAME}"
     LOCAL_PATH="$APP_DIR/${JAR_NAME}"
     LOG_FILE="$LOG_DIR/${svc}.log"
 
