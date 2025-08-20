@@ -4,14 +4,18 @@ import { theme } from '../../../theme/theme.ts';
 
 interface PropsState {
     textColor?: string;
+    onClick?: () => void;
     children: React.ReactNode;
 }
 
 export default function ModalButton(props: PropsState) {
-    const { textColor = 'grey-100', children } = props;
+    const { textColor = 'grey-100', onClick, children } = props;
     return (
         <div css={buttonContainerStyle}>
-            <button css={modalButtonStyle({ color: textColor })}>
+            <button
+                onClick={onClick}
+                css={modalButtonStyle({ color: textColor })}
+            >
                 {children}
             </button>
         </div>
