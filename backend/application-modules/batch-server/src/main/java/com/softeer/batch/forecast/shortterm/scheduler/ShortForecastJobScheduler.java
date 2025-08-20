@@ -1,7 +1,5 @@
 package com.softeer.batch.forecast.shortterm.scheduler;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -10,16 +8,17 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
+@Profile("!test")
 public class ShortForecastJobScheduler {
 
     private final JobLauncher jobLauncher;
@@ -48,7 +47,7 @@ public class ShortForecastJobScheduler {
                             .addLong("unique", System.currentTimeMillis()) // 항상 새 인스턴스
                             .toJobParameters()
             );
-            log.info("Startup job finished with status={}", execution.getStatus());
+            log.info("StartUpShortForecastJob finished with status={}", execution.getStatus());
         } catch (Exception e) {
             log.error("Failed to run startupForecastJob on startup", e);
         }
@@ -68,6 +67,6 @@ public class ShortForecastJobScheduler {
 
         log.info("Launching shortForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("Job finished with status={}", execution.getStatus());
+        log.info("ScheduledShortForecastJob finished with status={}", execution.getStatus());
     }
 }

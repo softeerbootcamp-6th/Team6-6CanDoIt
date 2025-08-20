@@ -2,6 +2,9 @@ package com.softeer.shortterm;
 
 import com.softeer.shortterm.dto.response.ShortForecastItem;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public final class ShortForecastItemFixture {
 
     private ShortForecastItemFixture() {}
@@ -18,8 +21,8 @@ public final class ShortForecastItemFixture {
         private String baseDate = "20250816";
         private String baseTime = "0500";
         private String category = "TMP"; // 기온(TMP)을 기본값으로 설정
-        private String forecastDate = "20250816";
-        private String forecastTime = "0600";
+        private LocalDate forecastDate = LocalDate.of(2025, 8, 20);
+        private LocalTime forecastTime = LocalTime.of(6, 0);
         private String forecastValue = "22";
         private int nx = 60;
         private int ny = 127;
@@ -34,7 +37,7 @@ public final class ShortForecastItemFixture {
             return this;
         }
 
-        public ItemBuilder forecastTime(String forecastTime) {
+        public ItemBuilder forecastTime(LocalTime forecastTime) {
             this.forecastTime = forecastTime;
             return this;
         }

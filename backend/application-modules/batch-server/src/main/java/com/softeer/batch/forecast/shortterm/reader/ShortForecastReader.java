@@ -34,10 +34,18 @@ public class ShortForecastReader extends JdbcPagingItemReader<Grid> {
         try {
             SqlPagingQueryProviderFactoryBean factory = new SqlPagingQueryProviderFactoryBean();
             factory.setDataSource(dataSource);
-            factory.setSelectClause("distinct g.id, g.x, g.y ");
+            factory.setSelectClause("distinct id, x, y ");
 
-            factory.setFromClause("from grid g inner join course_point cp on g.id = cp.grid_id");
-            factory.setSortKeys(Map.of("g.id", Order.ASCENDING));
+            factory.setFromClause(
+                    "from (" +
+                            "select g.id, g.x, g.y from grid g " +
+                            "inner join course_point cp on g.id = cp.grid_id " +
+                            "union all " +
+                            "select g.id, g.x, g.y from grid g " +
+                            "inner join mountain m on g.id = m.grid_id" +
+                            ") as d"
+            );
+            factory.setSortKeys(Map.of("id", Order.ASCENDING));
 
             PagingQueryProvider queryProvider = factory.getObject();
 

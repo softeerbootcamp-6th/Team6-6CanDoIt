@@ -88,7 +88,7 @@ public class WeatherCardService {
         Course course = coursePlan.course();
 
         Grid startGrid = course.startGrid();
-        Grid destinationGrid = course.destinationGrid();
+        Grid destinationGrid = coursePlan.mountain().grid();
         double totalDuration = course.totalDuration();
 
         HikingTime hikingTime = TimeUtil.getHikingTime(startDateTime, totalDuration);
