@@ -2,14 +2,15 @@ import TextWithIcon from '../Text/TextWithIcon.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-interface propsState {
+interface PropsState {
     text: string;
     iconName: string;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
-export default function ChipButton({ text, iconName }: propsState) {
+export default function ChipButton({ text, iconName, onClick }: PropsState) {
     return (
-        <button css={chipStyle}>
+        <button onClick={onClick} css={chipStyle}>
             <TextWithIcon text={text} iconName={iconName} color='grey-80' />
         </button>
     );
