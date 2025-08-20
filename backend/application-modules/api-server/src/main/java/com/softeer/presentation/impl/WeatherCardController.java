@@ -5,12 +5,14 @@ import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
 import com.softeer.dto.response.card.MountainCardResponse;
+import com.softeer.dto.response.card.MountainCourseCardResponse;
 import com.softeer.presentation.WeatherCardApi;
 import com.softeer.service.WeatherCardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,5 +45,10 @@ public class WeatherCardController implements WeatherCardApi {
     @Override
     public ResponseEntity<List<HourlyWeatherResponse>> hourlyWeatherForecasts(Long mountainId, LocalDateTime startDateTime) {
         return ResponseEntity.ok(weatherCardService.findForecastsByMountainId(mountainId, startDateTime));
+    }
+
+    @Override
+    public ResponseEntity<MountainCourseCardResponse> mountainCourse(Long courseId, LocalDate date) {
+        return ResponseEntity.ok(weatherCardService.createMountainCourseCard(courseId, date));
     }
 }
