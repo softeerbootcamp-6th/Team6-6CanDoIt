@@ -1,6 +1,5 @@
 package com.softeer.batch.common.writersupporter;
 
-import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -9,7 +8,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 
 @Component
 @StepScope
