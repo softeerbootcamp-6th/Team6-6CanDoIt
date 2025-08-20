@@ -11,32 +11,29 @@ interface imageFile {
 
 export default function ImageInputField() {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const [dragActive, setDragActive] = useState(false);
+    const [dragOverActive, setDragOverActive] = useState(false);
     const [image, setImage] = useState<imageFile | null>(null);
 
     const handleFile = (file?: File) => {
         if (!file) return;
         if (!file.type.startsWith('image/')) return;
         const previewUrl = URL.createObjectURL(file);
-        setImage((prev) => {
-            if (prev) URL.revokeObjectURL(prev.previewUrl);
-            return { imageFile: file, previewUrl };
-        });
+        setImage({ imageFile: file, previewUrl });
     };
 
     const openPicker = () => inputRef.current?.click();
 
     const onDragOver = (e: React.DragEvent) => {
         e.preventDefault();
-        setDragActive(true);
+        setDragOverActive(true);
     };
     const onDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
-        setDragActive(false);
+        setDragOverActive(false);
     };
     const onDrop = (e: React.DragEvent) => {
         e.preventDefault();
-        setDragActive(false);
+        setDragOverActive(false);
         handleFile(e.dataTransfer.files?.[0]);
     };
 
@@ -48,7 +45,7 @@ export default function ImageInputField() {
 
     return (
         <div
-            css={[imageAttachmentStyle, dragActive && dragStyle]}
+            css={[imageAttachmentStyle, dragOverActive && dragStyle]}
             onClick={openPicker}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
