@@ -47,7 +47,7 @@ public class ShortForecastJobScheduler {
                             .addLong("unique", System.currentTimeMillis()) // 항상 새 인스턴스
                             .toJobParameters()
             );
-            log.info("Startup job finished with status={}", execution.getStatus());
+            log.info("StartUpShortForecastJob finished with status={}", execution.getStatus());
         } catch (Exception e) {
             log.error("Failed to run startupForecastJob on startup", e);
         }
@@ -67,6 +67,6 @@ public class ShortForecastJobScheduler {
 
         log.info("Launching shortForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("Job finished with status={}", execution.getStatus());
+        log.info("ScheduledShortForecastJob finished with status={}", execution.getStatus());
     }
 }

@@ -62,6 +62,6 @@ public class MountainForecastJobScheduler {
 
         log.info("Launching mountainForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("Job finished with status={}", execution.getStatus());
+        log.info("ScheduledMountainForecastJob finished with status={}", execution.getStatus());
     }
 }
