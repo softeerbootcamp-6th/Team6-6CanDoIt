@@ -1,4 +1,6 @@
 dependencies {
+    implementation project(':infrastructure-modules:s3-client-module')
+
     testImplementation(testFixtures(project(':domain-modules:image-domain')))
 
 }

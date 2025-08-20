@@ -4,6 +4,8 @@ dependencies {
 	implementation project(':domain-modules:forecast-domain')
 	implementation project(':domain-modules:mountain-domain')
 	implementation project(':domain-modules:interaction-domain')
+	implementation project(':domain-modules:image-domain')
+	implementation project(':infrastructure-modules:s3-client-module')
 
 	implementation project(':common-modules:exception')
 
