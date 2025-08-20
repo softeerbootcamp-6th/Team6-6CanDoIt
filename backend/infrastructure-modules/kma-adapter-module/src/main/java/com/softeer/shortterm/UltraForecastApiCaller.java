@@ -4,7 +4,7 @@ import org.springframework.web.client.RestClient;
 
 public class UltraForecastApiCaller extends AbstractShortForecastApiCaller{
 
-    protected UltraForecastApiCaller(RestClient restClient) {
+    public UltraForecastApiCaller(RestClient restClient) {
         super(restClient);
     }
 
