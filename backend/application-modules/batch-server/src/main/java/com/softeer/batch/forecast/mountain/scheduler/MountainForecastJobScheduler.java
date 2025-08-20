@@ -8,6 +8,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
+@Profile("!test")
 public class MountainForecastJobScheduler {
 
     private final JobLauncher jobLauncher;
