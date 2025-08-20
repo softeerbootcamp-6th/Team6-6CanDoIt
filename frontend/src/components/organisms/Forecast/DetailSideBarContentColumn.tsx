@@ -67,7 +67,6 @@ const wrapperStyles = css`
     flex-direction: column;
     height: 80%;
     padding-top: 1.25rem;
-    padding-bottom: 2rem;
     box-sizing: border-box;
     border-top: 0.5px solid ${colors.grey[40]};
     gap: 8%;
