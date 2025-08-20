@@ -55,7 +55,6 @@ export default function SearchBar(props: PropsState) {
 
     const isMainPage = pageName === 'main';
     const isReportPage = pageName === 'report';
-    const isSafetyPage = pageName === 'safety';
 
     const handleToggleDropdown = createHandleToggleDropdown({
         setOpenDropdown: setOpenedDropdownType,
@@ -114,11 +113,9 @@ export default function SearchBar(props: PropsState) {
                 )}
                 <SearchBarText>{searchBarMessage}</SearchBarText>
                 {isMainPage && <Dropdown {...dropdownProps.weekday} />}
-                {(isMainPage || isSafetyPage) && (
-                    <button type='submit' css={searchButtonStyle}>
-                        <Icon {...searchButtonIconProps} />
-                    </button>
-                )}
+                <button type='submit' css={searchButtonStyle}>
+                    <Icon {...searchButtonIconProps} />
+                </button>
             </form>
         </div>
     );
