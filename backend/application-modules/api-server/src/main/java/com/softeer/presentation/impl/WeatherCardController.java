@@ -27,7 +27,7 @@ public class WeatherCardController implements WeatherCardApi {
 
     @Override
     public ResponseEntity<List<CourseInfoResponse>> courseInfos(long mountainId) {
-        return null;
+        return ResponseEntity.ok(weatherCardService.findCoursesByMountainId(mountainId));
     }
 
     @Override

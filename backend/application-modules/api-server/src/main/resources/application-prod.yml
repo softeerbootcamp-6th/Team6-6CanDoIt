@@ -13,3 +13,7 @@ spring:
 jwt:
   access-token-expiration-ms: ${JWT_EXPIRATION_MS}
   secret-key: ${JWT_SECRET_KEY}
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
