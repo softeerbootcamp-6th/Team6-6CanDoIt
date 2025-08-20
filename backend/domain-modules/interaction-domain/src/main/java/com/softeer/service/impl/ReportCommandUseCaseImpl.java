@@ -1,6 +1,7 @@
 package com.softeer.service.impl;
 
 import com.softeer.entity.id.ReportEtceteraKeywordId;
+import com.softeer.entity.id.ReportLikeId;
 import com.softeer.entity.id.ReportRainKeywordId;
 import com.softeer.entity.id.ReportWeatherKeywordId;
 import com.softeer.entity.keyword.ReportEtceteraKeywordEntity;
@@ -32,6 +33,19 @@ public class ReportCommandUseCaseImpl implements ReportCommandUseCase {
         saveWeatherKeywords(reportCreateDto, reportId);
         saveRainKeywords(reportCreateDto, reportId);
         saveEtceteraKeywords(reportCreateDto, reportId);
+    }
+
+    @Override
+    public void likeReport(long userId, long reportId) {
+        ReportLikeId reportLikeId = new ReportLikeId(reportId, userId);
+
+        boolean exists = reportCommandAdapter.existsReportLike(reportLikeId);
+
+        if (exists) {
+            reportCommandAdapter.deleteReportLike(reportLikeId);
+        } else {
+            reportCommandAdapter.saveReportLike(reportLikeId);
+        }
     }
 
     private void saveWeatherKeywords(ReportCreateDto reportCreateDto, long reportId) {
@@ -69,6 +83,4 @@ public class ReportCommandUseCaseImpl implements ReportCommandUseCase {
             reportEtceteraKeywordRepository.saveAll(etceteraEntities);
         }
     }
-
-
 }
