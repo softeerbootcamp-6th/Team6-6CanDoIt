@@ -13,6 +13,8 @@ dependencies {
     // infrastructure-modules
     implementation project(':infrastructure-modules:kma-adapter-module')
     implementation project(':infrastructure-modules:redis-module')
+
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
