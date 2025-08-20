@@ -23,6 +23,6 @@ public class InteractionCommandCardController implements InteractionCommandCardA
     ) {
         interactionCommandCardService.createReport(request, imageFile, userId);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
