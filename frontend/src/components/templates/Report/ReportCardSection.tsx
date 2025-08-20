@@ -7,7 +7,11 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportModal from '../../organisms/Report/ReportModal.tsx';
-import { formatTimeDifference, getCurrentTime } from './utils.ts';
+import {
+    formatTimeDifference,
+    getCurrentTime,
+    filterGatherer,
+} from './utils.ts';
 
 interface CardData {
     reportId: number;
@@ -69,16 +73,16 @@ export default function ReportCardSection() {
                     text='제보하기'
                     iconName='edit-03'
                 />
+                <ReportModal
+                    title='실시간 날씨 제보하기'
+                    description='실시간 날씨를 제보하려면 코스 근처에 있어야 해요. 사진은 6시간 이내에 촬영된 사진만 업로드 가능해요.'
+                    filterColumn={filterColumn}
+                    type={reportType}
+                    isOpen={isReportModalOpen}
+                    onClose={() => setIsReportModalOpen(false)}
+                    onSubmit={reportModalSubmitHandler}
+                />
             </div>
-            <ReportModal
-                title='실시간 날씨 제보하기'
-                description='실시간 날씨를 제보하려면 코스 근처에 있어야 해요. 사진은 6시간 이내에 촬영된 사진만 업로드 가능해요.'
-                filterColumn={filterColumn}
-                type={reportType}
-                isOpen={isReportModalOpen}
-                onClose={() => setIsReportModalOpen(false)}
-                onSubmit={reportModalSubmitHandler}
-            />
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
                 {cardsData.map((card) => {
                     const filterLabels = filterGatherer({
@@ -112,27 +116,6 @@ export default function ReportCardSection() {
             </div>
         </>
     );
-}
-function filterGatherer({
-    weatherKeywords = [],
-    rainKeywords = [],
-    etceteraKeywords = [],
-}: {
-    weatherKeywords?: string[];
-    rainKeywords?: string[];
-    etceteraKeywords?: string[];
-}) {
-    const filterLabels = [];
-    if (weatherKeywords.length > 0) {
-        filterLabels.push(...weatherKeywords);
-    }
-    if (rainKeywords.length > 0) {
-        filterLabels.push(...rainKeywords);
-    }
-    if (etceteraKeywords.length > 0) {
-        filterLabels.push(...etceteraKeywords);
-    }
-    return filterLabels;
 }
 
 const reportCardContainerStyle = css`

@@ -28,3 +28,15 @@ export function formatTimeDifference({
         return `${diffDay}일 전`;
     }
 }
+
+export function filterGatherer({
+    weatherKeywords = [],
+    rainKeywords = [],
+    etceteraKeywords = [],
+}: {
+    weatherKeywords?: string[];
+    rainKeywords?: string[];
+    etceteraKeywords?: string[];
+}) {
+    return [...weatherKeywords, ...rainKeywords, ...etceteraKeywords];
+}
