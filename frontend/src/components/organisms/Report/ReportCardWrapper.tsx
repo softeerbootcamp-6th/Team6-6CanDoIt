@@ -1,12 +1,17 @@
 import { theme } from '../../../theme/theme.ts';
 import { css } from '@emotion/react';
 
-interface propsState {
+interface PropsState {
+    onClick: () => void;
     children: React.ReactNode;
 }
 
-export default function ReportCardWrapper({ children }: propsState) {
-    return <div css={cardStyle}>{children}</div>;
+export default function ReportCardWrapper({ onClick, children }: PropsState) {
+    return (
+        <div onClick={onClick} css={cardStyle}>
+            {children}
+        </div>
+    );
 }
 
 const { colors } = theme;

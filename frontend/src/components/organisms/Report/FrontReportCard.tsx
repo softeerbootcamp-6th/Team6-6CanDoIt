@@ -4,27 +4,29 @@ import FrontCardFooter from '../../molecules/ReportCard/FrontCardFooter.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 
-interface propsState {
+interface PropsState {
     comment: string;
-    minutesAgo: number;
+    timeAgo: string;
     filterLabels: string[];
     imgSrc?: string;
     imgAlt?: string;
+    onClick: () => void;
 }
 
-export default function FrontReportCard(props: propsState) {
+export default function FrontReportCard(props: PropsState) {
     const {
         comment,
-        minutesAgo,
+        timeAgo,
         filterLabels,
         imgSrc = '',
         imgAlt = '',
+        onClick,
     } = props;
     return (
-        <ReportCardWrapper>
+        <ReportCardWrapper onClick={onClick}>
             <img src={imgSrc} alt={imgAlt} css={reportImgStyle} />
             <LabelList labels={filterLabels} />
-            <FrontCardFooter minutesAgo={minutesAgo} comment={comment} />
+            <FrontCardFooter timeAgo={timeAgo} comment={comment} />
         </ReportCardWrapper>
     );
 }
