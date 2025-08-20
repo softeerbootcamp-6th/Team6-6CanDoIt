@@ -8,7 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RestController;
+
 @RequiredArgsConstructor
+@RestController
 public class InteractionCommandCardController implements InteractionCommandCardApi {
 
     private final InteractionCommandCardService interactionCommandCardService;
