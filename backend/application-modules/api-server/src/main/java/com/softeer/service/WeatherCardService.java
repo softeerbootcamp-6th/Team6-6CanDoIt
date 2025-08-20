@@ -9,6 +9,7 @@ import com.softeer.dto.response.card.CourseCardResponse;
 import com.softeer.dto.response.card.ForecastCardResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.MountainCardResponse;
+import com.softeer.dto.response.card.MountainCourseCardResponse;
 import com.softeer.time.HikingTime;
 import com.softeer.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -99,5 +100,15 @@ public class WeatherCardService {
         ForecastUseCase.CourseForecast courseForecast = forecastUseCase.findForecastsByHikingTime(startGrid, destinationGrid, hikingTime);
 
         return ForecastCardResponse.from(courseForecast, courseAltitude, mountainAltitude);
+    }
+
+    public MountainCourseCardResponse createMountainCourseCard(long courseId, LocalDate date) {
+        CoursePlan coursePlan = mountainUseCase.getCoursePlan(courseId, date);
+
+        return new MountainCourseCardResponse(
+                coursePlan.mountain(),
+                coursePlan.course(),
+                coursePlan.sunTime()
+        );
     }
 }
