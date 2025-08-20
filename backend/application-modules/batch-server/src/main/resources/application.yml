@@ -18,8 +18,29 @@ forecast:
       "1": "RAIN"
       "2": "RAIN_SNOW"
       "3": "SNOW"
+      "4": "SHOWER"
+      "5": "DRIZZLE"
+      "6": "DRIZZLE_SNOW"
+      "7": "SNOW_FLURRY"
 
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/hiking?characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
+    username: root
+    password: ykbaik100!
+    driver-class-name: com.mysql.cj.jdbc.Driver
   batch:
     job:
       enabled: false
+  redis:
+    host: localhost
+    port: 6379
+    username: default
+
+kma:
+  api:
+    key:
+      mountain: QBBMlbJZSKeQTJWyWRinTw
+      short: ruGWumGhfqpbu0QB9wx61m7UE9x1/bWN9V+tk+CeiAyIibISDjsloov6ICHpZFtz5KcEn8nsZtJIEee1BIZanw==
+
+
