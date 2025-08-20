@@ -45,4 +45,8 @@ public class InteractionCommandCardService {
 
         reportCommandUseCase.saveReport(reportCreateDto);
     }
+
+    public void likeReport(Long reportId, Long userId) {
+        reportCommandUseCase.likeReport(reportId, userId);
+    }
 }

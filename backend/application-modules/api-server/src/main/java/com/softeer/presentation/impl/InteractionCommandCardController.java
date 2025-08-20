@@ -17,8 +17,6 @@ public class InteractionCommandCardController implements InteractionCommandCardA
 
     private final InteractionCommandCardService interactionCommandCardService;
 
-
-
     @Override
     public ResponseEntity<HttpStatus> saveReport(
             ReportCreateRequest request,
@@ -28,5 +26,12 @@ public class InteractionCommandCardController implements InteractionCommandCardA
         interactionCommandCardService.createReport(request, imageFile, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Override
+    public ResponseEntity<HttpStatus> likeReport(Long reportId, Long userId) {
+        interactionCommandCardService.likeReport(reportId, userId);
+
+        return ResponseEntity.ok().build();
     }
 }

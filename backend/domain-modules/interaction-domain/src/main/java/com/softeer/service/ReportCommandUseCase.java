@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface ReportCommandUseCase {
     void saveReport(ReportCreateDto reportCreateDto);
+    void likeReport(long userId, long reportId);
 
     record ReportCreateDto(
             long userId,
