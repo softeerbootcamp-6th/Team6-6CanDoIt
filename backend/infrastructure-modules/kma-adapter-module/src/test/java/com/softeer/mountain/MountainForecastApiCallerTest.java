@@ -1,5 +1,7 @@
 package com.softeer.mountain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.softeer.mountain.dto.MountainForecastApiRequest;
 import com.softeer.mountain.dto.MountainForecastApiResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +38,7 @@ class MountainForecastApiCallerTest {
 
     @BeforeEach
     void setUp() {
-        target = new MountainForecastApiCaller(restClient);
+        target = new MountainForecastApiCaller(restClient, new XmlMapper());
     }
 
     @Test

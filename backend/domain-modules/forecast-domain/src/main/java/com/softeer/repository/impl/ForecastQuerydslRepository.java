@@ -37,7 +37,8 @@ public class ForecastQuerydslRepository {
                         dailyTemperatureEntity.date.eq(forecastDate)
                 )
                 .where(
-                        gridEntity.id.eq(gridId),
+                        forecastEntity.gridEntity.id.eq(gridId),
+                        forecastEntity.type.eq(ForecastType.SHORT),
                         forecastEntity.dateTime.between(startDaTeTime,  endDateTime)
                 )
                 .orderBy(forecastEntity.dateTime.asc())
@@ -49,16 +50,16 @@ public class ForecastQuerydslRepository {
 
         return Optional.ofNullable(
                 selectForecast()
-                .innerJoin(gridEntity).on(forecastEntity.gridEntity.id.eq(gridEntity.id))
-                .innerJoin(dailyTemperatureEntity).on(
-                        gridEntity.id.eq(dailyTemperatureEntity.gridEntity.id),
-                        dailyTemperatureEntity.date.eq(forecastDate)
-                )
-                .where(
-                        gridEntity.id.eq(gridId),
-                        forecastEntity.dateTime.eq(dateTime),
-                        forecastEntity.type.eq(type)
-                ).fetchOne());
+                        .innerJoin(gridEntity).on(forecastEntity.gridEntity.id.eq(gridEntity.id))
+                        .innerJoin(dailyTemperatureEntity).on(
+                                gridEntity.id.eq(dailyTemperatureEntity.gridEntity.id),
+                                dailyTemperatureEntity.date.eq(forecastDate)
+                        )
+                        .where(
+                                forecastEntity.gridEntity.id.eq(gridId),
+                                forecastEntity.dateTime.eq(dateTime),
+                                forecastEntity.type.eq(type)
+                        ).fetchOne());
     }
 
     public Map<Integer, Forecast> findForecastsByTypeAndDateTime(List<Integer> gridIds, ForecastType type, LocalDateTime dateTime) {
@@ -73,7 +74,7 @@ public class ForecastQuerydslRepository {
                         dailyTemperatureEntity.date.eq(forecastDate)
                 )
                 .where(
-                        gridEntity.id.in(gridIds),
+                        forecastEntity.gridEntity.id.in(gridIds),
                         forecastEntity.dateTime.eq(dateTime),
                         forecastEntity.type.eq(type)
                 )

@@ -1,6 +1,6 @@
 package com.softeer.batch.forecast.shortterm.writer;
 
-import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
+import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.domain.Forecast;
 import com.softeer.time.TimeUtil;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @StepScope
 public class StartUpShortForecastWriter extends AbstractShortForecastWriter{
 
-    public StartUpShortForecastWriter(ForecastWriterSupporter forecastWriterSupporter) {
-        super(forecastWriterSupporter);
+    public StartUpShortForecastWriter(ForecastJdbcWriter forecastJdbcWriter) {
+        super(forecastJdbcWriter);
     }
 
     @Override

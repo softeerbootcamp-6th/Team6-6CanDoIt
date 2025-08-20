@@ -18,8 +18,8 @@ forecast:
       "1": "RAIN"
       "2": "RAIN_SNOW"
       "3": "SNOW"
+      "4": "SHOWER"
+      "5": "DRIZZLE"
+      "6": "DRIZZLE_SNOW"
+      "7": "SNOW_FLURRY"
 
-spring:
-  batch:
-    job:
-      enabled: false

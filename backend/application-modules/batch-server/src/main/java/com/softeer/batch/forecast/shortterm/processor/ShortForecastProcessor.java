@@ -2,13 +2,15 @@ package com.softeer.batch.forecast.shortterm.processor;
 
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
 import com.softeer.batch.mapper.ForecastMapper;
-import com.softeer.common.KmaApiCaller;
+import com.softeer.domain.DailyTemperature;
 import com.softeer.domain.Forecast;
 import com.softeer.domain.Grid;
+import com.softeer.entity.DailyTemperatureEntity;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
 import com.softeer.entity.enums.Sky;
 import com.softeer.entity.enums.WindDirection;
+import com.softeer.shortterm.ShortForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
 import com.softeer.time.ApiTime;
@@ -22,12 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,11 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecastList> {
 
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
-    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-
-    private final KmaApiCaller<ShortForecastItem> kmaApiCaller;
-
+    private final ShortForecastApiCaller kmaApiCaller;
     private final ForecastMapper forecastMapper;
 
     @Value("${kma.api.key.short}")
@@ -54,7 +47,7 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
                 serviceKey,
                 1,
                 1500,
-                "json",
+                "JSON",
                 apiTime.baseDate(),
                 apiTime.baseTime(),
                 grid.x(),
@@ -64,34 +57,45 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
     }
 
     private ShortForecastList processApiResponse(Grid grid, List<ShortForecastItem> items) {
+        Map<LocalDate, List<ShortForecastItem>> temperatureMap = items.stream()
+                .filter(item -> item.category().equals("TMX") || item.category().equals("TMN"))
+                .collect(Collectors.groupingBy(ShortForecastItem::forecastDate));
+
+        Map<LocalDate, DailyTemperature> dailyTemperatureMap = new HashMap<>();
+
+        for (Map.Entry<LocalDate, List<ShortForecastItem>> temperatureEntry : temperatureMap.entrySet()) {
+            List<ShortForecastItem> temperatureValues = temperatureEntry.getValue();
+            if(temperatureValues.size() != 2) continue;
+
+            temperatureValues.sort(Comparator.comparingDouble(item -> Double.parseDouble(item.forecastValue())));
+            ShortForecastItem lowestTemperatureItem = temperatureValues.get(0);
+            ShortForecastItem highestTemperatureItem = temperatureValues.get(1);
+
+            DailyTemperature dailyTemperature = new DailyTemperature(Double.parseDouble(highestTemperatureItem.forecastValue()), Double.parseDouble(lowestTemperatureItem.forecastValue()));
+            dailyTemperatureMap.put(temperatureEntry.getKey(), dailyTemperature);
+        }
+
         Map<LocalDateTime, List<ShortForecastItem>> groupedByTime = items.stream()
-                .collect(Collectors.groupingBy(item -> {
-                    String forecastDate = item.forecastDate();
-                    String forecastTime = item.forecastTime();
-
-                    if (forecastDate == null || forecastTime == null) {
-                        log.warn("forecastDate or forecastTime is null for gridId: {}. Skipping item.", grid.id());
-                    }
-
-                    return LocalDateTime.of(
-                            LocalDate.parse(forecastDate.trim(), dateFormatter),
-                            LocalTime.parse(forecastTime.trim(), timeFormatter)
-                    );
-                }));
+                .collect(Collectors.groupingBy(item -> LocalDateTime.of(
+                        item.forecastDate(),
+                        item.forecastTime()
+                )));
 
         List<Forecast> hourlyForecasts = new ArrayList<>();
 
         for (Map.Entry<LocalDateTime, List<ShortForecastItem>> entry : groupedByTime.entrySet()) {
             List<ShortForecastItem> shortForecastItems = entry.getValue();
+            LocalDate date = LocalDate.from(entry.getKey());
 
-            hourlyForecasts.add(createForecastObject(entry.getKey(), shortForecastItems));
+            if (!dailyTemperatureMap.containsKey(date)) continue;
+            hourlyForecasts.add(createForecastObject(entry.getKey(), shortForecastItems, dailyTemperatureMap.get(date)));
         }
 
         hourlyForecasts.sort(Comparator.comparing(Forecast::dateTime));
         return new ShortForecastList(grid.id(), hourlyForecasts);
     }
 
-    private Forecast createForecastObject(LocalDateTime dateTime, List<ShortForecastItem> items) {
+    private Forecast createForecastObject(LocalDateTime dateTime, List<ShortForecastItem> items, DailyTemperature dailyTemperature) {
         Map<String, String> forecastData = items.stream()
                 .collect(Collectors.toMap(
                         ShortForecastItem::category,
@@ -113,16 +117,16 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
                 dateTime,
                 ForecastType.SHORT,
                 sky,
-                safeParseDouble(forecastData.get("TMP")),
-                safeParseDouble(forecastData.get("REH")),
+                Double.parseDouble(forecastData.get("TMP")),
+                Double.parseDouble(forecastData.get("REH")),
                 windDir,
-                safeParseDouble(forecastData.get("WSD")),
+                Double.parseDouble(forecastData.get("WSD")),
                 pty,
                 pcpValue,
-                safeParseDouble(forecastData.get("POP")),
+                Double.parseDouble(forecastData.get("POP")),
                 snoValue,
-                safeParseDouble(forecastData.get("TMX")),
-                safeParseDouble(forecastData.get("TMN"))
+                dailyTemperature.highestTemperature(),
+                dailyTemperature.lowestTemperature()
         );
     }
 

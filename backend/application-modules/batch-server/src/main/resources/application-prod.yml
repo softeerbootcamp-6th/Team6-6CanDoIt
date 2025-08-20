@@ -15,3 +15,22 @@ kma:
     key:
       mountain: ${secrets.KMA_API_KEY_MOUNTAIN}
       short: ${secrets.KMA_API_KEY_SHORT}
+
+forecast:
+  mapping:
+    sky:
+      "1.0": "SUNNY"
+      "1": "SUNNY"
+      "3.0": "CLOUDY"
+      "3": "CLOUDY"
+      "4.0": "OVERCAST"
+      "4": "OVERCAST"
+    precipitation-type:
+      "0": "NONE"
+      "1": "RAIN"
+      "2": "RAIN_SNOW"
+      "3": "SNOW"
+      "4": "SHOWER"
+      "5": "DRIZZLE"
+      "6": "DRIZZLE_SNOW"
+      "7": "SNOW_FLURRY"

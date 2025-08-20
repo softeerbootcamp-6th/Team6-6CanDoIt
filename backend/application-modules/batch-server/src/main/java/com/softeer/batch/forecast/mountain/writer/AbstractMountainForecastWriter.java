@@ -1,7 +1,8 @@
 package com.softeer.batch.forecast.mountain.writer;
 
+import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
+import com.softeer.batch.common.writersupporter.SunTimeJdbcWriter;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
-import com.softeer.batch.common.writersupporter.ForecastWriterSupporter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public abstract class AbstractMountainForecastWriter implements ItemWriter<MountainDailyForecast> {
 
-    protected final ForecastWriterSupporter forecastWriterSupporter;
+    protected final ForecastJdbcWriter forecastWriterSupporter;
+    protected final SunTimeJdbcWriter sunTimeJdbcWriter;
 
     @Override
     public void write(Chunk<? extends MountainDailyForecast> chunk) {
@@ -27,10 +29,10 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
     private void writeSunTime(Chunk<? extends MountainDailyForecast> chunk) {
         SqlParameterSource[] sunTimeParams = chunk.getItems().stream()
                 .filter(item -> item.sunTime() != null && item.sunTime().sunrise() != null)
-                .map(forecastWriterSupporter::createSunTimeParams)
+                .map(sunTimeJdbcWriter::createSunTimeParams)
                 .toArray(SqlParameterSource[]::new);
 
-        forecastWriterSupporter.batchUpdateSunTime(sunTimeParams);
+        sunTimeJdbcWriter.batchUpdateSunTime(sunTimeParams);
     }
 
     private void writeForecast(Chunk<? extends MountainDailyForecast> chunk) {
