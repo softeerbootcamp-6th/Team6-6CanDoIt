@@ -5,30 +5,15 @@ import { theme } from '../../../theme/theme.ts';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
+import { useState } from 'react';
 
-const dummy = [
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-];
+const dummy = Array.from({ length: 34 });
 
 const { colors, typography } = theme;
 
 export default function TimeSeletor() {
+    const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
+
     let size = 5;
 
     const dynamicScrollSizeStyles = css`
@@ -56,13 +41,16 @@ export default function TimeSeletor() {
                             }
                         </span>
                     </div>
-                    <ToggleButton />
+                    <ToggleButton
+                        isOn={isToggleOn}
+                        onClick={() => setIsToggleOn((prev) => !prev)}
+                    />
                 </div>
             </div>
             <div css={contentWrapperStyles}>
                 <div
                     css={css`
-                        height: '2.1rem';
+                        height: 2.1rem;
                     `}
                 >
                     <div css={[scrollStyles, dynamicScrollSizeStyles]}>
@@ -77,8 +65,9 @@ export default function TimeSeletor() {
                         margin: auto;
                     `}
                 >
-                    {dummy.map(() => (
+                    {dummy.map((_, idx) => (
                         <WeatherCell
+                            key={idx}
                             time='2AM'
                             iconName='clear-day'
                             temperature={20}
@@ -189,7 +178,8 @@ const tooltipWrapper = css`
         line-height: 1.4;
     }
 
-    &:hover span {
+    &:hover span,
+    &:focus span {
         visibility: visible;
         opacity: 1;
     }
