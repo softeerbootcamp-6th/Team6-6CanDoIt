@@ -130,7 +130,8 @@ const timeSeletorStyles = css`
     align-items: flex-start;
     gap: 0.75rem;
     box-sizing: border-box;
-    width: 87rem;
+    width: 90%;
+    max-width: 90rem;
     padding: 0.5rem 1.5rem 1.5rem 1.5rem;
     border-radius: 1.5rem;
     border: 1px solid ${colors.greyOpacityWhite[80]};
