@@ -33,7 +33,8 @@ const wrapperStyles = css`
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-
+    flex: 0 0 auto;
+    scroll-snap-align: start;
     width: 5rem;
     height: 7.875rem;
 `;
