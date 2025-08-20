@@ -2,20 +2,20 @@ import CircleImage from '../../atoms/Image/CircleImage.tsx';
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 
-interface propsState {
-    minutesAgo: number;
+interface PropsState {
+    timeAgo: string;
 }
 
-export default function BackReportCardHeader({ minutesAgo }: propsState) {
+export default function BackReportCardHeader({ timeAgo }: PropsState) {
     return (
         <div css={backReportCardHeaderStyle}>
             <CircleImage size='3.75rem' />
-            <CommonText {...minutesAgoProps}>{`${minutesAgo}분전`}</CommonText>
+            <CommonText {...timeAgoProps}>{timeAgo}</CommonText>
         </div>
     );
 }
 
-const minutesAgoProps = {
+const timeAgoProps = {
     TextTag: 'span',
     fontSize: 'caption',
     fontWeight: 'medium',
