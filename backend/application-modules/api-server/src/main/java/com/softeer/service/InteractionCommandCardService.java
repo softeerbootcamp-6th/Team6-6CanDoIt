@@ -1,23 +1,19 @@
 package com.softeer.service;
 
 import com.softeer.domain.ImageMeta;
-import com.softeer.dto.ReportCreateDto;
 import com.softeer.dto.request.ReportCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 @Service
 public class InteractionCommandCardService {
 
-    private final ReportJpaUseCase reportJpaUseCase;
+    private final ReportCommandUseCase reportCommandUseCase;
     private final ImageUseCase imageUseCase;
 
     public void createReport(
@@ -36,7 +32,7 @@ public class InteractionCommandCardService {
             throw new RuntimeException("Failed to upload image", e);
         }
 
-        ReportCreateDto reportCreateDto = new ReportCreateDto(
+        ReportCommandUseCase.ReportCreateDto reportCreateDto = new ReportCommandUseCase.ReportCreateDto(
                 userId,
                 request.courseId(),
                 request.type(),
@@ -47,6 +43,6 @@ public class InteractionCommandCardService {
                 imageId
         );
 
-        reportJpaUseCase.saveReport(reportCreateDto);
+        reportCommandUseCase.saveReport(reportCreateDto);
     }
 }
