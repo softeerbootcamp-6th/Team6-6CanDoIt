@@ -45,6 +45,10 @@ export default function DetailInfoSection() {
         setIsOpen((prev) => !prev);
     };
 
+    const handleSidebarClose = () => {
+        setIsOpen(false);
+    };
+
     return (
         <div css={wrapperStyles}>
             <div css={wholeWrapper}>
@@ -82,6 +86,8 @@ export default function DetailInfoSection() {
                 {isOpen && (
                     <WeatherDetailSideBar
                         selectedWeatherData={DummyWeatherData}
+                        type='시작지점'
+                        onClose={handleSidebarClose}
                     />
                 )}
             </div>
