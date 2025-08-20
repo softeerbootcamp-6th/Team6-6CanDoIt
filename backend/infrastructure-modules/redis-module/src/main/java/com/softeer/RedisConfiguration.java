@@ -61,9 +61,6 @@ public class RedisConfiguration {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(connectionFactory);
 
-
-
-
         redisTemplate.setKeySerializer(stringRedisSerializer);
         redisTemplate.setValueSerializer(genericJackson2JsonRedisSerializer);
         redisTemplate.setHashKeySerializer(stringRedisSerializer);
@@ -73,16 +70,20 @@ public class RedisConfiguration {
     }
 
     @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return objectMapper;
+    }
+
+    @Bean
     public StringRedisSerializer stringRedisSerializer() {
         return new StringRedisSerializer();
     }
 
     @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer(ObjectMapper objectMapper) {
 
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }
