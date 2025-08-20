@@ -16,7 +16,7 @@ export default function FilterModalContent({
 }: PropsState) {
     return (
         <div css={filterContentStyle}>
-            {keywords.map((keyword) => (
+            {(Object.keys(filterColumn) as Keyword[]).map((keyword) => (
                 <LabelButtonsColumn
                     key={keyword}
                     keyword={keyword}
@@ -41,9 +41,3 @@ const filterContentStyle = css`
     gap: 1.5rem;
     padding: 1.5rem 1.5rem 2rem;
 `;
-
-const keywords: Keyword[] = [
-    'weatherKeywords',
-    'rainKeywords',
-    'etceteraKeywords',
-];

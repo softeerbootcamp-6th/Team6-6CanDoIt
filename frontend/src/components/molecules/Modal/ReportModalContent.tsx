@@ -37,7 +37,7 @@ export default function ReportModalContent({ filterColumn }: PropsState) {
             <div css={rightPaneStyle}>
                 <ModalTextInputBox placeholder='사진과 함께 올릴 설명을 100글자 이내로 작성해주세요.' />
                 <div css={labelButtonsRowStyle}>
-                    {keywords.map((keyword) => (
+                    {(Object.keys(filterColumn) as Keyword[]).map((keyword) => (
                         <LabelButtonsColumn
                             key={keyword}
                             keyword={keyword}
@@ -50,7 +50,7 @@ export default function ReportModalContent({ filterColumn }: PropsState) {
                     ))}
                 </div>
 
-                {keywords.map((keyword) =>
+                {(Object.keys(filterColumn) as Keyword[]).map((keyword) =>
                     selectedKeywords[keyword].map((id) => (
                         <input
                             key={`${keyword}-${id}`}
@@ -86,9 +86,3 @@ const labelButtonsRowStyle = css`
     gap: 1.5rem;
     margin-top: 2.5rem;
 `;
-
-const keywords: Keyword[] = [
-    'weatherKeywords',
-    'rainKeywords',
-    'etceteraKeywords',
-];
