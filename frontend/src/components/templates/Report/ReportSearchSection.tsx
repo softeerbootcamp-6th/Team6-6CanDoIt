@@ -1,6 +1,5 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
 import { css } from '@emotion/react';
-import SearchSectionChipsRow from '../../organisms/Report/SearchSectionChipsRow.tsx';
 import { useEffect, useState } from 'react';
 import type {
     MountainCourse,
@@ -12,6 +11,7 @@ import {
 } from '../Main/utils/utils.ts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import FilterModal from '../../organisms/Report/FilterModal.tsx';
+import ChipButton from '../../molecules/Button/ChipButton.tsx';
 
 interface Option {
     id: string;
@@ -56,7 +56,9 @@ export default function ReportSearchSection() {
 
     return (
         <div css={searchWrapperStyle}>
-            {mountainId && courseId && <SearchSectionChipsRow hidden />}
+            {mountainId && courseId && (
+                <ChipButton hidden text='필터' iconName='filter-lines' />
+            )}
 
             <div css={searchBarStyle}>
                 <SearchBar
@@ -71,17 +73,22 @@ export default function ReportSearchSection() {
             </div>
 
             {mountainId && courseId && (
-                <SearchSectionChipsRow onFilterClick={filterClickHandler} />
+                <>
+                    <ChipButton
+                        onClick={filterClickHandler}
+                        text='필터'
+                        iconName='filter-lines'
+                    />
+                    <FilterModal
+                        isOpen={isFilterModalOpen}
+                        onClose={() => setIsFilterModalOpen(false)}
+                        title='필터'
+                        description='원하는 날씨 조건을 선택하세요'
+                        filterColumn={filterColumn}
+                        anchorElement={filterAnchor}
+                    />
+                </>
             )}
-
-            <FilterModal
-                isOpen={isFilterModalOpen}
-                onClose={() => setIsFilterModalOpen(false)}
-                title='필터'
-                description='원하는 날씨 조건을 선택하세요'
-                filterColumn={filterColumn}
-                anchorElement={filterAnchor}
-            />
         </div>
     );
 }
