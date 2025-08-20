@@ -1,9 +1,14 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 
-export default function ToggleButton() {
+interface PropsState {
+    onClick?: () => void;
+}
+
+export default function ToggleButton(props: PropsState) {
+    const { onClick } = props;
     return (
-        <div css={buttonWrapperStyles}>
+        <div css={buttonWrapperStyles} onClick={() => onClick && onClick()}>
             <div css={circleStyles}></div>
         </div>
     );
