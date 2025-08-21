@@ -1,18 +1,18 @@
 package com.softeer.shortterm;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestClient;
+
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 public class ShortForecastApiCaller extends AbstractShortForecastApiCaller {
 
-    public ShortForecastApiCaller(RestClient restClient, XmlMapper xmlMapper) {
-        super(restClient, xmlMapper);
+    public ShortForecastApiCaller(WebClient webClient) {
+        super(webClient);
     }
 
     @Override
     protected String getApiPath() {
-        return "/1360000/VilageFcstInfoService_2.0/getVilageFcst";
+        return "/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst";
     }
 }
