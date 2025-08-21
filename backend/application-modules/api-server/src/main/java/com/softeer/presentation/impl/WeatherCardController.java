@@ -2,17 +2,15 @@ package com.softeer.presentation.impl;
 
 import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
-import com.softeer.dto.response.card.CourseCardResponse;
-import com.softeer.dto.response.card.ForecastCardResponse;
-import com.softeer.dto.response.card.MountainCardResponse;
-import com.softeer.dto.response.card.MountainCourseCardResponse;
+import com.softeer.dto.response.card.*;
 import com.softeer.presentation.WeatherCardApi;
+import com.softeer.service.InteractionCommandCardService;
+import com.softeer.service.InteractionQueryCardService;
 import com.softeer.service.WeatherCardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +19,7 @@ import java.util.List;
 public class WeatherCardController implements WeatherCardApi {
 
     private final WeatherCardService weatherCardService;
+    private final InteractionCommandCardService interactionCommandCardService;
 
     @Override
     public ResponseEntity<List<MountainCardResponse>> mountainCards() {
@@ -48,7 +47,12 @@ public class WeatherCardController implements WeatherCardApi {
     }
 
     @Override
-    public ResponseEntity<MountainCourseCardResponse> mountainCourse(Long courseId, LocalDate date) {
-        return ResponseEntity.ok(weatherCardService.createMountainCourseCard(courseId, date));
+    public ResponseEntity<MountainCourseCardResponse> mountainCourse(Long courseId, LocalDateTime dateTime) {
+        return ResponseEntity.ok(weatherCardService.createMountainCourseCard(courseId, dateTime));
+    }
+
+    @Override
+    public ResponseEntity<CourseScheduleCardResponse> courseSchedule(Long courseId, Long userId, LocalDateTime startDateTime) {
+        return ResponseEntity.ok(weatherCardService.createCourseScheduleCard(courseId, userId, startDateTime));
     }
 }
