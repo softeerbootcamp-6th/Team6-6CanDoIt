@@ -356,7 +356,8 @@ public interface WeatherCardApi {
       - **precipitationProbability**: 강수확률(%)
       - **sky**: 하늘 상태(설명)
       - **humidity**: 습도(%)
-    - **sunrise / sunset**: 일출/일몰 시각 (`HH:mm:ss`)
+    - **highestTemperature**: 해당 일자의 최고 기온 (°C)  
+    - **lowestTemperature**: 해당 일자의 최저 기온 (°C)  
     - **hikingActivityStatus**: 등산지수 상태 (예: 매우좋음/좋음/보통/나쁨/매우나쁨)
     
     ---
@@ -394,9 +395,9 @@ public interface WeatherCardApi {
         "sky": "조금 흐린 하늘",
         "humidity": 70.0
       },
-      "sunrise": "05:51:00",
-      "sunset": "19:51:00",
-      "hikingActivityStatus": "나쁨"
+    "highestTemperature": 26.0,
+    "lowestTemperature": 17.0
+    "hikingActivityStatus": "나쁨"
     }
     """
     )

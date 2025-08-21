@@ -17,8 +17,8 @@ public record CourseScheduleCardResponse(
         ForecastOverview startForecast,
         ForecastOverview arrivalForecast,
         ForecastOverview descentForecast,
-        LocalTime sunrise,
-        LocalTime sunset,
+        double lowestTemperature,
+        double highestTemperature,
         String hikingActivityStatus
 ) {
     public CourseScheduleCardResponse(
@@ -39,8 +39,8 @@ public record CourseScheduleCardResponse(
                 new ForecastOverview(startForecast),
                 new ForecastOverview(arrivalForecast),
                 new ForecastOverview(descentForecast),
-                coursePlan.sunTime().sunrise(),
-                coursePlan.sunTime().sunset(),
+                arrivalForecast.dailyTemperature().lowestTemperature(),
+                arrivalForecast.dailyTemperature().highestTemperature(),
                 hikingActivityStatus
         );
     }
