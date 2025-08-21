@@ -6,12 +6,16 @@ interface PropsState {
     totalDuration: number;
     totalDistance: number;
     courseImageUrl: string;
+    sunriseTime: string;
+    sunsetTime: string;
 }
 
 export default function MountainInfoPreview({
     totalDuration,
     totalDistance,
     courseImageUrl,
+    sunriseTime,
+    sunsetTime,
 }: PropsState) {
     return (
         <div css={wrapperStyles}>
@@ -23,7 +27,7 @@ export default function MountainInfoPreview({
                 totalDistance={totalDistance}
                 totalDuration={totalDuration}
             />
-            <SunSchedule sunriseTime='05:22' sunsetTime='17:02' />
+            <SunSchedule sunriseTime={sunriseTime} sunsetTime={sunsetTime} />
         </div>
     );
 }

@@ -1,27 +1,47 @@
 import MountainInfoPreview from '../../molecules/Forecast/MountainInfoPreview.tsx';
 import { css } from '@emotion/react';
 import ScrollIndicator from '../../molecules/Forecast/ScrollIndicator.tsx';
+import { useState, useEffect } from 'react';
 
-const dummyData = {
+const placeholderData = {
     courseImageUrl: 'https://cdn.example.com/images/course01.png',
     totalDuration: 2.5,
     totalDistance: 4.8,
-    weatherMetric: {
-        precipitationType: 'NONE',
-        sky: 'CLOUDY',
-        surfaceTemperature: 21.3,
-        topTemperature: 17.0,
-    },
+    sunrise: '09:00:00',
+    sunset: '09:00:00',
     hikingActivityStatus: '좋음',
-};
+} as const;
+
+interface MountainCourseData {
+    courseImageUrl: string;
+    totalDuration: number;
+    totalDistance: number;
+    sunrise: string;
+    sunset: string;
+    hikingActivityStatus: HikingActivityStatus;
+}
+
+type HikingActivityStatus = '좋음' | '매우좋음' | '나쁨' | '보통';
 
 export default function SummaryInfoSection() {
+    const [mountainCourseData, setMountainCourseData] =
+        useState<MountainCourseData>(placeholderData);
+
+    useEffect(() => {
+        setMountainCourseData(placeholderData);
+    }, []);
+
+    const { totalDuration, totalDistance, courseImageUrl, sunrise, sunset } =
+        mountainCourseData;
+
     return (
         <div css={wrapperStyles}>
             <MountainInfoPreview
-                totalDuration={dummyData.totalDuration}
-                totalDistance={dummyData.totalDistance}
-                courseImageUrl={dummyData.courseImageUrl}
+                totalDuration={totalDuration}
+                totalDistance={totalDistance}
+                courseImageUrl={courseImageUrl}
+                sunriseTime={sunrise.slice(0, 5)}
+                sunsetTime={sunset.slice(0, 5)}
             />
             <ScrollIndicator />
         </div>
