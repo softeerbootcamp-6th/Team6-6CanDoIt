@@ -19,4 +19,8 @@ public final class BatchNames {
         public static final String START_UP_SHORT_FORECAST_STEP = "StartUpShortForecastStep";
         public static final String SCHEDULED_SHORT_FORECAST_STEP = "ScheduledShortForecastStep";
     }
+
+    public static final class Handlers {
+        public static final String SHORT_SIMPLE_RETRY_HANDLER = "ShortSimpleRetryHandler";
+    }
 }
