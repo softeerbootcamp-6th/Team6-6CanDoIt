@@ -20,7 +20,7 @@ public class CardHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "cousre_id")
+    @Column(name = "course_id")
     private long courseId;
 
     @Column(name = "user_id")
@@ -29,12 +29,16 @@ public class CardHistoryEntity {
     @Column(name = "forecast_date", nullable = false)
     private LocalDateTime forecastDate;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public void touch() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
