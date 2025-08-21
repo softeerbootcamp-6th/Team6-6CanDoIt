@@ -1,6 +1,8 @@
 package com.softeer.throttle;
 
-import com.softeer.SpringBootTestWithRedis;
+import com.softeer.throttle.ex.ThrottleException;
+import com.softeer.throttle.ex.ThrottleExceptionStatus;
+import com.softeer.throttle.manager.ThrottlingManager;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.distributed.proxy.ProxyManager;

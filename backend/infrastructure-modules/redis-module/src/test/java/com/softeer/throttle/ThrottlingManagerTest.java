@@ -1,6 +1,7 @@
 package com.softeer.throttle;
 
 import com.softeer.SpringBootTestWithRedis;
+import com.softeer.throttle.manager.ThrottlingManager;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
