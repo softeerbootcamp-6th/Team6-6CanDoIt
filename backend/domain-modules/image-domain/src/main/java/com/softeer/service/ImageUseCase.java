@@ -4,5 +4,5 @@ import com.softeer.domain.ImageMeta;
 
 public interface ImageUseCase {
 
-    Long uploadImage(ImageMeta imageMeta) throws Exception;
+    long uploadImage(ImageMeta imageMeta) throws Exception;
 }
