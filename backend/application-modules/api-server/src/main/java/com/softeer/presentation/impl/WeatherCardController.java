@@ -4,8 +4,6 @@ import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
 import com.softeer.dto.response.card.*;
 import com.softeer.presentation.WeatherCardApi;
-import com.softeer.service.InteractionCommandCardService;
-import com.softeer.service.InteractionQueryCardService;
 import com.softeer.service.WeatherCardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +17,6 @@ import java.util.List;
 public class WeatherCardController implements WeatherCardApi {
 
     private final WeatherCardService weatherCardService;
-    private final InteractionCommandCardService interactionCommandCardService;
 
     @Override
     public ResponseEntity<List<MountainCardResponse>> mountainCards() {
