@@ -9,22 +9,7 @@ import java.util.List;
 public record MountainDailyForecast(
         long mountainId,
         int gridId,
-        SunTime sunTime,
+        List<DailySunTime> dailySunTimes,
         List<Forecast> hourlyForecasts
 ) {
-
-    public MountainDailyForecast(
-            long mountainId,
-            int gridId,
-            LocalTime sunrise,
-            LocalTime sunset,
-            List<Forecast> hourlyForecasts
-    ) {
-        this(
-                mountainId,
-                gridId,
-                new SunTime(sunrise, sunset),
-                hourlyForecasts
-        );
-    }
 }
