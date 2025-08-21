@@ -79,7 +79,6 @@ export default function ImageInputField() {
                 accept='image/*'
                 multiple={false}
                 name='image'
-                required
                 style={{ display: 'none' }}
                 onChange={(e) => handleFile(e.target.files?.[0])}
             />
