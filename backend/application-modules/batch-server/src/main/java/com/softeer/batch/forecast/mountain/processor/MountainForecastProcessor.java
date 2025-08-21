@@ -1,8 +1,10 @@
 package com.softeer.batch.forecast.mountain.processor;
 
+import com.softeer.batch.forecast.chained.dto.DailyTemperatureValue;
 import com.softeer.batch.forecast.mountain.dto.DailySunTime;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.batch.forecast.mountain.dto.MountainIdentifier;
+import com.softeer.batch.forecast.mountain.listener.MountainDailyTempLoader;
 import com.softeer.batch.mapper.ForecastMapper;
 import com.softeer.common.KmaApiCaller;
 import com.softeer.domain.Forecast;
@@ -45,6 +47,7 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
     private static final int MINIMUM_FORECAST_ITEMS = 8;
 
     private final KmaApiCaller<MountainForecastApiResponse> kmaApiCaller;
+    private final MountainDailyTempLoader mountainDailyTempLoader;
 
     private final ForecastMapper forecastMapper;
 
@@ -89,7 +92,7 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
             dailySunTimes.add(dailySunTime);
 
             if (hourlyItems.size() >= MINIMUM_FORECAST_ITEMS) {
-                hourlyForecasts.add(createForecastObject(entry.getKey(), hourlyItems));
+                hourlyForecasts.add(createForecastObject(identifier.gridId(), entry.getKey(), hourlyItems));
             }
         }
 
@@ -125,7 +128,7 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
         return dailySunTime;
     }
 
-    private Forecast createForecastObject(LocalDateTime dateTime, List<MountainForecastApiResponse> hourlyItems) {
+    private Forecast createForecastObject(long gridId, LocalDateTime dateTime, List<MountainForecastApiResponse> hourlyItems) {
         Map<String, String> forecastData = hourlyItems.stream()
                 .collect(Collectors.toMap(
                         MountainForecastApiResponse::category,
@@ -142,6 +145,8 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
         WindDirection windDir = forecastMapper.mapWindDirection(vecCode);
         PrecipitationType pty = forecastMapper.deriveMountainPrecipitationType(pcpValue, snoValue);
 
+        DailyTemperatureValue dailyTemperatureValue = mountainDailyTempLoader.find(gridId, dateTime.toLocalDate());
+
         return new Forecast(
                 0L,
                 dateTime,
@@ -155,8 +160,8 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
                 pcpValue,
                 Double.parseDouble(forecastData.get("POP")),
                 snoValue,
-                DEFAULT_TEMPERATURE,
-                DEFAULT_TEMPERATURE
+                dailyTemperatureValue.highest(),
+                dailyTemperatureValue.lowest()
         );
     }
 
