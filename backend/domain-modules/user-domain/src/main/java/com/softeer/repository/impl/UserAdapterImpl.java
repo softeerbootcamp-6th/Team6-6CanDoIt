@@ -32,4 +32,14 @@ public class UserAdapterImpl implements UserAdapter {
     public Optional<UserEntity> findByLoginIdAndPassword(String loginId, String password) {
         return userJpaRepository.findByLoginIdAndPassword(loginId, password);
     }
+
+    @Override
+    public void updateNickname(long userId, String nickname) {
+        userJpaRepository.updateNickname(userId, nickname);
+    }
+
+    @Override
+    public void updateImage(long userId, long imageId) {
+        userJpaRepository.updateImage(userId, imageId);
+    }
 }
