@@ -6,23 +6,14 @@ interface PropsState {
     title: string;
     description: string;
     filterColumn: FilterColumn;
-    type: string;
     isOpen?: boolean;
     onClose?: () => void;
     onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
 }
 
 export default function ReportModal(props: PropsState) {
-    const {
-        title,
-        description,
-        filterColumn,
-        type,
-        isOpen,
-        onClose,
-        onSubmit,
-    } = props;
-    const reportType = type === 'weather' ? 'WEATHER' : 'SAFE';
+    const { title, description, filterColumn, isOpen, onClose, onSubmit } =
+        props;
 
     const secondButtonClickHandler = () => {
         (
@@ -44,7 +35,6 @@ export default function ReportModal(props: PropsState) {
         >
             <form id='reportForm' onSubmit={onSubmit}>
                 <ReportModalContent filterColumn={filterColumn} />
-                <input type='hidden' name='reportType' value={reportType} />
             </form>
         </BaseModal>
     );
