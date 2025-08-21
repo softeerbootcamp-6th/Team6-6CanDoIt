@@ -1,5 +1,6 @@
 package com.softeer.batch.common.writersupporter;
 
+import com.softeer.batch.forecast.mountain.dto.DailySunTime;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 @StepScope
@@ -28,11 +30,14 @@ public class SunTimeJdbcWriter {
         }
     }
 
-    public MapSqlParameterSource createSunTimeParams(MountainDailyForecast item) {
-        return new MapSqlParameterSource()
-                .addValue("sunrise", item.sunTime().sunrise())
-                .addValue("sunset", item.sunTime().sunset())
-                .addValue("date", LocalDate.now())
-                .addValue("mountainId", item.mountainId());
+    public List<MapSqlParameterSource> createSunTimeParams(MountainDailyForecast item) {
+        return item.dailySunTimes().stream()
+                .map(dailySunTime -> new MapSqlParameterSource()
+                        .addValue("sunrise", dailySunTime.sunTime().sunrise())
+                        .addValue("sunset", dailySunTime.sunTime().sunset())
+                        .addValue("date", dailySunTime.date())
+                        .addValue("mountainId", item.mountainId())
+                )
+                .toList();
     }
 }
