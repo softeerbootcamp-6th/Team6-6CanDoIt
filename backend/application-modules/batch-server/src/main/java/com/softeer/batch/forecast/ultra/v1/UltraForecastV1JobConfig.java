@@ -3,6 +3,8 @@ package com.softeer.batch.forecast.ultra.v1;
 import com.softeer.batch.forecast.shortterm.reader.ShortForecastReader;
 import com.softeer.batch.forecast.ultra.dto.UltraForecastResponseList;
 import com.softeer.domain.Grid;
+import com.softeer.throttle.BackoffStrategy;
+import com.softeer.throttle.manager.SimpleRetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -21,8 +23,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 @RequiredArgsConstructor
 public class UltraForecastV1JobConfig {
 
+    public static final String ULTRA_FORECAST = "ULTRA_FORECAST";
+
     public static final String SCHEDULED_ULTRA_FORECAST_V1_JOB = "ScheduledUltraForecastV1Job";
     public static final String SCHEDULED_ULTRA_FORECAST_V1_STEP = SCHEDULED_ULTRA_FORECAST_V1_JOB + "Step";
+    public static final String ULTRA_SIMPLE_RETRY_HANDLER = SCHEDULED_ULTRA_FORECAST_V1_JOB + "RetryHandler";
+
 
     private static final int CHUNK_SIZE = 30;
 
@@ -47,5 +53,13 @@ public class UltraForecastV1JobConfig {
                 .reader(shortForecastReader)
                 .processor(ultraForecastV1Processor)
                 .writer(ultraForecastV1Writer)
-                .build();    }
+                .build();
+    }
+
+    @Bean(name = ULTRA_SIMPLE_RETRY_HANDLER)
+    @StepScope
+    public SimpleRetryHandler simpleRetryHandler() {
+        BackoffStrategy backoffStrategy = new BackoffStrategy(100, 400);
+        return new SimpleRetryHandler(backoffStrategy, 5);
+    }
 }
