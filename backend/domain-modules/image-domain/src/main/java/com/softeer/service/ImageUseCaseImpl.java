@@ -17,7 +17,7 @@ public class ImageUseCaseImpl implements ImageUseCase {
     private final ImageJpaRepository imageJpaRepository;
 
     @Override
-    public Long uploadImage(ImageMeta imageMeta) throws Exception {
+    public long uploadImage(ImageMeta imageMeta) throws Exception {
         String imageUrl = s3Service.uploadFile(imageMeta.imageBytes(), imageMeta.fileName(), imageMeta.contentType());
 
         Image image = new Image(0L, imageUrl, LocalDateTime.now());
