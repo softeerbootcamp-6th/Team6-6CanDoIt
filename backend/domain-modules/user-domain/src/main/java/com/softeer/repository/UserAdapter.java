@@ -9,4 +9,7 @@ public interface UserAdapter {
     boolean existsByNickname(String nickname);
     void save(String loginId, String nickname, String password);
     Optional<UserEntity> findByLoginIdAndPassword(String loginId, String password);
+
+    void updateNickname(long userId, String nickname);
+    void updateImage(long userId, long imageId);
 }
