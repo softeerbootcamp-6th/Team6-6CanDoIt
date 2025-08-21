@@ -1,5 +1,6 @@
 package com.softeer.batch.forecast.mountain.processor;
 
+import com.softeer.batch.forecast.mountain.dto.DailySunTime;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.batch.forecast.mountain.dto.MountainIdentifier;
 import com.softeer.batch.mapper.ForecastMapper;
@@ -33,9 +34,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MountainForecastProcessor implements ItemProcessor<MountainIdentifier, MountainDailyForecast> {
 
+    public static final int DEFAULT_TEMPERATURE = -999;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmm");
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
     private final DateTimeFormatter sunTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+    private static final LocalTime DEFAULT_SUNRISE_TIME = LocalTime.of(5, 32);
+    private static final LocalTime DEFAULT_SUNSET_TIME = LocalTime.of(18, 48);
+
+    private static final int MINIMUM_FORECAST_ITEMS = 8;
 
     private final KmaApiCaller<MountainForecastApiResponse> kmaApiCaller;
 
@@ -61,20 +68,10 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
     }
 
     private MountainDailyForecast processApiResponse(MountainIdentifier identifier, List<MountainForecastApiResponse> items) {
-        if (items == null || items.isEmpty()) {
-            LocalTime sunriseTime = LocalTime.parse("06:00", sunTimeFormatter);
-            LocalTime sunsetTime = LocalTime.parse("18:00", sunTimeFormatter);
-            return new MountainDailyForecast(identifier.id(), identifier.gridId(), sunriseTime, sunsetTime, Collections.emptyList());
-        }
-
         Map<LocalDateTime, List<MountainForecastApiResponse>> groupedByTime = items.stream()
                 .collect(Collectors.groupingBy(item -> {
                     String forecastDate = item.forecastDate();
                     String forecastTime = item.forecastTime();
-
-                    if (forecastDate == null || forecastTime == null) {
-                        log.warn("forecastDate or forecastTime is null for mountainId: {}. Skipping item.", identifier.id());
-                    }
 
                     return LocalDateTime.of(
                             LocalDate.parse(forecastDate.trim(), dateFormatter),
@@ -83,30 +80,49 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
                 }));
 
         List<Forecast> hourlyForecasts = new ArrayList<>();
-        LocalTime sunriseTime = null;
-        LocalTime sunsetTime = null;
+        List<DailySunTime> dailySunTimes = new ArrayList<>();
 
         for (Map.Entry<LocalDateTime, List<MountainForecastApiResponse>> entry : groupedByTime.entrySet()) {
             List<MountainForecastApiResponse> hourlyItems = entry.getValue();
+            DailySunTime dailySunTime = getDailySunTime(entry, hourlyItems);
 
-            if (isActualForecast(hourlyItems)) {
+            dailySunTimes.add(dailySunTime);
+
+            if (hourlyItems.size() >= MINIMUM_FORECAST_ITEMS) {
                 hourlyForecasts.add(createForecastObject(entry.getKey(), hourlyItems));
-            } else {
-                for (MountainForecastApiResponse item : hourlyItems) {
-                    String category = item.category().trim();
-                    String value = item.forecastValue().trim();
-
-                    if ("SRE".equals(category)) {
-                        sunriseTime = LocalTime.parse(value, sunTimeFormatter);
-                    } else if ("SSE".equals(category)) {
-                        sunsetTime = LocalTime.parse(value, sunTimeFormatter);
-                    }
-                }
             }
         }
 
-        hourlyForecasts.sort(Comparator.comparing(Forecast::id));
-        return new MountainDailyForecast(identifier.id(), identifier.gridId(), sunriseTime, sunsetTime, hourlyForecasts);
+        hourlyForecasts.sort(Comparator.comparing(Forecast::dateTime));
+
+        return new MountainDailyForecast(identifier.id(), identifier.gridId(), dailySunTimes, hourlyForecasts);
+    }
+
+    private DailySunTime getDailySunTime(
+            Map.Entry<LocalDateTime, List<MountainForecastApiResponse>> entry,
+            List<MountainForecastApiResponse> hourlyItems
+    ) {
+        DailySunTime dailySunTime;
+        LocalTime sunriseTime = null;
+        LocalTime sunsetTime = null;
+
+        for (MountainForecastApiResponse item : hourlyItems) {
+            String category = item.category().trim();
+            String value = item.forecastValue().trim();
+
+            if ("SRE".equals(category)) {
+                sunriseTime = LocalTime.parse(value, sunTimeFormatter);
+            } else if ("SSE".equals(category)) {
+                sunsetTime = LocalTime.parse(value, sunTimeFormatter);
+            }
+        }
+
+        if (sunriseTime != null && sunsetTime != null) {
+            dailySunTime = new DailySunTime(entry.getKey().toLocalDate(), sunriseTime, sunsetTime);
+        } else {
+            dailySunTime = new DailySunTime(entry.getKey().toLocalDate(), DEFAULT_SUNRISE_TIME, DEFAULT_SUNSET_TIME);
+        }
+        return dailySunTime;
     }
 
     private Forecast createForecastObject(LocalDateTime dateTime, List<MountainForecastApiResponse> hourlyItems) {
@@ -126,22 +142,22 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
         WindDirection windDir = forecastMapper.mapWindDirection(vecCode);
         PrecipitationType pty = forecastMapper.deriveMountainPrecipitationType(pcpValue, snoValue);
 
-        return new Forecast(0L, dateTime, ForecastType.MOUNTAIN, sky,
-                safeParseDouble(forecastData.get("TMP")),
-                safeParseDouble(forecastData.get("REH")),
+        return new Forecast(
+                0L,
+                dateTime,
+                ForecastType.MOUNTAIN,
+                sky,
+                Double.parseDouble(forecastData.get("TMP")),
+                Double.parseDouble(forecastData.get("REH")),
                 windDir,
-                safeParseDouble(forecastData.get("WSD")),
+                Double.parseDouble(forecastData.get("WSD")),
                 pty,
                 pcpValue,
-                safeParseDouble(forecastData.get("POP")),
+                Double.parseDouble(forecastData.get("POP")),
                 snoValue,
-                safeParseDouble(forecastData.get("TMX")),
-                safeParseDouble(forecastData.get("TMN"))
+                DEFAULT_TEMPERATURE,
+                DEFAULT_TEMPERATURE
         );
-    }
-
-    private boolean isActualForecast(List<MountainForecastApiResponse> hourlyItems) {
-        return hourlyItems.stream().anyMatch(item -> "TMP".equals(item.category()));
     }
 
     private String getValueOrDefault(Map<String, String> map, String key, String defaultValue) {
@@ -150,17 +166,5 @@ public class MountainForecastProcessor implements ItemProcessor<MountainIdentifi
             return defaultValue;
         }
         return value;
-    }
-
-    private double safeParseDouble(String value) {
-        if (value == null || value.trim().isEmpty() || !Character.isDigit(value.charAt(0))) {
-            return 0.0;
-        }
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            log.warn("Failed to parse double value: '{}'. Defaulting to 0.0.", value);
-            return 0.0;
-        }
     }
 }

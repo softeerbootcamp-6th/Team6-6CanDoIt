@@ -7,7 +7,7 @@ import com.softeer.batch.forecast.shortterm.writer.ScheduledShortForecastWriter;
 import com.softeer.batch.forecast.shortterm.writer.StartUpShortForecastWriter;
 import com.softeer.domain.Grid;
 import com.softeer.throttle.BackoffStrategy;
-import com.softeer.throttle.manager.SimpleRetryHandler;
+import com.softeer.throttle.manager.retry.SimpleRetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -44,7 +44,7 @@ public class ShortForecastJobConfig {
 
     @Bean(name = START_UP_SHORT_FORECAST_JOB)
     public Job startupForecastJob() {
-        return new JobBuilder(START_UP_SHORT_FORECAST_STEP, jobRepository)
+        return new JobBuilder(START_UP_SHORT_FORECAST_JOB, jobRepository)
                 .start(startupShortForecastStep())
                 .build();
     }

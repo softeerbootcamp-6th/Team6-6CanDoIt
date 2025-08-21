@@ -4,7 +4,7 @@ import com.softeer.batch.forecast.shortterm.reader.ShortForecastReader;
 import com.softeer.batch.forecast.ultra.dto.UltraForecastResponseList;
 import com.softeer.domain.Grid;
 import com.softeer.throttle.BackoffStrategy;
-import com.softeer.throttle.manager.AsyncRetryHandler;
+import com.softeer.throttle.manager.retry.AsyncRetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

@@ -11,7 +11,7 @@ import com.softeer.entity.enums.WindDirection;
 import com.softeer.shortterm.UltraForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
-import com.softeer.throttle.manager.AsyncRetryHandler;
+import com.softeer.throttle.manager.retry.AsyncRetryHandler;
 import com.softeer.time.ApiTime;
 import com.softeer.time.ApiTimeUtil;
 import lombok.extern.slf4j.Slf4j;

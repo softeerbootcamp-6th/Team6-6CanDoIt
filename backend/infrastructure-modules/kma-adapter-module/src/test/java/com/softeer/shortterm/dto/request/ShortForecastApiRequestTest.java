@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ShortForecastApiRequestTest {
 
-//    @Test
+    @Test
     @DisplayName("queryString 메서드는 모든 파라미터를 올바른 키와 함께 문자열로 조립한다")
     void queryString_shouldAssembleAllParametersIntoCorrectString() {
         // given
@@ -19,7 +19,7 @@ class ShortForecastApiRequestTest {
         String queryString = request.queryString();
 
         // then
-        String expectedQueryString = "serviceKey=TEST_SERVICE_KEY" +
+        String expectedQueryString = "authKey=TEST_SERVICE_KEY" +
                 "&pageNo=1" +
                 "&numOfRows=100" +
                 "&dataType=JSON" +
@@ -31,7 +31,7 @@ class ShortForecastApiRequestTest {
         assertThat(queryString).isEqualTo(expectedQueryString);
     }
 
-//    @Test
+    @Test
     @DisplayName("serviceKey에 특수문자가 포함된 경우, 올바르게 URL 인코딩된다")
     void queryString_shouldUrlEncodeServiceKeyWithSpecialCharacters() {
         // given
@@ -46,7 +46,7 @@ class ShortForecastApiRequestTest {
         // then
         String expectedEncodedKey = "a%2Fb%2Bc%3Dd";
 
-        assertThat(actualQueryString).startsWith("serviceKey=" + expectedEncodedKey);
+        assertThat(actualQueryString).startsWith("authKey=" + expectedEncodedKey);
         assertThat(actualQueryString).contains("&pageNo=1");
     }
 }

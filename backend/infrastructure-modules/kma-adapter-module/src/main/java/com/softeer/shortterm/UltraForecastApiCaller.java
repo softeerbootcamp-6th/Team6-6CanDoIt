@@ -1,11 +1,11 @@
 package com.softeer.shortterm;
 
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 public class UltraForecastApiCaller extends AbstractShortForecastApiCaller{
 
-    public UltraForecastApiCaller(WebClient webClient) {
-        super(webClient);
+    public UltraForecastApiCaller(RestClient restClient) {
+        super(restClient);
     }
 
     @Override

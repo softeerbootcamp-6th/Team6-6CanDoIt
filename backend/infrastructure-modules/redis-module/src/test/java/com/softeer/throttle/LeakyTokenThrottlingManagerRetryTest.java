@@ -2,7 +2,8 @@ package com.softeer.throttle;
 
 import com.softeer.throttle.ex.ThrottleException;
 import com.softeer.throttle.ex.ThrottleExceptionStatus;
-import com.softeer.throttle.manager.ThrottlingManager;
+import com.softeer.throttle.manager.AbstractThrottlingManager;
+import com.softeer.throttle.manager.impl.LeakyTokenThrottlingManager;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
@@ -20,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ThrottlingManagerRetryTest {
+public class LeakyTokenThrottlingManagerRetryTest {
 
-    ThrottlingManager manager;
+    LeakyTokenThrottlingManager manager;
 
     @AfterEach
     void tearDown() {
@@ -34,14 +35,14 @@ public class ThrottlingManagerRetryTest {
 
         ProxyManager<String> pm = mock(ProxyManager.class); // 실제 Redis 없이 진행
         ThrottlingProperties props = mock(ThrottlingProperties.class);
-        when(props.initialTps()).thenReturn(30);
+        when(props.initialTps()).thenReturn(5);
         when(props.maxTps()).thenReturn(100);
         when(props.minTps()).thenReturn(1);
         when(props.failStep()).thenReturn(5);
 
         BackoffStrategy backoff = new BackoffStrategy(10, 30);// 10ms, 20ms, 40ms...
 
-        manager = new ThrottlingManager(pm, props, backoff);
+        manager = new LeakyTokenThrottlingManager(pm, props, backoff);
         manager.initialize();
 
         Bucket bucket = mock(Bucket.class);
@@ -57,7 +58,15 @@ public class ThrottlingManagerRetryTest {
             int a = attempt.incrementAndGet();
             if (a < succeedOn) {
                 CompletableFuture<String> f = new CompletableFuture<>();
-                f.completeExceptionally(new ThrottleException(ThrottleExceptionStatus.RETRY));
+
+                try {
+                    Thread.sleep(500);
+                    f = new CompletableFuture<>();
+                    f.completeExceptionally(new ThrottleException(ThrottleExceptionStatus.RETRY));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
                 return f;
             }
             return CompletableFuture.completedFuture("OK@" + a);
@@ -82,7 +91,7 @@ public class ThrottlingManagerRetryTest {
         BackoffStrategy backoff = new BackoffStrategy(10, 30);// 10ms, 20ms, 40ms...
 
 
-        manager = new ThrottlingManager(pm, props, backoff);
+        manager = new LeakyTokenThrottlingManager(pm, props, backoff);
         manager.initialize();
 
         Bucket bucket = mock(Bucket.class);
@@ -106,8 +115,8 @@ public class ThrottlingManagerRetryTest {
         assertThat(attempt.get()).isEqualTo(1);
     }
 
-    private static void injectBucket(ThrottlingManager manager, Bucket bucket) throws Exception {
-        Field f = ThrottlingManager.class.getDeclaredField("bucket");
+    private static void injectBucket(LeakyTokenThrottlingManager manager, Bucket bucket) throws Exception {
+        Field f = AbstractThrottlingManager.class.getDeclaredField("bucket");
         f.setAccessible(true);
         f.set(manager, bucket);
     }
