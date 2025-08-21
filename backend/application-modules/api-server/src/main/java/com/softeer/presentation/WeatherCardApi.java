@@ -279,7 +279,7 @@ public interface WeatherCardApi {
     ---
     
     #### 📌 **Query**
-    - **date**: "2025-08-12T06:00:00" 형식.
+    - **dateTime**: "2025-08-12T06:00:00" 형식.
     
     ---
     
@@ -314,7 +314,7 @@ public interface WeatherCardApi {
     @GetMapping("/mountain/course/{courseId}")
     ResponseEntity<MountainCourseCardResponse> mountainCourse(
             @PathVariable("courseId") Long courseId,
-            @RequestParam LocalDateTime dateTime
+            @RequestParam("dateTime") LocalDateTime dateTime
     );
 
     @Operation(

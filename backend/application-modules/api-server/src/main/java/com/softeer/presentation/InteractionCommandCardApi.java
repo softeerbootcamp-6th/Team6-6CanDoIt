@@ -37,14 +37,14 @@ public interface InteractionCommandCardApi {
                       ```json
                       {
                         "courseId": 12,
-                        "reportType": "WEATHER",  
+                        "type": "WEATHER",  
                         "content": "정상에 안개가 자욱해요. 시야 확보가 어렵습니다.",
-                        "weatherKeywordIds": [0, 1],
-                        "rainKeywordIds": [],
-                        "etceteraKeywordIds": [0, 2]
+                        "weatherKeywords": [0, 1],
+                        "rainKeywords": [],
+                        "etceteraKeywords": [0, 2]
                       }
                       ```
-                      reportType 필드의 경우 ["WEATHER", "SAFE"] 중 1개 선택.
+                      type 필드의 경우 ["WEATHER", "SAFE"] 중 1개 선택.
                     - **imageFile** (`image/*`): 유저가 업로드하는 이미지 파일입니다. 필수로 전송해야 합니다.
                     
                     ---
