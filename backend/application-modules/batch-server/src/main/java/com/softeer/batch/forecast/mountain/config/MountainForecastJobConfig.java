@@ -17,13 +17,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static com.softeer.batch.forecast.support.BatchNames.Steps.SCHEDULED_MOUNTAIN_FORECAST_STEP;
+import static com.softeer.batch.forecast.support.BatchNames.Steps.STARTUP_MOUNTAIN_FORECAST_STEP;
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class MountainForecastJobConfig {
-
-    public static final String STARTUP_MOUNTAIN_FORECAST_STEP = "startupMountainForecastStep";
-    public static final String SCHEDULED_MOUNTAIN_FORECAST_STEP = "scheduledMountainForecastStep";
 
     private static final int CHUNK_SIZE = 20;
 

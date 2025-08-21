@@ -20,14 +20,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import static com.softeer.batch.forecast.support.BatchNames.Handlers.SHORT_SIMPLE_RETRY_HANDLER;
+import static com.softeer.batch.forecast.support.BatchNames.Steps.SCHEDULED_SHORT_FORECAST_STEP;
+import static com.softeer.batch.forecast.support.BatchNames.Steps.START_UP_SHORT_FORECAST_STEP;
+
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class ShortForecastJobConfig {
-
-    public static final String START_UP_SHORT_FORECAST_STEP = "StartUpShortForecastStep";
-    public static final String SCHEDULED_SHORT_FORECAST_STEP = "ScheduledShortForecastStep";
-    public static final String SHORT_SIMPLE_RETRY_HANDLER = "ShortSimpleRetryHandler";
 
     private static final int CHUNK_SIZE = 20;
 
