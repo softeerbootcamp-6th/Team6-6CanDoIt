@@ -1,7 +1,7 @@
-import MountainInfoPreview from '../../molecules/Forecast/MountainInfoPreview.tsx';
 import { css } from '@emotion/react';
-import ScrollIndicator from '../../molecules/Forecast/ScrollIndicator.tsx';
 import { useState, useEffect } from 'react';
+import MountainInfoPreview from '../../molecules/Forecast/MountainInfoPreview.tsx';
+import ScrollIndicator from '../../molecules/Forecast/ScrollIndicator.tsx';
 
 const placeholderData = {
     courseImageUrl: 'https://cdn.example.com/images/course01.png',
