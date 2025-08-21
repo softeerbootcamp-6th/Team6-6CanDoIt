@@ -10,6 +10,15 @@ interface PropsState {
     onClick: () => void;
 }
 
+export default function ToggleButton(props: PropsState) {
+    const { onClick } = props;
+    return (
+        <div css={buttonWrapperStyles} onClick={() => onClick && onClick()}>
+            <div css={circleStyles}></div>
+        </div>
+    );
+}
+
 const { colors } = theme;
 
 export default function ToggleButton({

@@ -8,16 +8,32 @@ import {
 
 type Method = 'POST' | 'PUT' | 'DELETE';
 
+const getToken = () =>
+    localStorage.getItem('accessToken') ??
+    sessionStorage.getItem('accessToken');
+
 export default function useApiMutation<TRequest = any, TResponse = any>(
     url: string,
     method: Method = 'POST',
     options?: UseMutationOptions<TResponse | string, Error, TRequest>,
 ): UseMutationResult<TResponse | string, Error, TRequest> {
     const mutationFn = async (body: TRequest): Promise<TResponse | string> => {
+        const token = getToken();
+        const isFormData = body instanceof FormData;
+
+        const headers: HeadersInit = isFormData
+            ? token
+                ? { Authorization: `Bearer ${token}` }
+                : {}
+            : {
+                  'Content-Type': 'application/json',
+                  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              };
+
         const res = await fetch(`${API_BASE_URL}${url}`, {
             method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
+            headers,
+            body: isFormData ? body : JSON.stringify(body),
         });
 
         const text = await res.text();

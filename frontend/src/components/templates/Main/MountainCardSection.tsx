@@ -1,35 +1,40 @@
 import MountainCard from '../../organisms/Main/MountainCard.tsx';
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { refactorMountainsData } from './utils/utils.ts';
+import { refactorMountainsData } from './utils.ts';
 import type { MountainData } from '../../../types/mountainTypes';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 export default function MountainCardSection() {
     const navigate = useNavigate();
-    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
-    useEffect(() => {
-        setMountainsData(MountainsData);
-    }, []);
 
-    const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+    const { data: mountainsData } = useApiQuery<MountainData[]>(
+        '/card/mountain',
+        {},
+        {
+            placeholderData: MountainsData,
+            retry: false,
+        },
+    );
+
+    const wheelHandler = (event: React.WheelEvent<HTMLDivElement>) => {
         event.currentTarget.scrollLeft += Number(event.deltaY);
     };
-    const handleCardClick = (mountainId: string) => {
+    const cardClickHandler = (mountainId: string) => {
         navigate(
             `/forecast?mountainid=${mountainId}&courseId=null&weekdayId=null`,
         );
     };
 
-    const data = refactorMountainsData(mountainsData);
+    const data = refactorMountainsData(mountainsData ?? []);
 
     return (
-        <div css={mountainCardContainerStyle} onWheel={handleWheel}>
+        <div css={mountainCardContainerStyle} onWheel={wheelHandler}>
             {data.map((mountain) => (
                 <MountainCard
                     key={mountain.mountainName}
                     onClick={() => {
-                        handleCardClick(mountain.mountainId);
+                        cardClickHandler(mountain.mountainId);
                     }}
                     {...mountain}
                 />

@@ -5,10 +5,7 @@ import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
 import { useState } from 'react';
-import {
-    createHandleSubmit,
-    createHandleToggleDropdown,
-} from './utils/utils.ts';
+import { createHandleSubmit, createHandleToggleDropdown } from './utils.ts';
 
 type PageName = 'main' | 'report' | 'safety';
 type DropdownType = 'mountain' | 'course' | 'weekday' | null;
@@ -55,7 +52,6 @@ export default function SearchBar(props: PropsState) {
 
     const isMainPage = pageName === 'main';
     const isReportPage = pageName === 'report';
-    const isSafetyPage = pageName === 'safety';
 
     const handleToggleDropdown = createHandleToggleDropdown({
         setOpenDropdown: setOpenedDropdownType,
@@ -114,11 +110,9 @@ export default function SearchBar(props: PropsState) {
                 )}
                 <SearchBarText>{searchBarMessage}</SearchBarText>
                 {isMainPage && <Dropdown {...dropdownProps.weekday} />}
-                {(isMainPage || isSafetyPage) && (
-                    <button type='submit' css={searchButtonStyle}>
-                        <Icon {...searchButtonIconProps} />
-                    </button>
-                )}
+                <button type='submit' css={searchButtonStyle}>
+                    <Icon {...searchButtonIconProps} />
+                </button>
             </form>
         </div>
     );

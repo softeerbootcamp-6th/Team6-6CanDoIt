@@ -4,14 +4,25 @@ import ModalButton from '../../atoms/Button/ModalButton.tsx';
 interface PropsState {
     firstButtonText: string;
     secondButtonText: string;
+    onFirstButtonClick?: () => void;
+    onSecondButtonClick?: () => void;
 }
 
 export default function ModalFooter(props: PropsState) {
-    const { firstButtonText, secondButtonText } = props;
+    const {
+        firstButtonText,
+        secondButtonText,
+        onFirstButtonClick,
+        onSecondButtonClick,
+    } = props;
     return (
         <div css={modalFooterStyle}>
-            <ModalButton textColor='grey-80'>{firstButtonText}</ModalButton>
-            <ModalButton>{secondButtonText}</ModalButton>
+            <ModalButton onClick={onFirstButtonClick} textColor='grey-80'>
+                {firstButtonText}
+            </ModalButton>
+            <ModalButton onClick={onSecondButtonClick}>
+                {secondButtonText}
+            </ModalButton>
         </div>
     );
 }

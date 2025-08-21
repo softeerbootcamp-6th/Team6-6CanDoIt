@@ -3,22 +3,22 @@ import TwoLinesEllipsis from '../../atoms/Text/TwoLinesEllipsis.tsx';
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 
-interface propsState {
-    minutesAgo: number;
+interface PropsState {
+    timeAgo: string;
     comment: string;
 }
 
-export default function FrontCardFooter({ minutesAgo, comment }: propsState) {
+export default function FrontCardFooter({ timeAgo, comment }: PropsState) {
     return (
         <div css={frontCardFooterStyle}>
             <CircleImage />
             <TwoLinesEllipsis>{comment}</TwoLinesEllipsis>
-            <CommonText {...minutesAgoProps}>{`${minutesAgo}분전`}</CommonText>
+            <CommonText {...timeAgoProps}>{timeAgo}</CommonText>
         </div>
     );
 }
 
-const minutesAgoProps = {
+const timeAgoProps = {
     TextTag: 'span',
     fontSize: 'caption',
     fontWeight: 'medium',
