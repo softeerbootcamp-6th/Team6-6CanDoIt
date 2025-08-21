@@ -2,18 +2,20 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import MainSearchSection from '../../components/templates/Main/MainSearchSection.tsx';
 import MountainCardSection from '../../components/templates/Main/MountainCardSection.tsx';
-import { formValidChange } from './utils.ts';
 
 export default function MainPage() {
     const [isOpen, setIsOpen] = useState(false);
 
+    const formValidChangeHandler = (isValid: boolean) => setIsOpen(!isValid);
+    const backgroundClickHandler = () => setIsOpen(false);
+
     return (
         <>
-            {isOpen && <div css={backgroundStyle} />}
+            {isOpen && (
+                <div css={backgroundStyle} onClick={backgroundClickHandler} />
+            )}
             <div css={overBackgroundStyle}>
-                <MainSearchSection
-                    onFormValidChange={formValidChange({ setIsOpen })}
-                />
+                <MainSearchSection onFormValidChange={formValidChangeHandler} />
             </div>
             <MountainCardSection />
         </>
