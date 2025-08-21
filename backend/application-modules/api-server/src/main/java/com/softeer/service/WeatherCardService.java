@@ -1,15 +1,13 @@
 package com.softeer.service;
 
+import com.softeer.activity.HikingActivityCalculator;
 import com.softeer.domain.Course;
 import com.softeer.domain.CoursePlan;
 import com.softeer.domain.Grid;
 import com.softeer.domain.Mountain;
 import com.softeer.dto.response.CourseInfoResponse;
-import com.softeer.dto.response.card.CourseCardResponse;
-import com.softeer.dto.response.card.ForecastCardResponse;
+import com.softeer.dto.response.card.*;
 import com.softeer.dto.response.HourlyWeatherResponse;
-import com.softeer.dto.response.card.MountainCardResponse;
-import com.softeer.dto.response.card.MountainCourseCardResponse;
 import com.softeer.time.HikingTime;
 import com.softeer.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +27,7 @@ public class WeatherCardService {
 
     private final MountainUseCase mountainUseCase;
     private final ForecastUseCase forecastUseCase;
+    private final CardHistoryUseCase cardHistoryUseCase;
 
     public List<HourlyWeatherResponse> findForecastsByMountainId(long mountainId, LocalDateTime startDatetime) {
         Mountain mountain = mountainUseCase.getMountainById(mountainId);
@@ -102,13 +101,59 @@ public class WeatherCardService {
         return ForecastCardResponse.from(courseForecast, courseAltitude, mountainAltitude);
     }
 
-    public MountainCourseCardResponse createMountainCourseCard(long courseId, LocalDate date) {
-        CoursePlan coursePlan = mountainUseCase.getCoursePlan(courseId, date);
+    public MountainCourseCardResponse createMountainCourseCard(long courseId, LocalDateTime dateTime) {
+        CoursePlan coursePlan = mountainUseCase.getCoursePlan(courseId, LocalDate.from(dateTime));
 
         return new MountainCourseCardResponse(
                 coursePlan.mountain(),
                 coursePlan.course(),
                 coursePlan.sunTime()
+        );
+    }
+
+    public CourseScheduleCardResponse createCourseScheduleCard(Long courseId, Long userId, LocalDateTime startDateTime) {
+        CoursePlan coursePlan = mountainUseCase.getCoursePlan(courseId, LocalDate.from(startDateTime));
+
+        HikingTime hikingTime = TimeUtil.getHikingTime(startDateTime, coursePlan.course().totalDuration());
+
+        ForecastUseCase.CourseForecast forecasts = forecastUseCase.findForecastsByHikingTime(
+                coursePlan.course().startGrid(),
+                coursePlan.mountain().grid(),
+                hikingTime
+        );
+
+        int courseAltitude = coursePlan.course().altitude();
+        int mountainAltitude = coursePlan.mountain().altitude();
+
+        double adjustedTemperature = HikingActivityCalculator.calculateTemperatureWithAltitude(
+                forecasts.arrivalForecast().temperatureCondition().temperature(),
+                courseAltitude,
+                mountainAltitude
+        );
+
+        double adjustedWindSpeed = HikingActivityCalculator.calculateWindSpeedWithAltitude(
+                forecasts.arrivalForecast().windCondition().windSpeed(),
+                courseAltitude,
+                mountainAltitude
+        );
+
+        String hikingActivityStatus = HikingActivityCalculator.calculateHikingActivity(
+                adjustedTemperature,
+                forecasts.arrivalForecast().dailyTemperature().dailyTemperatureRange(),
+                forecasts.arrivalForecast().precipitationCondition().precipitation(),
+                adjustedWindSpeed,
+                forecasts.arrivalForecast().humidityCondition().humidity()
+        );
+
+        cardHistoryUseCase.updateCardHistory(userId, courseId, startDateTime);
+
+        return new CourseScheduleCardResponse(
+                coursePlan,
+                hikingTime,
+                forecasts.startForecast(),
+                forecasts.arrivalForecast(),
+                forecasts.descentForecast(),
+                hikingActivityStatus
         );
     }
 }
