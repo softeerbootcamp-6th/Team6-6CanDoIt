@@ -54,18 +54,14 @@ export default function ReportSearchSection() {
     );
 
     const mountainOptions: Option[] = refactorMountainDataToOptions(
-        mountainsData ?? [],
+        mountainsData ?? MountainsData,
     );
     const courseOptions: Option[] = refactorCoursesDataToOptions(
-        coursesData ?? [],
+        coursesData ?? initCoursesData,
     );
 
     const mountainChangeHandler = (mountain: Option) => {
-        setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.set('mountainId', mountain.id);
-            return next;
-        });
+        setSearchParams(`mountainid=${mountain.id}`);
     };
 
     const submitHandler = (values: {
