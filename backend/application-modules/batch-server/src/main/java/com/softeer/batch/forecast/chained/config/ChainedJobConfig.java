@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.softeer.batch.forecast.support.BatchNames.Jobs.SCHEDULED_CHAINED_FORECAST_JOB;
-import static com.softeer.batch.forecast.support.BatchNames.Jobs.STARTUP_CHAINED_FORECAST_JOB;
-import static com.softeer.batch.forecast.support.BatchNames.Steps.*;
+import static com.softeer.batch.common.support.BatchNames.Jobs.SCHEDULED_CHAINED_FORECAST_JOB;
+import static com.softeer.batch.common.support.BatchNames.Jobs.STARTUP_CHAINED_FORECAST_JOB;
+import static com.softeer.batch.common.support.BatchNames.Steps.*;
 
 @Slf4j
 @Configuration

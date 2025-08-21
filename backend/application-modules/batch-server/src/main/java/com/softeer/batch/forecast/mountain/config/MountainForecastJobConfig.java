@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import static com.softeer.batch.forecast.support.BatchNames.Steps.SCHEDULED_MOUNTAIN_FORECAST_STEP;
-import static com.softeer.batch.forecast.support.BatchNames.Steps.STARTUP_MOUNTAIN_FORECAST_STEP;
+import static com.softeer.batch.common.support.BatchNames.Steps.SCHEDULED_MOUNTAIN_FORECAST_STEP;
+import static com.softeer.batch.common.support.BatchNames.Steps.STARTUP_MOUNTAIN_FORECAST_STEP;
 
 @Slf4j
 @Configuration

@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.support;
+package com.softeer.batch.common.support;
 
 public final class BatchNames {
 

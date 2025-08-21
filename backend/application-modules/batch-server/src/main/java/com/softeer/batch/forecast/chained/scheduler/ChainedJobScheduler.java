@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
-import static com.softeer.batch.forecast.support.BatchNames.Jobs.SCHEDULED_CHAINED_FORECAST_JOB;
-import static com.softeer.batch.forecast.support.BatchNames.Jobs.STARTUP_CHAINED_FORECAST_JOB;
+import static com.softeer.batch.common.support.BatchNames.Jobs.SCHEDULED_CHAINED_FORECAST_JOB;
+import static com.softeer.batch.common.support.BatchNames.Jobs.STARTUP_CHAINED_FORECAST_JOB;
 
 @Slf4j
 @Component
