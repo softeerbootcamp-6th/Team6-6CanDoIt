@@ -5,7 +5,6 @@ import com.softeer.batch.mapper.ForecastMapper;
 import com.softeer.domain.DailyTemperature;
 import com.softeer.domain.Forecast;
 import com.softeer.domain.Grid;
-import com.softeer.entity.DailyTemperatureEntity;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.entity.enums.PrecipitationType;
 import com.softeer.entity.enums.Sky;
@@ -13,12 +12,13 @@ import com.softeer.entity.enums.WindDirection;
 import com.softeer.shortterm.ShortForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
+import com.softeer.throttle.manager.SimpleRetryHandler;
 import com.softeer.time.ApiTime;
 import com.softeer.time.ApiTimeUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +27,26 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.softeer.batch.forecast.shortterm.config.ShortForecastJobConfig.SHORT_SIMPLE_RETRY_HANDLER;
+
 @Slf4j
 @Component
 @StepScope
-@RequiredArgsConstructor
 public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecastList> {
+
+    private static final String SHORT_FORECAST = "SHORT_FORECAST";
 
     private final ShortForecastApiCaller kmaApiCaller;
     private final ForecastMapper forecastMapper;
+    private final SimpleRetryHandler simpleRetryHandler;
+
+    public ShortForecastProcessor(ShortForecastApiCaller kmaApiCaller,
+                                  ForecastMapper forecastMapper,
+                                  @Qualifier(SHORT_SIMPLE_RETRY_HANDLER) SimpleRetryHandler simpleRetryHandler) {
+        this.kmaApiCaller = kmaApiCaller;
+        this.forecastMapper = forecastMapper;
+        this.simpleRetryHandler = simpleRetryHandler;
+    }
 
     @Value("${kma.api.key.short}")
     private String serviceKey;
@@ -53,7 +65,8 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
                 grid.x(),
                 grid.y()
         );
-        return processApiResponse(grid, kmaApiCaller.call(request));
+
+        return simpleRetryHandler.submit(SHORT_FORECAST, () -> processApiResponse(grid, kmaApiCaller.call(request)));
     }
 
     private ShortForecastList processApiResponse(Grid grid, List<ShortForecastItem> items) {

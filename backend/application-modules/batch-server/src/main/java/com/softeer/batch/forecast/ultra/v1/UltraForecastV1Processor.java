@@ -10,12 +10,14 @@ import com.softeer.entity.enums.WindDirection;
 import com.softeer.shortterm.UltraForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
+import com.softeer.throttle.manager.SimpleRetryHandler;
 import com.softeer.time.ApiTime;
 import com.softeer.time.ApiTimeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.UnknownContentTypeException;
@@ -24,14 +26,24 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.softeer.batch.forecast.ultra.v1.UltraForecastV1JobConfig.*;
+
 @Slf4j
 @Component
 @StepScope
-@RequiredArgsConstructor
 public class UltraForecastV1Processor implements ItemProcessor<Grid, UltraForecastResponseList> {
 
     private final UltraForecastApiCaller kmaApiCaller;
     private final ForecastMapper forecastMapper;
+    private final SimpleRetryHandler simpleRetryHandler;
+
+    public UltraForecastV1Processor(UltraForecastApiCaller kmaApiCaller,
+                                    ForecastMapper forecastMapper,
+                                    @Qualifier(ULTRA_SIMPLE_RETRY_HANDLER) SimpleRetryHandler simpleRetryHandler) {
+        this.kmaApiCaller = kmaApiCaller;
+        this.forecastMapper = forecastMapper;
+        this.simpleRetryHandler = simpleRetryHandler;
+    }
 
     @Value("${kma.api.key.short}")
     private String serviceKey;
@@ -53,19 +65,14 @@ public class UltraForecastV1Processor implements ItemProcessor<Grid, UltraForeca
                 grid.x(),
                 grid.y()
         );
-        List<ShortForecastItem> items;
-        try {
-            items = kmaApiCaller.call(request);
-        } catch (UnknownContentTypeException e) {
-            log.error("grid {} {}", grid.x(), grid.y());
-            throw e;
-        }
-        return processApiResponse(grid, items);
+
+        return simpleRetryHandler.submit(ULTRA_FORECAST, () -> {
+            List<ShortForecastItem> items = kmaApiCaller.call(request);
+            return processApiResponse(grid, items);
+        });
     }
 
     private UltraForecastResponseList processApiResponse(Grid grid, List<ShortForecastItem> items) {
-
-
         Map<LocalDateTime, List<ShortForecastItem>> groupedByTime = items.stream()
                 .collect(Collectors.groupingBy(item -> LocalDateTime.of(
                         item.forecastDate(),
