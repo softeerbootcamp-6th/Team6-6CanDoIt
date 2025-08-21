@@ -3,8 +3,6 @@ package com.softeer.mountain.dto;
 import com.softeer.common.ApiRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.StringJoiner;
-
 public record MountainForecastApiRequest(
         String authKey,
         int mountainNum,

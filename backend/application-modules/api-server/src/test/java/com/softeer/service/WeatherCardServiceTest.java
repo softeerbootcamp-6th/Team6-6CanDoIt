@@ -30,12 +30,14 @@ public class WeatherCardServiceTest {
 
     private MountainUseCase mountainUseCase;
     private ForecastUseCase forecastUseCase;
+    private CardHistoryUseCase cardHistoryUseCase;
 
     @BeforeEach
     void setUp() {
         mountainUseCase = mock(MountainUseCase.class);
         forecastUseCase = mock(ForecastUseCase.class);
-        target = new WeatherCardService(mountainUseCase, forecastUseCase);
+        cardHistoryUseCase = mock(CardHistoryUseCase.class);
+        target = new WeatherCardService(mountainUseCase, forecastUseCase, cardHistoryUseCase);
     }
 
     @Test
@@ -85,7 +87,7 @@ public class WeatherCardServiceTest {
             mountains.add(mountain);
 
             Forecast surface = ForecastFixture.builder().dateTime(baseTime).temperature(10 + i).build();
-            Forecast top     = ForecastFixture.builder().dateTime(baseTime).temperature(20 + i).build();
+            Forecast top = ForecastFixture.builder().dateTime(baseTime).temperature(20 + i).build();
             ForecastUseCase.WeatherCondition condition = new ForecastUseCase.WeatherCondition(surface, top);
 
             weatherConditionMap.put(grid.id(), condition);

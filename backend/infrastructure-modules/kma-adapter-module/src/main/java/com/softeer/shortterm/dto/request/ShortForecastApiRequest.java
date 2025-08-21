@@ -24,7 +24,7 @@ public record ShortForecastApiRequest(
 
         StringJoiner queryString = new StringJoiner("&");
 
-        queryString.add("serviceKey=" + serviceKey);
+        queryString.add("authKey=" + serviceKey);
         queryString.add("pageNo=" + this.pageNo);
         queryString.add("numOfRows=" + this.numOfRows);
         queryString.add("dataType=" + this.dataType);

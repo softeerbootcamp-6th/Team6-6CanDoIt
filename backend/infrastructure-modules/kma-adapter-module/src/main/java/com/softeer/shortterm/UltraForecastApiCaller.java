@@ -1,16 +1,15 @@
 package com.softeer.shortterm;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 public class UltraForecastApiCaller extends AbstractShortForecastApiCaller{
 
-    public UltraForecastApiCaller(RestClient restClient, XmlMapper xmlMapper) {
-        super(restClient, xmlMapper);
+    public UltraForecastApiCaller(WebClient webClient) {
+        super(webClient);
     }
 
     @Override
     protected String getApiPath() {
-        return "/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst";
+        return "/api/typ02/openApi/VilageFcstInfoService_2.0/getUltraSrtFcst";
     }
 }
