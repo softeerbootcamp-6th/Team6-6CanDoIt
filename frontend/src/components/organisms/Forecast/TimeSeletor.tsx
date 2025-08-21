@@ -5,35 +5,51 @@ import { theme } from '../../../theme/theme.ts';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
+import { useState, useRef } from 'react';
 
-const dummy = [
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-    '_',
-];
-
+const dummy = Array.from({ length: 34 });
 const { colors, typography } = theme;
 
 export default function TimeSeletor() {
-    let size = 5;
+    const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [startX, setStartX] = useState(0);
+    const [scrollLeft, setScrollLeft] = useState(0);
 
+    const startDrag = (x: number) => {
+        setIsDragging(true);
+        setStartX(x);
+        setScrollLeft(scrollRef.current?.scrollLeft ?? 0);
+    };
+
+    const moveDrag = (x: number) => {
+        if (!isDragging || !scrollRef.current) return;
+        const walk = x - startX;
+        scrollRef.current.scrollLeft = scrollLeft - walk;
+    };
+
+    const endDrag = () => {
+        if (!scrollRef.current) return;
+        setIsDragging(false);
+
+        const container = scrollRef.current;
+        const cellWidth = container.children[0]?.clientWidth ?? 1;
+        const gap = 8;
+        const scrollPos = container.scrollLeft;
+
+        const nearestIndex = Math.round(scrollPos / (cellWidth + gap));
+        container.scrollTo({
+            left: nearestIndex * (cellWidth + gap),
+            behavior: 'smooth',
+        });
+    };
+
+    let size = 5;
     const dynamicScrollSizeStyles = css`
         width: ${size * 5}rem;
     `;
+
     return (
         <div css={timeSeletorStyles}>
             <div css={headerStyles}>
@@ -43,19 +59,30 @@ export default function TimeSeletor() {
                 </div>
                 <div>
                     <SelectorTitleText>고도 보정하기</SelectorTitleText>
-                    <Icon
-                        name='info-circle'
-                        width={1.5}
-                        height={1.5}
-                        color='grey-100'
+                    <div css={tooltipWrapper}>
+                        <Icon
+                            name='info-circle'
+                            width={1.5}
+                            height={1.5}
+                            color='grey-100'
+                        />
+                        <span>
+                            {
+                                '코스의 정상 고도를 반영해,\n기온과 풍속을 알려드려요.'
+                            }
+                        </span>
+                    </div>
+                    <ToggleButton
+                        isOn={isToggleOn}
+                        onClick={() => setIsToggleOn((prev) => !prev)}
                     />
-                    <ToggleButton />
                 </div>
             </div>
+
             <div css={contentWrapperStyles}>
                 <div
                     css={css`
-                        height: '2.1rem';
+                        height: 2.1rem;
                     `}
                 >
                     <div css={[scrollStyles, dynamicScrollSizeStyles]}>
@@ -66,12 +93,26 @@ export default function TimeSeletor() {
 
                 <div
                     css={css`
+                        width: 100%;
+                        max-width: 100%;
+                        overflow-x: hidden;
                         display: flex;
-                        margin: auto;
+                        gap: 8px;
+                        cursor: grab;
+                        user-select: none;
                     `}
+                    ref={scrollRef}
+                    onMouseDown={(e) => startDrag(e.pageX)}
+                    onMouseMove={(e) => moveDrag(e.pageX)}
+                    onMouseUp={endDrag}
+                    onMouseLeave={endDrag}
+                    onTouchStart={(e) => startDrag(e.touches[0].pageX)}
+                    onTouchMove={(e) => moveDrag(e.touches[0].pageX)}
+                    onTouchEnd={endDrag}
                 >
-                    {dummy.map(() => (
+                    {dummy.map((_, idx) => (
                         <WeatherCell
+                            key={idx}
                             time='2AM'
                             iconName='clear-day'
                             temperature={20}
@@ -89,10 +130,9 @@ const timeSeletorStyles = css`
     align-items: flex-start;
     gap: 0.75rem;
     box-sizing: border-box;
-
-    width: 87rem;
+    width: 90%;
+    max-width: 90rem;
     padding: 0.5rem 1.5rem 1.5rem 1.5rem;
-
     border-radius: 1.5rem;
     border: 1px solid ${colors.greyOpacityWhite[80]};
     background: ${colors.greyOpacityWhite[70]};
@@ -121,14 +161,13 @@ const courseTimeStyles = css`
     font-weight: ${typography.fontWeight.medium};
     line-height: 150%;
     color: ${colors.grey[90]};
-
     background-color: ${colors.greyOpacityWhite[80]};
     padding: 0.1rem 0.4rem;
     margin-left: 0.2rem;
-
     border-radius: 0.375rem;
     border: 1px solid ${colors.greyOpacityWhite[90]};
 `;
+
 const scrollStyles = css`
     position: relative;
     display: flex;
@@ -140,20 +179,48 @@ const scrollStyles = css`
     & span {
         position: relative;
         padding: 0 0.8rem;
-
         height: 2rem;
-
         background-color: ${colors.greyOpacityWhite[70]};
-
         border-radius: 2rem;
         line-height: 150%;
-
         z-index: 10;
     }
 `;
 
 const contentWrapperStyles = css`
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+`;
+
+const tooltipWrapper = css`
+    position: relative;
+    display: inline-block;
+
+    & span {
+        visibility: hidden;
+        opacity: 0;
+        width: 12rem;
+        background-color: ${colors.grey[100]};
+        color: ${colors.grey[0]};
+        text-align: center;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        position: absolute;
+        z-index: 99;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: opacity 0.3s;
+        font-size: ${typography.fontSize.caption};
+        white-space: pre-wrap;
+        line-height: 1.4;
+    }
+
+    &:hover span,
+    &:focus span {
+        visibility: visible;
+        opacity: 1;
+    }
 `;

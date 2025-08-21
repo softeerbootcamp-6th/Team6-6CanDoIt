@@ -7,6 +7,7 @@ import { theme } from '../../../theme/theme.ts';
 interface PropsState {
     title: string;
     weatherInfo: WeatherInfo;
+    onClick: () => void;
 }
 
 interface WeatherInfo {
@@ -18,7 +19,11 @@ interface WeatherInfo {
 const { colors } = theme;
 
 // 배경색을 동적으로 입혀주고 이름 등은 백엔드와 협의 후 로직짜서 수정해야할듯.
-export default function WeatherCard({ title, weatherInfo }: PropsState) {
+export default function WeatherCard({
+    title,
+    weatherInfo,
+    onClick,
+}: PropsState) {
     const dynamicBackgoundStyle = css`
         background-color: ${colors.accentWeather.sunny};
     `;
@@ -27,7 +32,7 @@ export default function WeatherCard({ title, weatherInfo }: PropsState) {
         <div css={[cardStyles, dynamicBackgoundStyle]}>
             <div css={headerStyles}>
                 <CommonText {...titleTextProps}>{title}</CommonText>
-                <button css={buttonStyles}>
+                <button css={buttonStyles} onClick={onClick}>
                     <Icon {...iconProps} />
                 </button>
             </div>
@@ -66,8 +71,8 @@ const cardStyles = css`
     justify-content: space-between;
 
     box-sizing: border-box;
-    width: 15rem;
-    height: 10.5rem;
+    width: 13rem;
+    height: 9.5rem;
 
     padding: 0.75rem 0;
 

@@ -4,6 +4,13 @@ import DetailTitle from '../../../components/molecules/Forecast/DetailTitle.tsx'
 import { css, keyframes } from '@emotion/react';
 import bgImage from '../../../assets/Bg-fixed.png';
 import cloudImage from '../../../assets/Bg-scroll.png';
+import { WeatherIndexLight } from '../../atoms/Text/WeatherIndex.tsx';
+import { useState } from 'react';
+import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.tsx';
+import { DummyWeatherData } from './dummy.ts';
+import Icon from '../../atoms/Icon/Icons.tsx';
+import { theme } from '../../../theme/theme.ts';
+import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
 
 const weatherDataList = [
     {
@@ -33,25 +40,70 @@ const weatherDataList = [
 ];
 
 export default function DetailInfoSection() {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isCard, setIsCard] = useState<boolean>(false);
+
+    const handleCardClick = () => {
+        setIsOpen((prev) => !prev);
+    };
+
+    const handleSidebarClose = () => {
+        setIsOpen(false);
+    };
+
     return (
         <div css={wrapperStyles}>
-            <div css={contentSectionStyles}>
-                <img src={cloudImage} css={animatedImageStyles} alt='cloud' />
-                <DetailTitle />
-                <div css={weatherCardWrapperStyles}>
-                    {weatherDataList.map((data, index) => (
-                        <WeatherCard
-                            key={index}
-                            title={data.title}
-                            weatherInfo={data.weatherInfo}
+            <div css={wholeWrapper}>
+                <div css={contentSectionStyles}>
+                    <button
+                        css={storeBtnStyles}
+                        onClick={() => setIsCard(true)}
+                    >
+                        <Icon
+                            name='download-02'
+                            width={1.4}
+                            height={1.4}
+                            color='grey-100'
                         />
-                    ))}
+                    </button>
+                    <img
+                        src={cloudImage}
+                        css={animatedImageStyles}
+                        alt='cloud'
+                    />
+                    <DetailTitle />
+                    <div css={weatherSummaryWrapperStyles}>
+                        <div css={weatherCardWrapperStyles}>
+                            {weatherDataList.map((data, index) => (
+                                <WeatherCard
+                                    key={index}
+                                    title={data.title}
+                                    weatherInfo={data.weatherInfo}
+                                    onClick={handleCardClick}
+                                />
+                            ))}
+                        </div>
+                        <WeatherIndexLight type='좋음' />
+                    </div>
+
+                    <TimeSeletor />
                 </div>
-                <TimeSeletor />
+                {isOpen && (
+                    <WeatherDetailSideBar
+                        selectedWeatherData={DummyWeatherData}
+                        type='시작지점'
+                        onClose={handleSidebarClose}
+                    />
+                )}
+                {isCard && (
+                    <WeatherCardModal onClose={() => setIsCard(false)} />
+                )}
             </div>
         </div>
     );
 }
+
+const { colors } = theme;
 
 const float = keyframes`
     0%, 100% {
@@ -66,7 +118,8 @@ const animatedImageStyles = css`
     position: absolute;
     top: 0;
     width: 100%;
-    height: 95%;
+
+    height: 85%;
     opacity: 0.8;
 
     animation: ${float} 4s ease-in-out infinite;
@@ -92,29 +145,64 @@ const weatherCardWrapperStyles = css`
     }
 `;
 
+const weatherSummaryWrapperStyles = css`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
 const wrapperStyles = css`
     width: 100%;
+    padding-top: 5rem;
+    box-sizing: border-box;
     height: 100dvh;
     display: flex;
     flex-direction: column;
 `;
 
 const contentSectionStyles = css`
+    height: 100%;
     position: relative;
     display: flex;
     flex: 1 1 auto;
-
+    margin-top: 5rem;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     margin: auto;
-    width: 80%;
+    padding: 2rem 0;
+    box-sizing: border-box;
+    width: 70%;
+    max-width: 80%;
     background-image: url(${bgImage});
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    padding-bottom: 2rem;
     & h1 {
         text-align: center;
     }
+`;
+
+const wholeWrapper = css`
+    height: 100%;
+    display: flex;
+    position: relative;
+`;
+
+const storeBtnStyles = css`
+    all: unset;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 3rem;
+    right: 5%;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+    background-color: ${colors.greyOpacityWhite[70]};
+    padding: 0 3px 5px 0;
+    box-sizing: border-box;
+    cursor: pointer;
 `;
