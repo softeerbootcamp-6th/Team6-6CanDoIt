@@ -8,14 +8,13 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class RestClientConfig {
 
-    public static final String MOUNTAIN_BASE_URL = "https://apihub.kma.go.kr";
-    public static final String KMA_PUBLIC_BASE_URL = "https://apis.data.go.kr";
+    public static final String KMA_BASE_URL = "https://apihub.kma.go.kr";
 
     @Bean
     @Qualifier("mountainForecastApiRestClient")
     public RestClient mountainForecastApiRestClient(RestClient.Builder restClientBuilder) {
         return restClientBuilder
-                .baseUrl(MOUNTAIN_BASE_URL)
+                .baseUrl(KMA_BASE_URL)
                 .build();
     }
 
@@ -23,7 +22,7 @@ public class RestClientConfig {
     @Qualifier("kmaPublicApiRestClient")
     public RestClient kmaPublicApiRestClient(RestClient.Builder restClientBuilder) {
         return restClientBuilder
-                .baseUrl(KMA_PUBLIC_BASE_URL)
+                .baseUrl(KMA_BASE_URL)
                 .build();
     }
 }
