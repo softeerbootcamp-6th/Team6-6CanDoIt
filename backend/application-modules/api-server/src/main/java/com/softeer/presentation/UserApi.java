@@ -1,19 +1,23 @@
 package com.softeer.presentation;
 
+import com.softeer.config.LoginUserId;
 import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
 import com.softeer.config.auth.Token;
+import com.softeer.dto.request.UpdateNicknameRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "SignApi", description = "로그인 및 회원가입 관련된 API")
 @RequestMapping("/user")
-public interface SignApi {
+public interface UserApi {
 
     @Operation(
             summary = "로그인 아이디 중복 및 유효성 확인",
@@ -105,4 +109,62 @@ public interface SignApi {
     @PostMapping("/sign-in")
     ResponseEntity<Token> signIn(@RequestBody SignInRequest signInRequest);
 
+
+    @Operation(
+            summary = "사용자 닉네임 수정",
+            description = """
+    ### ✏️ **닉네임 변경 요청**
+
+    인증된 사용자의 닉네임을 수정합니다.  
+    요청 본문에 새로운 닉네임을 JSON 형식으로 전달해야 하며, Authorization 헤더에 JWT 토큰이 필요합니다.
+
+    ---
+
+    #### 🔐 **Authorization Header**
+    - **Authorization** (필수): `Bearer {JWT_TOKEN}`
+
+    ---
+
+    #### 📥 **Request Body**
+    ```json
+    {
+      "nickname": "새로운닉네임"
+    }
+    ```
+
+    ---
+
+    #### ✅ **성공 응답 (HTTP 200)**
+    - 내용 없음 (`200 OK`)
+    """
+    )
+    @PatchMapping("/nickname")
+    ResponseEntity<Void> updateNickname(@LoginUserId Long userId, @RequestBody UpdateNicknameRequest updateNicknameRequest);
+
+    @Operation(
+            summary = "사용자 프로필 이미지 수정",
+            description = """
+    ### 🖼️ **프로필 이미지 변경 요청**
+
+    인증된 사용자의 프로필 이미지를 변경합니다.
+    이미지는 `multipart/form-data` 형식으로 전송하며, Authorization 헤더에 JWT 토큰이 필요합니다.
+
+    ---
+
+    #### 🔐 **Authorization Header**
+    - **Authorization** (필수): `Bearer {JWT_TOKEN}`
+
+    ---
+
+    #### 📥 **Request Parameter**
+    - **imageFile** (필수): 업로드할 이미지 파일 (`.jpg`, `.png` 등)
+
+    ---
+
+    #### ✅ **성공 응답 (HTTP 200)**
+    - 내용 없음 (`200 OK`)
+    """
+    )
+    @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<Void> updateNickname(@LoginUserId Long userId, @RequestParam MultipartFile imageFile);
 }

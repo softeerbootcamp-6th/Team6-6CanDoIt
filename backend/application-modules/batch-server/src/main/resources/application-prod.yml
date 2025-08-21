@@ -9,6 +9,9 @@ spring:
     port: ${REDIS_PORT}
     username: ${REDIS_USERNAME}
     password: ${REDIS_PASSWORD}
+  batch:
+    job:
+      enabled: false
 
 kma:
   api:

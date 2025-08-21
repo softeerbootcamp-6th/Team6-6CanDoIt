@@ -81,9 +81,7 @@ public class AsyncRetryHandler {
         }
 
         try {
-            CompletableFuture.supplyAsync(() ->
-                                    task.supplier().get()
-                            , executor)
+            CompletableFuture.supplyAsync(() -> task.supplier().get(), executor)
                     .whenComplete((result, ex) -> {
                         if (ex != null) {
                             Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
