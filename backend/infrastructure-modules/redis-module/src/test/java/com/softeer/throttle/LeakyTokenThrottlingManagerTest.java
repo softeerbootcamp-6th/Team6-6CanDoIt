@@ -1,7 +1,7 @@
 package com.softeer.throttle;
 
 import com.softeer.SpringBootTestWithRedis;
-import com.softeer.throttle.manager.ThrottlingManager;
+import com.softeer.throttle.manager.impl.LeakyTokenThrottlingManager;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -18,11 +18,11 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTestWithRedis
-class ThrottlingManagerTest {
+class LeakyTokenThrottlingManagerTest {
 
-    private static final Logger log = LoggerFactory.getLogger(ThrottlingManagerTest.class);
+    private static final Logger log = LoggerFactory.getLogger(LeakyTokenThrottlingManagerTest.class);
 
-    private ThrottlingManager throttlingManager;
+    private LeakyTokenThrottlingManager leakyTokenThrottlingManager;
     @Autowired
     private ProxyManager<String> proxyManager;
     @Autowired
@@ -35,21 +35,24 @@ class ThrottlingManagerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+        //(10, 20) -> 18초
+        //(5, 10) ->
         properties = new ThrottlingProperties(
                 "test-key",
-                20,     // initialTps
+                3,     // initialTps
                 2,     // minTps
-                50,    // maxTps
+                30,    // maxTps
                 5
         );
 
         BackoffStrategy backoffStrategy = new BackoffStrategy(100, 500);
 
-        throttlingManager = new ThrottlingManager(proxyManager, properties, backoffStrategy);
-        throttlingManager.initialize();
+        leakyTokenThrottlingManager = new LeakyTokenThrottlingManager(proxyManager, properties, backoffStrategy);
+        leakyTokenThrottlingManager.initialize();
 
         // Redis 정리
         redisConnection.sync().flushall();
+        proxyManager.removeProxy("test-key");
     }
 
     @Test
@@ -59,7 +62,7 @@ class ThrottlingManagerTest {
         CompletableFuture<String> task = CompletableFuture.completedFuture("success");
 
         // when
-        CompletableFuture<String> result = throttlingManager.submit("test-key", () -> task);
+        CompletableFuture<String> result = leakyTokenThrottlingManager.submit("test-key", () -> task);
 
         // then
         assertEquals("success", result.get(1, TimeUnit.SECONDS));
@@ -70,7 +73,7 @@ class ThrottlingManagerTest {
     void testTpsExceededRetry() throws Exception {
         // given
         List<CompletableFuture<Integer>> futures = new ArrayList<>();
-        int requestCount = 50; // initialTps(5)보다 많은 요청
+        int requestCount = 100; // initialTps(5)보다 많은 요청
 
         int expected = 0;
         // when
@@ -79,14 +82,14 @@ class ThrottlingManagerTest {
             expected += i;
             CompletableFuture<Integer> task = CompletableFuture.supplyAsync(() -> {
                 try {
-                    Thread.sleep(1000); // 작업 시뮬레이션
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
                 return index;
             });
 
-            futures.add(throttlingManager.submit("test-key", () -> task));
+            futures.add(leakyTokenThrottlingManager.submit("test-key", () -> task));
         }
 
         // then
@@ -111,7 +114,7 @@ class ThrottlingManagerTest {
         failingTask.completeExceptionally(new RuntimeException("작업 실패"));
 
         // when
-        CompletableFuture<String> result = throttlingManager.submit("test-key", () -> failingTask);
+        CompletableFuture<String> result = leakyTokenThrottlingManager.submit("test-key", () -> failingTask);
 
         // then
         ExecutionException exception = assertThrows(ExecutionException.class, () -> {
