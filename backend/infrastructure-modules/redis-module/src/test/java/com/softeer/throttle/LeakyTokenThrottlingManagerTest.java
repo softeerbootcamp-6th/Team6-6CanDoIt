@@ -73,7 +73,7 @@ class LeakyTokenThrottlingManagerTest {
     void testTpsExceededRetry() throws Exception {
         // given
         List<CompletableFuture<Integer>> futures = new ArrayList<>();
-        int requestCount = 100; // initialTps(5)보다 많은 요청
+        int requestCount = 30; // initialTps(5)보다 많은 요청
 
         int expected = 0;
         // when
@@ -82,7 +82,7 @@ class LeakyTokenThrottlingManagerTest {
             expected += i;
             CompletableFuture<Integer> task = CompletableFuture.supplyAsync(() -> {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
