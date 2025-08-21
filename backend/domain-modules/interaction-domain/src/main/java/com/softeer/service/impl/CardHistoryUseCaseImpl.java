@@ -7,6 +7,7 @@ import com.softeer.service.CardHistoryUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,5 +19,10 @@ public class CardHistoryUseCaseImpl implements CardHistoryUseCase {
     @Override
     public List<CardHistory> findUserCardHistory(long userId, CardHistoryPageable pageable) {
         return cardHistoryAdapter.findUserCardHistory(userId, pageable);
+    }
+
+    @Override
+    public void updateCardHistory(long userId, long courseId, LocalDateTime forecastDate) {
+        cardHistoryAdapter.touchOrCreate(userId, courseId, forecastDate);
     }
 }

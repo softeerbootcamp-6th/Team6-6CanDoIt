@@ -2,9 +2,7 @@ package com.softeer.presentation.impl;
 
 import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
-import com.softeer.dto.response.card.CourseCardResponse;
-import com.softeer.dto.response.card.ForecastCardResponse;
-import com.softeer.dto.response.card.MountainCardResponse;
+import com.softeer.dto.response.card.*;
 import com.softeer.presentation.WeatherCardApi;
 import com.softeer.service.WeatherCardService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +41,15 @@ public class WeatherCardController implements WeatherCardApi {
     @Override
     public ResponseEntity<List<HourlyWeatherResponse>> hourlyWeatherForecasts(Long mountainId, LocalDateTime startDateTime) {
         return ResponseEntity.ok(weatherCardService.findForecastsByMountainId(mountainId, startDateTime));
+    }
+
+    @Override
+    public ResponseEntity<MountainCourseCardResponse> mountainCourse(Long courseId, LocalDateTime dateTime) {
+        return ResponseEntity.ok(weatherCardService.createMountainCourseCard(courseId, dateTime));
+    }
+
+    @Override
+    public ResponseEntity<CourseScheduleCardResponse> courseSchedule(Long courseId, Long userId, LocalDateTime startDateTime) {
+        return ResponseEntity.ok(weatherCardService.createCourseScheduleCard(courseId, userId, startDateTime));
     }
 }

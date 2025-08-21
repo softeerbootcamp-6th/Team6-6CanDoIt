@@ -1,10 +1,9 @@
 package com.softeer.presentation;
 
+import com.softeer.config.LoginUserId;
 import com.softeer.dto.response.CourseInfoResponse;
 import com.softeer.dto.response.HourlyWeatherResponse;
-import com.softeer.dto.response.card.CourseCardResponse;
-import com.softeer.dto.response.card.ForecastCardResponse;
-import com.softeer.dto.response.card.MountainCardResponse;
+import com.softeer.dto.response.card.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -126,8 +125,8 @@ public interface WeatherCardApi {
     - **weatherMetric**: 날씨 정보 객체
       - **precipitationType**: 강수 형태 (예: NONE, RAIN, SNOW 등)
       - **sky**: 하늘 상태 (예: SUNNY, CLOUDY, OVERCAST 등)  
-      - **surfaceTemperature**: 시작점 기온 (°C)  
-      - **topTemperature**: 정상 기온 (°C)  
+      - **sunrise**: 일출 시각
+      - **sunset**: 일몰 시각  
     - **hikingActivityStatus**: 산악활동지수 (예: 매우좋음, 보통, 나쁨 등)  
 
     ---
@@ -138,12 +137,8 @@ public interface WeatherCardApi {
       "courseImageUrl": "https://cdn.example.com/images/course01.png",
       "totalDuration": 2.5,
       "totalDistance": 4.8,
-      "weatherMetric": {
-        "precipitationType": "NONE",
-        "sky": "CLOUDY",
-        "surfaceTemperature": 21.3,
-        "topTemperature": 17.0
-      },
+      "sunrise": "05:51:00",
+      "sunset": "19:51:00",
       "hikingActivityStatus": "좋음"
     }
     ```
@@ -273,4 +268,142 @@ public interface WeatherCardApi {
     )
     @GetMapping("/mountain/{mountainId}/forecast")
     ResponseEntity<List<HourlyWeatherResponse>> hourlyWeatherForecasts(@PathVariable Long mountainId, @RequestParam LocalDateTime startDateTime);
+
+    @Operation(
+            summary = "산 코스 카드 + 일출/일몰 조회",
+            description = """
+    ### 🌄 **산/코스 정보와 일출·일몰 시각**
+    
+    해당 API는 특정 **등산 코스 ID**에 대해 **산 정보 + 코스 기본 정보 + 요청 날짜의 일출/일몰 시각**을 포함한 **카드 형태의 응답**을 제공합니다.
+    
+    ---
+    
+    #### 📌 **Query**
+    - **dateTime**: "2025-08-12T06:00:00" 형식.
+    
+    ---
+    
+    #### 📌 **Response 필드 설명 (MountainCourseCardResponse)**
+    - **mountainId**: 산 id (long)
+    - **mountainName**: 산 이름 (string)
+    - **mountainImageUrl**: 산 대표 이미지 URL (string)
+    - **courseId**: 코스 id (long)
+    - **courseName**: 코스 이름 (string)
+    - **distance**: 총 거리 (km, number)
+    - **duration**: 예상 소요 시간 (시간, number)
+    - **courseImageUrl**: 코스 대표 이미지 URL (string)
+    - **sunrise**: 일출 시각 (`HH:mm:ss`)
+    - **sunset**: 일몰 시각 (`HH:mm:ss`)
+    ---
+    
+    #### ✅ **성공 응답 예시 (HTTP 200)**
+    ```json
+    {
+      "mountainId": 12,
+      "mountainName": "치악산",
+      "mountainImageUrl": "https://cdn.example.com/images/chiak.png"
+      "courseId": 301,
+      "courseName": "비로봉 왕복 코스",
+      "courseImageUrl": "https://cdn.example.com/images/course301.png",
+      "distance": 8.6,
+      "duration": 4.2
+      "sunrise": "05:51:00",
+      "sunset": "19:51:00"
+    }
+    """)
+    @GetMapping("/mountain/course/{courseId}")
+    ResponseEntity<MountainCourseCardResponse> mountainCourse(
+            @PathVariable("courseId") Long courseId,
+            @RequestParam("dateTime") LocalDateTime dateTime
+    );
+
+    @Operation(
+            summary = "코스 등산 일정 카드 조회",
+            description = """
+    ### 🗺️ **코스 등산 일정 카드**
+    
+    지정한 **등산 코스**와 **출발 시각**을 기준으로, **예상 하산 시각**, **거리**,  
+    출발/정상 도착/하산 시작 시점의 **요약 예보**(기온·체감온도·풍속·강수확률·하늘상태·습도),  
+    그리고 요청 날짜의 **일출/일몰 시각**, **등산지수 상태**를 카드 형태로 반환합니다.
+    
+    ---
+                    
+    #### 🔐 **Authorization Header**
+    - **Authorization** (필수): `Bearer {JWT_TOKEN}` \s
+    → 누락 시 `JWT-001`: `"로그인이 필요한 서비스입니다."` 예외 발생
+    
+    ---
+    
+    #### 🔗 **Path Variable**
+    - **courseId** (필수): 코스 등산 일정을 조회할 코스의 id
+    
+    #### 📌 **Query**
+    - **date**: "2025-08-12T06:00:00" 형식.
+    
+    ---
+    
+    #### 📌 **Response (CourseScheduleCardResponse)**
+    - **date**: 등산 날짜
+    - **startTime**: 출발 시각
+    - **descentTime**: 예상 하산 시각
+    - **mountainName**: 산 이름
+    - **courseName**: 코스 이름
+    - **distance**: 총 거리(km)
+    - **startForecast / arrivalForecast / descentForecast**: 시점별 요약 예보
+      - **temperature**: 기온(°C)
+      - **windSpeed**: 풍속(m/s)
+      - **apparentTemperature**: 체감온도(°C)
+      - **precipitationProbability**: 강수확률(%)
+      - **sky**: 하늘 상태(설명)
+      - **humidity**: 습도(%)
+    - **sunrise / sunset**: 일출/일몰 시각 (`HH:mm:ss`)
+    - **hikingActivityStatus**: 등산지수 상태 (예: 매우좋음/좋음/보통/나쁨/매우나쁨)
+    
+    ---
+    
+    #### ✅ **성공 응답 예시 (HTTP 200)**
+    ```json
+    {
+      "date": "2025-08-19",
+      "startTime": "13:00:00",
+      "descentTime": "16:00:00",
+      "mountainName": "북한산",
+      "courseName": "백운대 코스",
+      "distance": 2.0,
+      "startForecast": {
+        "temperature": 28.0,
+        "windSpeed": 4.4,
+        "apparentTemperature": 30.0,
+        "precipitationProbability": 20.0,
+        "sky": "조금 흐린 하늘",
+        "humidity": 80.0
+      },
+      "arrivalForecast": {
+        "temperature": 30.0,
+        "windSpeed": 3.5,
+        "apparentTemperature": 31.3,
+        "precipitationProbability": 60.0,
+        "sky": "조금 흐린 하늘",
+        "humidity": 70.0
+      },
+      "descentForecast": {
+        "temperature": 28.0,
+        "windSpeed": 4.2,
+        "apparentTemperature": 29.3,
+        "precipitationProbability": 20.0,
+        "sky": "조금 흐린 하늘",
+        "humidity": 70.0
+      },
+      "sunrise": "05:51:00",
+      "sunset": "19:51:00",
+      "hikingActivityStatus": "나쁨"
+    }
+    """
+    )
+    @GetMapping("/mountain/course/{courseId}/schedule")
+    ResponseEntity<CourseScheduleCardResponse> courseSchedule(
+            @PathVariable("courseId") Long courseId,
+            @LoginUserId Long userId,
+            @RequestParam LocalDateTime startDateTime
+    );
 }

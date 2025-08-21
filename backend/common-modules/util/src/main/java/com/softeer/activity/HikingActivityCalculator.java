@@ -103,4 +103,26 @@ public final class HikingActivityCalculator {
             throw new IllegalArgumentException("유효하지 않은 산악활동지수 값입니다: " + calculatedValue);
         }
     }
+
+    public static double calculateTemperatureWithAltitude(double temperature, int lowAltitude, int highAltitude) {
+        if (lowAltitude == highAltitude) {
+            return Math.round(temperature * 10.0) / 10.0;
+        }
+
+        double temperatureChange = (highAltitude - lowAltitude) * 0.0065; // 기온 감소율: 0.0065 °C/m
+        double result = temperature - temperatureChange;
+
+        return Math.round(result * 10.0) / 10.0;
+    }
+
+    public static double calculateWindSpeedWithAltitude(double windSpeed, int lowAltitude, int highAltitude) {
+        if (lowAltitude == highAltitude) {
+            return Math.round(windSpeed * 10.0) / 10.0;
+        }
+
+        double windSpeedChange = (highAltitude - lowAltitude) * 0.001; // 풍속 증가율: 0.001 m/s/m
+        double result = windSpeed + windSpeedChange;
+
+        return Math.round(result * 10.0) / 10.0;
+    }
 }
