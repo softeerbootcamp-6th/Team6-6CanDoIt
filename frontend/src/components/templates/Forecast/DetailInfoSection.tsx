@@ -10,6 +10,7 @@ import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.
 import { DummyWeatherData } from './dummy.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { theme } from '../../../theme/theme.ts';
+import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
 
 const weatherDataList = [
     {
@@ -40,6 +41,7 @@ const weatherDataList = [
 
 export default function DetailInfoSection() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isCard, setIsCard] = useState<boolean>(false);
 
     const handleCardClick = () => {
         setIsOpen((prev) => !prev);
@@ -53,7 +55,10 @@ export default function DetailInfoSection() {
         <div css={wrapperStyles}>
             <div css={wholeWrapper}>
                 <div css={contentSectionStyles}>
-                    <button css={storeBtnStyles}>
+                    <button
+                        css={storeBtnStyles}
+                        onClick={() => setIsCard(true)}
+                    >
                         <Icon
                             name='download-02'
                             width={1.4}
@@ -89,6 +94,9 @@ export default function DetailInfoSection() {
                         type='시작지점'
                         onClose={handleSidebarClose}
                     />
+                )}
+                {isCard && (
+                    <WeatherCardModal onClose={() => setIsCard(false)} />
                 )}
             </div>
         </div>
