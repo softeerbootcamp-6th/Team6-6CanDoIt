@@ -2,13 +2,13 @@ package com.softeer.shortterm;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 
 @Slf4j
 public class ShortForecastApiCaller extends AbstractShortForecastApiCaller {
 
-    public ShortForecastApiCaller(WebClient webClient) {
-        super(webClient);
+    public ShortForecastApiCaller(RestClient restClient) {
+        super(restClient);
     }
 
     @Override

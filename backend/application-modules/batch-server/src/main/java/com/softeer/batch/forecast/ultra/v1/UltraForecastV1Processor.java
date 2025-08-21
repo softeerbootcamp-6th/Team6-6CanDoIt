@@ -10,17 +10,15 @@ import com.softeer.entity.enums.WindDirection;
 import com.softeer.shortterm.UltraForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
-import com.softeer.throttle.manager.SimpleRetryHandler;
+import com.softeer.throttle.manager.retry.SimpleRetryHandler;
 import com.softeer.time.ApiTime;
 import com.softeer.time.ApiTimeUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.UnknownContentTypeException;
 
 import java.time.LocalDateTime;
 import java.util.*;

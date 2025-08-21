@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.function.Function;
@@ -26,21 +25,21 @@ class MountainForecastApiCallerTest {
     private MountainForecastApiCaller target;
 
     @Mock
-    private WebClient webClient;
+    private RestClient webClient;
 
     @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    private RestClient.RequestHeadersUriSpec requestHeadersUriSpec;
     @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
+    private RestClient.RequestHeadersSpec requestHeadersSpec;
     @Mock
-    private WebClient.ResponseSpec responseSpec;
+    private RestClient.ResponseSpec responseSpec;
 
     @BeforeEach
     void setUp() {
         target = new MountainForecastApiCaller(webClient);
     }
 
-//    @Test
+    @Test
     @DisplayName("산악 날씨 API를 성공적으로 호출하고 응답 데이터를 파싱해야 한다")
     void call_api_successfully_and_parse_response() {
         // given
@@ -60,7 +59,7 @@ class MountainForecastApiCallerTest {
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(any(Function.class))).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(ArgumentMatchers.<ParameterizedTypeReference<List<MountainForecastApiResponse>>>any()).block())
+        when(responseSpec.body(ArgumentMatchers.<ParameterizedTypeReference<List<MountainForecastApiResponse>>>any()))
                 .thenReturn(expectedResponseList);
 
         // when

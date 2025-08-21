@@ -8,7 +8,6 @@ import io.github.bucket4j.*;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -18,11 +17,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Slf4j
-@RequiredArgsConstructor
-public class ThrottlingManager {
+public abstract class AbstractThrottlingManager {
+
+    protected final ThrottlingProperties properties;
 
     private final ProxyManager<String> proxyManager;
-    private final ThrottlingProperties properties;
     private final BackoffStrategy backoffStrategy;
 
     private final ScheduledExecutorService retryExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
@@ -31,18 +30,25 @@ public class ThrottlingManager {
         return t;
     });
 
-    private final AtomicInteger currentTps = new AtomicInteger();
+    protected final AtomicInteger currentTps = new AtomicInteger();
     private final AtomicInteger successCount = new AtomicInteger();
 
     private final ReentrantLock configurationLock = new ReentrantLock();
-    private final AtomicInteger lastUpdatedTps = new AtomicInteger(-1);
+    private final AtomicInteger lastUpdatedTps = new AtomicInteger();
 
     private volatile boolean shutdown = false;
     private volatile Bucket bucket;
 
+    public AbstractThrottlingManager(ProxyManager<String> proxyManager, ThrottlingProperties properties, BackoffStrategy backoffStrategy) {
+        this.proxyManager = proxyManager;
+        this.properties = properties;
+        this.backoffStrategy = backoffStrategy;
+    }
+
     @PostConstruct
     public void initialize() {
         currentTps.set(properties.initialTps());
+        lastUpdatedTps.set(currentTps.get());
     }
 
     @PreDestroy
@@ -63,16 +69,6 @@ public class ThrottlingManager {
         log.info("GreedyThrottlingManager 종료 완료");
     }
 
-    /**
-     * Submit a task to be executed asynchronously.
-     * The task is executed immediately if a token is available.
-     * If not, it is added to a retry queue with a backoff strategy.
-     *
-     * @param key The key to identify the bucket for throttling.
-     * @param task The task to be executed, wrapped in a CompletableFuture supplier.
-     * @param <T> The type of the result.
-     * @return A CompletableFuture that will be completed when the task is done.
-     */
     public <T> CompletableFuture<T> submit(String key, Supplier<CompletableFuture<T>> task) {
         if (shutdown) {
             CompletableFuture<T> future = new CompletableFuture<>();
@@ -146,26 +142,49 @@ public class ThrottlingManager {
         }
 
         long delay = backoffStrategy.computeDelay(task.attempt());
-        log.debug("백오프 재시도 예약. key: {}, attempt: {}, delay: {}ms", task.key(), task.attempt(), delay);
+        log.info("백오프 재시도 예약. key: {}, attempt: {}, delay: {}ms", task.key(), task.attempt(), delay);
 
         retryExecutor.schedule(() -> executeOrRetry(task), delay, TimeUnit.MILLISECONDS);
     }
+
+    private void adjustTps(boolean success) {
+        int oldTps = currentTps.get();
+        int newTps;
+
+        if (success) {
+            int successCounter = successCount.incrementAndGet();
+            if (successCounter >= oldTps && successCounter % oldTps == 0) {
+                successCount.set(0);
+                newTps = Math.min(properties.maxTps(), oldTps + 1);
+
+                if (currentTps.compareAndSet(oldTps, newTps)) {
+                    log.info("TPS 상향 조정: {} -> {} ({}회 연속 성공)", oldTps, newTps, successCounter);
+                    updateBucketConfiguration();
+                }
+            }
+        } else {
+            successCount.set(0);
+            newTps = Math.max(properties.minTps(), oldTps - properties.failStep());
+
+            if (currentTps.compareAndSet(oldTps, newTps)) {
+                updateBucketConfiguration();
+            }
+        }
+    }
+
+    protected abstract Bandwidth createBandwidth();
 
     private Bucket getBucket(String key) {
         if (bucket == null) {
             if (configurationLock.tryLock()) {
                 try {
-                    if (bucket == null) { // Double-check
+                    if (bucket == null) {
                         log.debug("버킷 초기 생성. key: {}, 초기 TPS: {}", key, properties.initialTps());
 
-                        Bandwidth initialBandwidth = Bandwidth.builder()
-                                .capacity(properties.maxTps())
-                                .refillGreedy(properties.initialTps(), Duration.ofSeconds(1))
-                                .initialTokens(0)
-                                .build();
+                        Bandwidth newBandwidth = createBandwidth();
 
                         BucketConfiguration configuration = BucketConfiguration.builder()
-                                .addLimit(initialBandwidth)
+                                .addLimit(newBandwidth)
                                 .build();
 
                         bucket = proxyManager.builder().build(key, () -> configuration);
@@ -179,10 +198,9 @@ public class ThrottlingManager {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
                     throw new RuntimeException("버킷 생성 중 인터럽트 발생", e);
                 }
-                return getBucket(key); // 재귀 호출
+                return getBucket(key);
             }
         }
         return bucket;
@@ -195,16 +213,14 @@ public class ThrottlingManager {
             return;
         }
 
-        // 락 획득 시도 (non-blocking)
         if (configurationLock.tryLock()) {
             try {
-                // Double-check: 락 획득 후 다시 확인
+
                 if (lastUpdatedTps.get() == currentTpsValue) {
                     return;
                 }
 
-                log.debug("버킷 설정 업데이트 시작. 이전 TPS: {} -> 새 TPS: {}",
-                        lastUpdatedTps.get(), currentTpsValue);
+                log.info("버킷 설정 업데이트 시작. 이전 TPS: {} -> 새 TPS: {}", lastUpdatedTps.get(), currentTpsValue);
 
                 Bandwidth newBandwidth = Bandwidth.builder()
                         .capacity(properties.maxTps())
@@ -231,32 +247,4 @@ public class ThrottlingManager {
             log.debug("다른 스레드가 버킷 설정 업데이트 중. TPS: {}", currentTpsValue);
         }
     }
-
-    private void adjustTps(boolean success) {
-        int oldTps = currentTps.get();
-        int newTps;
-
-        if (success) {
-            int successCounter = successCount.incrementAndGet();
-            if (successCounter >= oldTps && successCounter % oldTps == 0) {
-                successCount.set(0);
-                newTps = Math.min(properties.maxTps(), oldTps + 1);
-
-                if (currentTps.compareAndSet(oldTps, newTps)) {
-                    log.info("TPS 상향 조정: {} -> {} ({}회 연속 성공)", oldTps, newTps, successCounter);
-                    updateBucketConfiguration();
-                }
-            }
-        } else {
-            successCount.set(0);
-            newTps = Math.max(properties.minTps(), oldTps - properties.failStep());
-
-            if (currentTps.compareAndSet(oldTps, newTps)) {
-                log.info("TPS 하향 조정: {} -> {} (실패 감지)", oldTps, newTps);
-                updateBucketConfiguration();
-            }
-        }
-    }
-
-
 }
