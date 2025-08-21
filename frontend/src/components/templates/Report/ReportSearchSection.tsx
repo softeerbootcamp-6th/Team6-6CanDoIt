@@ -1,6 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
 import { css } from '@emotion/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type {
     MountainCourse,
     MountainData,
@@ -8,10 +8,11 @@ import type {
 import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
-} from '../Main/utils/utils.ts';
+} from '../Main/utils.ts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import FilterModal from '../../organisms/Report/FilterModal.tsx';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 interface Option {
     id: string;
@@ -19,23 +20,53 @@ interface Option {
 }
 
 export default function ReportSearchSection() {
-    const [coursesData, setCoursesData] = useState<MountainCourse[]>([]);
-    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const mountainId = searchParams.get('mountainid');
     const courseId = searchParams.get('courseid');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        setMountainsData(MountainsData);
-        setCoursesData(initCoursesData);
-    }, []);
+    const { data: mountainsData } = useApiQuery<MountainData[]>(
+        '/card/mountain',
+        {},
+        {
+            placeholderData: MountainsData,
+            retry: false,
+        },
+    );
+    const { data: coursesData } = useApiQuery<MountainCourse[]>(
+        `/card/mountain/${mountainId}/course`,
+        {},
+        {
+            placeholderData: initCoursesData,
+            enabled: !!mountainId,
+            retry: false,
+        },
+    );
+    const { data: filterColumn } = useApiQuery(
+        '/card/interaction/keyword',
+        {},
+        {
+            placeholderData: filterKeywords,
+            retry: false,
+        },
+    );
 
-    const mountainOptions: Option[] =
-        refactorMountainDataToOptions(mountainsData);
-    const courseOptions: Option[] = refactorCoursesDataToOptions(coursesData);
+    const mountainOptions: Option[] = refactorMountainDataToOptions(
+        mountainsData ?? [],
+    );
+    const courseOptions: Option[] = refactorCoursesDataToOptions(
+        coursesData ?? [],
+    );
+
+    const mountainChangeHandler = (mountain: Option) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('mountainId', mountain.id);
+            return next;
+        });
+    };
 
     const submitHandler = (values: {
         mountainId: string;
@@ -46,9 +77,7 @@ export default function ReportSearchSection() {
             `/report?mountainid=${values.mountainId}&courseid=${values.courseId}`,
         );
     };
-    const mountainChangeHandler = (data: Option) => {
-        // 선택한 산에 해당하는 코스 데이터를 가져올 예정, setCoursesData를 통해 상태 업데이트
-    };
+
     const filterClickHandler = (e: React.MouseEvent<HTMLElement>) => {
         setFilterAnchor(e.currentTarget);
         setIsFilterModalOpen(true);
@@ -84,7 +113,7 @@ export default function ReportSearchSection() {
                         onClose={() => setIsFilterModalOpen(false)}
                         title='필터'
                         description='원하는 날씨 조건을 선택하세요'
-                        filterColumn={filterColumn}
+                        filterColumn={filterColumn ?? filterKeywords}
                         anchorElement={filterAnchor}
                     />
                 </>
@@ -183,7 +212,7 @@ const MountainsData = [
     },
 ];
 
-const filterColumn = {
+const filterKeywords = {
     weatherKeywords: [
         { id: 0, description: '화창해요' },
         { id: 1, description: '구름이 많아요' },
