@@ -4,12 +4,13 @@ import { css } from '@emotion/react';
 
 interface propsState {
     count: number;
+    onHeartClick: () => void;
 }
 
-export default function HeartStat({ count }: propsState) {
+export default function HeartStat({ count, onHeartClick }: propsState) {
     return (
         <div css={heartStyle}>
-            <button css={buttonStyle}>
+            <button css={buttonStyle} onClick={onHeartClick}>
                 <Icon {...heartIconProps} />
             </button>
             <CommonText TextTag='span' fontSize='body' fontWeight='bold'>
