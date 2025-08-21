@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.softeer.batch.forecast.shortterm.config.ShortForecastJobConfig.SHORT_SIMPLE_RETRY_HANDLER;
+import static com.softeer.batch.common.support.BatchNames.Handlers.SHORT_SIMPLE_RETRY_HANDLER;
 
 @Slf4j
 @Component
