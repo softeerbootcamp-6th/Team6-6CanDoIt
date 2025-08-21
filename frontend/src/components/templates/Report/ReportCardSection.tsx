@@ -14,6 +14,7 @@ import {
 } from './utils.ts';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 type ReportType = 'WEATHER' | 'SAFE';
 
@@ -43,6 +44,7 @@ export default function ReportCardSection() {
     const [reportType, setReportType] = useState<ReportType>('WEATHER');
     const [flippedCardId, setFlippedCardId] = useState<number | null>(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [validationError, setValidationError] = useState<string>('');
     const [searchParams] = useSearchParams();
     const mountainId = searchParams.get('mountainid');
     const courseId = searchParams.get('courseid');
@@ -93,11 +95,41 @@ export default function ReportCardSection() {
         },
     );
 
+    const formValidation = (formData: FormData) => {
+        const imageFile = formData.get('image') as File;
+        if (!imageFile || !imageFile.type.startsWith('image/')) {
+            return '이미지 파일을 업로드해주세요';
+        }
+
+        const content = formData.get('content') as string;
+        if (!content || content.trim() === '') {
+            return '제보 내용을 입력해주세요';
+        }
+
+        const weatherKeywords = formData.getAll('weatherKeywords');
+        const rainKeywords = formData.getAll('rainKeywords');
+        const etceteraKeywords = formData.getAll('etceteraKeywords');
+        if (
+            weatherKeywords.length === 0 &&
+            rainKeywords.length === 0 &&
+            etceteraKeywords.length === 0
+        ) {
+            return '키워드를 선택해주세요';
+        }
+
+        return '';
+    };
+
     const reportModalSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const form = e.currentTarget;
         const formData = new FormData(form);
+
+        const validationErr = formValidation(formData);
+        setValidationError(validationErr);
+        if (validationErr) return;
+
         const ids = (keyword: string) =>
             formData.getAll(keyword).map((id) => Number(id));
 
@@ -137,6 +169,7 @@ export default function ReportCardSection() {
             <div css={reportTitleStyle}>
                 <HeadlineHeading HeadingTag='h2'>{title}</HeadlineHeading>
                 <ToggleButton
+                    isOn={reportType === 'SAFE'}
                     onClick={() => reportCardSectionToggleButtonHandler()}
                 />
                 <ChipButton
@@ -152,6 +185,11 @@ export default function ReportCardSection() {
                     onClose={() => setIsReportModalOpen(false)}
                     onSubmit={reportModalSubmitHandler}
                 />
+                {validationError && (
+                    <Modal onClose={() => setValidationError('')}>
+                        {validationError}
+                    </Modal>
+                )}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
                 {cardsData.map((card) => {
