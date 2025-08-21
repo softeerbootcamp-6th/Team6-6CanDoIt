@@ -1,5 +1,5 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type {
     MountainCourse,
     MountainData,
@@ -8,8 +8,9 @@ import {
     createHandleSubmit,
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
-} from './utils/utils.ts';
-import { useNavigate } from 'react-router-dom';
+} from './utils.ts';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 interface PropsState {
     onFormValidChange: (isValid: boolean) => void;
@@ -22,26 +23,55 @@ interface Option {
 
 export default function MainSearchSection(props: PropsState) {
     const { onFormValidChange } = props;
-    const [coursesData, setCoursesData] = useState<MountainCourse[]>([]);
-    const [mountainsData, setMountainsData] = useState<MountainData[]>([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const selectedMountainId = searchParams.get('mountainId');
+
+    const { data: mountainsData, failureReason: mountainFailReason } =
+        useApiQuery<MountainData[]>(
+            '/card/mountain',
+            {},
+            {
+                placeholderData: MountainsData,
+                retry: false,
+            },
+        );
+    const { data: coursesData, failureReason: courseFailReason } = useApiQuery<
+        MountainCourse[]
+    >(
+        `/card/mountain/${selectedMountainId}/course`,
+        {},
+        {
+            placeholderData: initCoursesData,
+            enabled: !!selectedMountainId,
+            retry: false,
+        },
+    );
+
+    const mountainChangeHandler = (mountain: Option) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('mountainId', mountain.id);
+            return next;
+        });
+    };
+
     useEffect(() => {
-        setMountainsData(MountainsData);
-        setCoursesData(initCoursesData);
-    }, []);
+        console.log(mountainFailReason);
+        console.log(courseFailReason);
+    }, [mountainFailReason, courseFailReason]);
 
-    const mountainOptions: Option[] =
-        refactorMountainDataToOptions(mountainsData);
-
-    const courseOptions: Option[] = refactorCoursesDataToOptions(coursesData);
+    const mountainOptions: Option[] = refactorMountainDataToOptions(
+        mountainsData ?? [],
+    );
+    const courseOptions: Option[] = refactorCoursesDataToOptions(
+        coursesData ?? [],
+    );
 
     const navigate = useNavigate();
-    const handleSubmit = createHandleSubmit({
+    const submitHandler = createHandleSubmit({
         onFormValidChange,
         navigate,
     });
-    const handleMountainChange = (data: Option) => {
-        // 선택한 산에 해당하는 코스 데이터를 가져올 예정, setCoursesData를 통해 상태 업데이트
-    };
 
     return (
         <SearchBar
@@ -51,8 +81,8 @@ export default function MainSearchSection(props: PropsState) {
             mountainOptions={mountainOptions}
             courseOptions={courseOptions}
             weekdayOptions={weekdayData}
-            onSubmit={handleSubmit}
-            onMountainChange={handleMountainChange}
+            onSubmit={submitHandler}
+            onMountainChange={mountainChangeHandler}
         />
     );
 }
