@@ -1,8 +1,8 @@
 import type {
     MountainCourse,
     MountainData,
-} from '../../../../types/mountainTypes';
-import { convertToIconName } from '../../../../utils/utils.ts';
+} from '../../../types/mountainTypes';
+import { convertToIconName } from '../../../utils/utils.ts';
 
 export function refactorMountainsData(data: MountainData[]) {
     return data.map((mountain) => ({
