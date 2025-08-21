@@ -1,4 +1,4 @@
-package com.softeer.throttle.manager;
+package com.softeer.throttle.manager.retry;
 
 import com.softeer.throttle.BackoffStrategy;
 import com.softeer.throttle.ex.ThrottleException;

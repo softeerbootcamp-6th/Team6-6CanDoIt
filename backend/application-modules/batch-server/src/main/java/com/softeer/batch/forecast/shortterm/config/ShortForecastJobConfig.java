@@ -7,7 +7,7 @@ import com.softeer.batch.forecast.shortterm.writer.ScheduledShortForecastWriter;
 import com.softeer.batch.forecast.shortterm.writer.StartUpShortForecastWriter;
 import com.softeer.domain.Grid;
 import com.softeer.throttle.BackoffStrategy;
-import com.softeer.throttle.manager.SimpleRetryHandler;
+import com.softeer.throttle.manager.retry.SimpleRetryHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
