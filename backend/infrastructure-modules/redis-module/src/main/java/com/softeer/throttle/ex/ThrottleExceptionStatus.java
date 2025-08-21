@@ -1,4 +1,4 @@
-package com.softeer.throttle;
+package com.softeer.throttle.ex;
 
 public enum ThrottleExceptionStatus {
     RETRY,

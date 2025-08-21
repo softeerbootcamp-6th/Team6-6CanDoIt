@@ -1,7 +1,8 @@
-package com.softeer.batch.forecast.ultra.v1;
+package com.softeer.batch.forecast.ultra.v2;
 
-import com.softeer.batch.forecast.ultra.dto.UltraForecastResponseList;
 import com.softeer.batch.forecast.ultra.dto.UltraForecastResponse;
+import com.softeer.batch.forecast.ultra.dto.UltraForecastResponseList;
+import com.softeer.batch.forecast.ultra.v1.UltraForecastV1JobConfig;
 import com.softeer.batch.mapper.ForecastMapper;
 import com.softeer.domain.Grid;
 import com.softeer.entity.enums.PrecipitationType;
@@ -10,39 +11,42 @@ import com.softeer.entity.enums.WindDirection;
 import com.softeer.shortterm.UltraForecastApiCaller;
 import com.softeer.shortterm.dto.request.ShortForecastApiRequest;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
-import com.softeer.throttle.manager.SimpleRetryHandler;
+import com.softeer.throttle.manager.AsyncRetryHandler;
 import com.softeer.time.ApiTime;
 import com.softeer.time.ApiTimeUtil;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.UnknownContentTypeException;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-import static com.softeer.batch.forecast.ultra.v1.UltraForecastV1JobConfig.*;
+import static com.softeer.batch.forecast.ultra.v2.UltraForecastV2JobConfig.SCHEDULED_ULTRA_FORECAST_V2_EX_SERVICE;
 
 @Slf4j
 @Component
 @StepScope
-public class UltraForecastV1Processor implements ItemProcessor<Grid, UltraForecastResponseList> {
-
+public class UltraForecastV2Processor implements ItemProcessor<Grid, CompletableFuture<UltraForecastResponseList>> {
     private final UltraForecastApiCaller kmaApiCaller;
     private final ForecastMapper forecastMapper;
-    private final SimpleRetryHandler simpleRetryHandler;
+    private final AsyncRetryHandler asyncRetryHandler;
+    private final ExecutorService executorService;
 
-    public UltraForecastV1Processor(UltraForecastApiCaller kmaApiCaller,
-                                    ForecastMapper forecastMapper,
-                                    @Qualifier(ULTRA_SIMPLE_RETRY_HANDLER) SimpleRetryHandler simpleRetryHandler) {
+    public UltraForecastV2Processor(UltraForecastApiCaller kmaApiCaller,
+                                    ForecastMapper forecastMapper, AsyncRetryHandler asyncRetryHandler,
+                                    @Qualifier(SCHEDULED_ULTRA_FORECAST_V2_EX_SERVICE) ExecutorService executorService) {
         this.kmaApiCaller = kmaApiCaller;
         this.forecastMapper = forecastMapper;
-        this.simpleRetryHandler = simpleRetryHandler;
+        this.asyncRetryHandler = asyncRetryHandler;
+        this.executorService = executorService;
     }
 
     @Value("${kma.api.key.short}")
@@ -51,8 +55,9 @@ public class UltraForecastV1Processor implements ItemProcessor<Grid, UltraForeca
     @Value("#{jobParameters[dateTime]}")
     private LocalDateTime dateTime;
 
+
     @Override
-    public UltraForecastResponseList process(Grid grid) {
+    public CompletableFuture<UltraForecastResponseList> process(Grid grid) throws Exception {
         ApiTime ultraBaseTime = ApiTimeUtil.getUltraBaseTime(dateTime);
 
         ShortForecastApiRequest request = new ShortForecastApiRequest(
@@ -66,13 +71,15 @@ public class UltraForecastV1Processor implements ItemProcessor<Grid, UltraForeca
                 grid.y()
         );
 
-        return simpleRetryHandler.submit(ULTRA_FORECAST, () -> {
-            List<ShortForecastItem> items = kmaApiCaller.call(request);
-            return processApiResponse(grid, items);
-        });
+        return asyncRetryHandler.submitAsync(
+                UltraForecastV1JobConfig.ULTRA_FORECAST,
+                () -> processApiResponse(grid, kmaApiCaller.call(request))
+        , executorService);
     }
 
     private UltraForecastResponseList processApiResponse(Grid grid, List<ShortForecastItem> items) {
+
+
         Map<LocalDateTime, List<ShortForecastItem>> groupedByTime = items.stream()
                 .collect(Collectors.groupingBy(item -> LocalDateTime.of(
                         item.forecastDate(),
