@@ -8,9 +8,9 @@ import java.util.Set;
 
 public abstract class AbstractKmaApiCaller<R> implements KmaApiCaller<R> {
 
-    // 재시도 가능한 에러 코드들
     protected static final Set<String> RETRYABLE_ERROR_CODES = Set.of(
-            "22"
+            "22",
+            "04"
     );
 
     protected final WebClient webClient;
