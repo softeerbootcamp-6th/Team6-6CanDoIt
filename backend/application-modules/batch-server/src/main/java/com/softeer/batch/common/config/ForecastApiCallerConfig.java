@@ -12,21 +12,17 @@ import org.springframework.web.client.RestClient;
 public class ForecastApiCallerConfig {
 
     @Bean
-    public MountainForecastApiCaller mountainForecastApiCaller(
-            @Qualifier("mountainForecastApiRestClient") RestClient restClient
-    ) {
+    public MountainForecastApiCaller mountainForecastApiCaller(RestClient restClient) {
         return new MountainForecastApiCaller(restClient);
     }
 
     @Bean
-    public ShortForecastApiCaller shortForecastApiCaller(
-            @Qualifier("kmaPublicApiRestClient") RestClient restClient
-    ) {
+    public ShortForecastApiCaller shortForecastApiCaller(RestClient restClient) {
         return new ShortForecastApiCaller(restClient);
     }
 
     @Bean
-    public UltraForecastApiCaller ultraForecastApiCaller(@Qualifier("kmaPublicApiRestClient") RestClient restClient
+    public UltraForecastApiCaller ultraForecastApiCaller(RestClient restClient
     ) {
         return new UltraForecastApiCaller(restClient);
     }
