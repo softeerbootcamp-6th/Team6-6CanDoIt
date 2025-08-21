@@ -4,20 +4,29 @@ import LabelList from '../../molecules/ReportCard/LabelList.tsx';
 import ReportCardWrapper from './ReportCardWrapper.tsx';
 import BackReportCardHeader from '../../molecules/ReportCard/BackReportCardHeader.tsx';
 
-interface propsState {
+interface PropsState {
     comment: string;
-    minutesAgo: number;
-    heartCount?: number;
+    timeAgo: string;
+    likeCount?: number;
     filterLabels: string[];
+    onHeartClick: () => void;
+    onClick: () => void;
 }
 
-export default function BackReportCard(props: propsState) {
-    const { comment, minutesAgo, heartCount = 0, filterLabels } = props;
+export default function BackReportCard(props: PropsState) {
+    const {
+        comment,
+        timeAgo,
+        likeCount = 0,
+        filterLabels,
+        onHeartClick,
+        onClick,
+    } = props;
     return (
-        <ReportCardWrapper>
-            <BackReportCardHeader minutesAgo={minutesAgo} />
+        <ReportCardWrapper onClick={onClick}>
+            <BackReportCardHeader timeAgo={timeAgo} />
             <CommonText {...textProps}>{comment}</CommonText>
-            <HeartStat count={heartCount} />
+            <HeartStat count={likeCount} onHeartClick={onHeartClick} />
             <LabelList labels={filterLabels} isCut={false} />
         </ReportCardWrapper>
     );

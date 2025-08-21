@@ -1,17 +1,25 @@
 import { css } from '@emotion/react';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 
-export default function ChipsRow({
-    hidden = false,
-    items = defaultChipItems,
-}: {
+interface PropsState {
     hidden?: boolean;
     items?: { text: string; iconName: string }[];
-}) {
+    onFilterClick?: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+export default function SearchSectionChipsRow({
+    hidden = false,
+    items = defaultChipItems,
+    onFilterClick,
+}: PropsState) {
     return (
         <div css={hidden ? chipsCloneStyle : chipsStyle}>
-            {items.map((it) => (
-                <ChipButton text={it.text} iconName={it.iconName} />
+            {items.map((item) => (
+                <ChipButton
+                    onClick={item.text === '필터' ? onFilterClick : undefined}
+                    text={item.text}
+                    iconName={item.iconName}
+                />
             ))}
         </div>
     );

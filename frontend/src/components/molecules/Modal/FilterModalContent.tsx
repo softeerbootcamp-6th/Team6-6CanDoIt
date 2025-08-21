@@ -1,23 +1,30 @@
 import LabelButtonsColumn from '../../organisms/Report/LabelButtonsColumn.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import type { FilterColumn, Keyword } from '../../../types/FilterTypes';
 
-interface FilterColumn {
-    title: string;
-    filterLabels: string[];
+interface PropsState {
+    filterColumn: FilterColumn;
+    selectedKeywords: Record<Keyword, number[]>;
+    updateSelectedKeywords: (keyword: Keyword, selectedIds: number[]) => void;
 }
 
-interface propsState {
-    filterColumns: FilterColumn[];
-}
-
-export default function FilterModalContent({ filterColumns }: propsState) {
+export default function FilterModalContent({
+    filterColumn,
+    selectedKeywords,
+    updateSelectedKeywords,
+}: PropsState) {
     return (
         <div css={filterContentStyle}>
-            {filterColumns?.map((column) => (
+            {(Object.keys(filterColumn) as Keyword[]).map((keyword) => (
                 <LabelButtonsColumn
-                    title={column.title}
-                    filterLabels={column.filterLabels}
+                    key={keyword}
+                    keyword={keyword}
+                    filterLabels={filterColumn[keyword]}
+                    selectedIds={selectedKeywords[keyword]}
+                    onSelectionChange={(selectedIds) =>
+                        updateSelectedKeywords(keyword, selectedIds)
+                    }
                 />
             ))}
         </div>
