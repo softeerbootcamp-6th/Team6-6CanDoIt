@@ -9,16 +9,24 @@ interface PropsState {
     timeAgo: string;
     likeCount?: number;
     filterLabels: string[];
+    onHeartClick: () => void;
     onClick: () => void;
 }
 
 export default function BackReportCard(props: PropsState) {
-    const { comment, timeAgo, likeCount = 0, filterLabels, onClick } = props;
+    const {
+        comment,
+        timeAgo,
+        likeCount = 0,
+        filterLabels,
+        onHeartClick,
+        onClick,
+    } = props;
     return (
         <ReportCardWrapper onClick={onClick}>
             <BackReportCardHeader timeAgo={timeAgo} />
             <CommonText {...textProps}>{comment}</CommonText>
-            <HeartStat count={likeCount} />
+            <HeartStat count={likeCount} onHeartClick={onHeartClick} />
             <LabelList labels={filterLabels} isCut={false} />
         </ReportCardWrapper>
     );

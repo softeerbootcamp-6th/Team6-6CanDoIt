@@ -3,7 +3,7 @@ import FrontReportCard from '../../organisms/Report/FrontReportCard.tsx';
 import { css } from '@emotion/react';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import ToggleButton from '../../atoms/Button/ToggleButton.tsx';
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportModal from '../../organisms/Report/ReportModal.tsx';
@@ -12,6 +12,10 @@ import {
     getCurrentTime,
     filterGatherer,
 } from './utils.ts';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
+import useApiMutation from '../../../hooks/useApiMutation.ts';
+
+type ReportType = 'WEATHER' | 'SAFE';
 
 interface CardData {
     reportId: number;
@@ -26,10 +30,17 @@ interface CardData {
     rainKeywords?: string[];
     etceteraKeywords?: string[];
 }
+interface ReportFormData {
+    courseId: number;
+    type: ReportType;
+    content: string;
+    weatherKeywords: number[];
+    rainKeywords: number[];
+    etceteraKeywords: number[];
+}
 
 export default function ReportCardSection() {
-    const [reportType, setReportType] = useState('weather');
-    const [cardsData, setCardsData] = useState<CardData[]>([]);
+    const [reportType, setReportType] = useState<ReportType>('WEATHER');
     const [flippedCardId, setFlippedCardId] = useState<number | null>(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [searchParams] = useSearchParams();
@@ -37,27 +48,87 @@ export default function ReportCardSection() {
     const courseId = searchParams.get('courseid');
 
     const title =
-        reportType === 'weather' ? '실시간 날씨 제보' : '실시간 안전 제보';
+        reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
     const currentTime = getCurrentTime();
+
+    const { data: filterColumn } = useApiQuery(
+        '/card/interaction/keyword',
+        {},
+        {
+            placeholderData: filterKeywords,
+            retry: false,
+        },
+    );
+    const { data: cardsData = initCardData } = useApiQuery<CardData[]>(
+        `/card/interaction/report/${courseId}`,
+        { reportType },
+        {
+            placeholderData: initCardData,
+            retry: false,
+        },
+    );
+    const reportMutation = useApiMutation<FormData, any>(
+        '/card/interaction/report',
+        'POST',
+        {
+            onSuccess: () => {
+                setIsReportModalOpen(false);
+                setFlippedCardId(null);
+            },
+            onError: (error) => {
+                console.error('Report submission failed:', error);
+            },
+        },
+    );
+    const cardLikeMutation = useApiMutation(
+        `/card/interaction/report/like/${flippedCardId}`,
+        'POST',
+        {
+            onSuccess: () => {
+                console.log('Like action successful');
+            },
+            onError: (error) => {
+                console.error('Like action failed:', error);
+            },
+        },
+    );
 
     const reportModalSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const form = e.currentTarget;
         const formData = new FormData(form);
+        const ids = (keyword: string) =>
+            formData.getAll(keyword).map((id) => Number(id));
+
+        const requestData: ReportFormData = {
+            courseId: Number(courseId),
+            type: reportType,
+            content: formData.get('content') as string,
+            weatherKeywords: ids('weatherKeywords'),
+            rainKeywords: ids('rainKeywords'),
+            etceteraKeywords: ids('etceteraKeywords'),
+        };
+        const imageFile = formData.get('image') as File;
+
+        const payload = new FormData();
+        payload.append(
+            'request',
+            new Blob([JSON.stringify(requestData)], {
+                type: 'application/json',
+            }),
+        );
+        payload.append('imageFile', imageFile);
+        reportMutation.mutate(payload);
     };
 
     const reportCardSectionToggleButtonHandler = () => {
-        setReportType((prev) => (prev === 'weather' ? 'safety' : 'weather'));
+        setReportType((prev) => (prev === 'WEATHER' ? 'SAFE' : 'WEATHER'));
     };
 
     const wheelHandler = (event: React.WheelEvent<HTMLDivElement>) => {
         event.currentTarget.scrollLeft += Number(event.deltaY);
     };
-
-    useEffect(() => {
-        setCardsData(initCardData);
-    }, [courseId]);
 
     if (!mountainId || !courseId) return null;
 
@@ -76,8 +147,7 @@ export default function ReportCardSection() {
                 <ReportModal
                     title='실시간 날씨 제보하기'
                     description='실시간 날씨를 제보하려면 코스 근처에 있어야 해요. 사진은 6시간 이내에 촬영된 사진만 업로드 가능해요.'
-                    filterColumn={filterColumn}
-                    type={reportType}
+                    filterColumn={filterColumn ?? filterKeywords}
                     isOpen={isReportModalOpen}
                     onClose={() => setIsReportModalOpen(false)}
                     onSubmit={reportModalSubmitHandler}
@@ -102,6 +172,7 @@ export default function ReportCardSection() {
                             likeCount={card.likeCount}
                             filterLabels={filterLabels}
                             onClick={() => setFlippedCardId(null)}
+                            onHeartClick={() => cardLikeMutation.mutate({})}
                         />
                     ) : (
                         <FrontReportCard
@@ -144,7 +215,7 @@ const reportTitleStyle = css`
     gap: 1.5rem;
 `;
 
-const filterColumn = {
+const filterKeywords = {
     weatherKeywords: [
         { id: 0, description: '화창해요' },
         { id: 1, description: '구름이 많아요' },

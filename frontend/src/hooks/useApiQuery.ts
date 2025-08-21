@@ -8,6 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default function useApiQuery<TResponse = any>(
     url: string,
+    params?: Record<string, any>,
     options?: Omit<
         UseQueryOptions<
             TResponse,
@@ -36,7 +37,6 @@ export default function useApiQuery<TResponse = any>(
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         });
-
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
             throw new Error(errorData.message || 'API 요청 실패');
@@ -51,9 +51,9 @@ export default function useApiQuery<TResponse = any>(
         TResponse,
         [string, Record<string, any>?]
     >({
-        queryKey: [url, {}],
+        queryKey: [url, params ?? {}],
         queryFn,
-        enabled: false,
+        enabled: true,
         ...options,
     });
 }
