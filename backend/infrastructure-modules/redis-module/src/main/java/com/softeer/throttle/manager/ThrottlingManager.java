@@ -1,5 +1,9 @@
-package com.softeer.throttle;
+package com.softeer.throttle.manager;
 
+import com.softeer.throttle.BackoffStrategy;
+import com.softeer.throttle.ThrottlingProperties;
+import com.softeer.throttle.ex.ThrottleException;
+import com.softeer.throttle.task.RetryTaskWithBucket;
 import io.github.bucket4j.*;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import jakarta.annotation.PostConstruct;
@@ -77,13 +81,13 @@ public class ThrottlingManager {
         }
 
         CompletableFuture<T> future = new CompletableFuture<>();
-        RetryTask<T> retryTask = new RetryTask<>(key, task, future, 0);
-        executeOrRetry(retryTask);
+        RetryTaskWithBucket<T> retryTaskWithBucket = new RetryTaskWithBucket<>(key, task, future, 0);
+        executeOrRetry(retryTaskWithBucket);
 
         return future;
     }
 
-    private <T> void executeOrRetry(RetryTask<T> task) {
+    private <T> void executeOrRetry(RetryTaskWithBucket<T> task) {
         if (shutdown) {
             task.future().completeExceptionally(new RejectedExecutionException("ThrottlingManager is shutting down"));
             return;
@@ -119,7 +123,7 @@ public class ThrottlingManager {
         }
     }
 
-    private <T> void handleTaskException(RetryTask<T> task, Throwable ex) {
+    private <T> void handleTaskException(RetryTaskWithBucket<T> task, Throwable ex) {
         if (ex instanceof ThrottleException throttleException) {
             if (throttleException.isRetryable()) {
                 log.warn("재시도 가능한 예외 발생. key: {}, attempt: {}, ex: {}", task.key(), task.attempt(), ex.getMessage());
@@ -135,7 +139,7 @@ public class ThrottlingManager {
         adjustTps(false);
     }
 
-    private void scheduleRetry(RetryTask<?> task) {
+    private void scheduleRetry(RetryTaskWithBucket<?> task) {
         if (shutdown) {
             task.future().completeExceptionally(new RejectedExecutionException("ThrottlingManager is shutting down"));
             return;
@@ -254,14 +258,5 @@ public class ThrottlingManager {
         }
     }
 
-    private record RetryTask<T>(
-            String key,
-            Supplier<CompletableFuture<T>> supplier,
-            CompletableFuture<T> future,
-            int attempt
-    ) {
-        public RetryTask<T> withIncrementedAttempt() {
-            return new RetryTask<>(key, supplier, future, attempt + 1);
-        }
-    }
+
 }
