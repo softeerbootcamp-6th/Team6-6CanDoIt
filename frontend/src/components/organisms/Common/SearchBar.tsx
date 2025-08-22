@@ -11,7 +11,7 @@ type PageName = 'main' | 'report' | 'safety';
 type DropdownType = 'mountain' | 'course' | 'weekday' | null;
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
@@ -23,11 +23,10 @@ interface PropsState {
     courseOptions?: Option[];
     weekdayOptions?: Option[];
     onSubmit: (values: {
-        mountainId: string;
-        courseId?: string;
-        weekdayId?: string;
+        mountainId: number;
+        courseId?: number;
+        weekdayId?: number;
     }) => void;
-    onMountainChange?: (mountain: Option) => void;
 }
 
 export default function SearchBar(props: PropsState) {
@@ -39,7 +38,6 @@ export default function SearchBar(props: PropsState) {
         courseOptions = [],
         weekdayOptions = [],
         onSubmit,
-        onMountainChange,
     } = props;
 
     const [openedDropdownType, setOpenedDropdownType] =
@@ -50,10 +48,10 @@ export default function SearchBar(props: PropsState) {
     const [selectedWeekday, setSelectedWeekday] =
         useState<Option>(defaultWeekday);
 
-    const [searchParams] = useSearchParams();
-    const mountainId = searchParams.get('mountainid');
-    const courseId = searchParams.get('courseid');
-    const weekdayId = searchParams.get('weekdayid');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const mountainId = Number(searchParams.get('mountainid'));
+    const courseId = Number(searchParams.get('courseid'));
+    const weekdayId = Number(searchParams.get('weekdayid'));
 
     useEffect(() => {
         const mountain =
@@ -86,7 +84,26 @@ export default function SearchBar(props: PropsState) {
             openedDropdownType === dropdown ? null : dropdown,
         );
     };
+    const mountainChangeHandler = (mountain: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('mountainid', String(mountain.id));
+        next.delete('courseid');
+        setSearchParams(next);
+    };
+    const courseChangeHandler = (course: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('courseid', String(course.id));
+        setSearchParams(next);
+    };
+    const weekdayChangeHandler = (weekday: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('weekdayid', String(weekday.id));
+        setSearchParams(next);
+    };
     const submitHandler = () => {
+        console.log(
+            `mountainId: ${selectedMountain.id}, courseId: ${selectedCourse.id}, weekdayId: ${selectedWeekday.id}`,
+        );
         onSubmit({
             mountainId: selectedMountain.id,
             courseId: selectedCourse.id,
@@ -107,7 +124,7 @@ export default function SearchBar(props: PropsState) {
             toggleDropdownHandler,
             onSelectValue: (selected: Option) => {
                 setSelectedMountain(selected);
-                onMountainChange?.(selected);
+                mountainChangeHandler(selected);
             },
         }),
         course: createDropdownProps({
@@ -116,7 +133,10 @@ export default function SearchBar(props: PropsState) {
             dropdownType: 'course',
             openedDropdownType: openedDropdownType,
             toggleDropdownHandler,
-            onSelectValue: setSelectedCourse,
+            onSelectValue: (selected: Option) => {
+                setSelectedCourse(selected);
+                courseChangeHandler(selected);
+            },
         }),
         weekday: createDropdownProps({
             title: '요일은?',
@@ -124,7 +144,10 @@ export default function SearchBar(props: PropsState) {
             dropdownType: 'weekday',
             openedDropdownType: openedDropdownType,
             toggleDropdownHandler,
-            onSelectValue: setSelectedWeekday,
+            onSelectValue: (selected: Option) => {
+                setSelectedWeekday(selected);
+                weekdayChangeHandler(selected);
+            },
         }),
     };
 
@@ -207,6 +230,6 @@ const searchButtonStyle = css`
     cursor: pointer;
 `;
 
-const defaultMountain: Option = { id: '0', name: '산' };
-const defaultCourse: Option = { id: '0', name: '코스' };
-const defaultWeekday: Option = { id: '0', name: '요일은?' };
+const defaultMountain: Option = { id: 0, name: '산' };
+const defaultCourse: Option = { id: 0, name: '코스' };
+const defaultWeekday: Option = { id: 0, name: '요일은?' };
