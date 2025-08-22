@@ -67,7 +67,7 @@ public class ChainedJobScheduler {
                 .addLong("unique", System.currentTimeMillis())
                 .toJobParameters();
 
-        log.info("Launching mountainForecastJob at {}", now);
+        log.info("Launching chainedForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(chainedScheduledJob, params);
         log.info("ScheduledMountainForecastJob finished with status={}", execution.getStatus());
     }
