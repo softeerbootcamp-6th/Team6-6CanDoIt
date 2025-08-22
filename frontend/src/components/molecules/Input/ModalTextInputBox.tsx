@@ -22,7 +22,6 @@ export default function ModalTextInputBox(props: PropsState) {
             <textarea
                 css={textareaStyle}
                 name='content'
-                required
                 value={text}
                 onChange={handleChange}
                 maxLength={maxLength}

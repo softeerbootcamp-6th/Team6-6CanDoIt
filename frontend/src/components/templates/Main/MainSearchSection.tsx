@@ -5,9 +5,9 @@ import type {
     MountainData,
 } from '../../../types/mountainTypes';
 import {
-    createHandleSubmit,
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
+    validate,
 } from './utils.ts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
@@ -48,11 +48,7 @@ export default function MainSearchSection(props: PropsState) {
     );
 
     const mountainChangeHandler = (mountain: Option) => {
-        setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.set('mountainId', mountain.id);
-            return next;
-        });
+        setSearchParams(`mountainid=${mountain.id}`);
     };
 
     useEffect(() => {
@@ -68,10 +64,24 @@ export default function MainSearchSection(props: PropsState) {
     );
 
     const navigate = useNavigate();
-    const submitHandler = createHandleSubmit({
-        onFormValidChange,
-        navigate,
-    });
+    const submitHandler = (values: {
+        mountainId: string;
+        courseId?: string;
+        weekdayId?: string;
+    }) => {
+        const { mountainId, courseId = null, weekdayId = null } = values;
+
+        const error = validate(values);
+        if (error) {
+            onFormValidChange(false);
+            return;
+        }
+
+        onFormValidChange(true);
+        navigate(
+            `/forecast?mountainid=${mountainId}&courseid=${courseId}&weekdayid=${weekdayId}`,
+        );
+    };
 
     return (
         <SearchBar
