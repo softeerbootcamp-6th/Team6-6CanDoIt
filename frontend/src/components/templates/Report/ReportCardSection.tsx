@@ -15,6 +15,7 @@ import {
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import { theme } from '../../../theme/theme.ts';
 
 type ReportType = 'WEATHER' | 'SAFE';
 
@@ -46,8 +47,8 @@ export default function ReportCardSection() {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [validationError, setValidationError] = useState<string>('');
     const [searchParams] = useSearchParams();
-    const mountainId = searchParams.get('mountainid');
-    const courseId = searchParams.get('courseid');
+    const mountainId = Number(searchParams.get('mountainid'));
+    const courseId = Number(searchParams.get('courseid'));
 
     const title =
         reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
@@ -61,7 +62,7 @@ export default function ReportCardSection() {
             retry: false,
         },
     );
-    const { data: cardsData = initCardData } = useApiQuery<CardData[]>(
+    const { data: cardsData } = useApiQuery<CardData[]>(
         `/card/interaction/report/${courseId}`,
         { reportType },
         {
@@ -70,7 +71,7 @@ export default function ReportCardSection() {
         },
     );
     const reportMutation = useApiMutation<FormData, any>(
-        '/card/interaction/report',
+        `/card/interaction/report`,
         'POST',
         {
             onSuccess: () => {
@@ -162,7 +163,8 @@ export default function ReportCardSection() {
         event.currentTarget.scrollLeft += Number(event.deltaY);
     };
 
-    if (!mountainId || !courseId) return null;
+    if (!mountainId || !courseId || mountainId === 0 || courseId === 0)
+        return null;
 
     return (
         <>
@@ -171,6 +173,9 @@ export default function ReportCardSection() {
                 <ToggleButton
                     isOn={reportType === 'SAFE'}
                     onClick={() => reportCardSectionToggleButtonHandler()}
+                    offBgColor={colors.grey[100]}
+                    onCircleColor={colors.status.normal.good}
+                    offCircleColor={colors.status.normal.bad}
                 />
                 <ChipButton
                     onClick={() => setIsReportModalOpen(true)}
@@ -192,7 +197,8 @@ export default function ReportCardSection() {
                 )}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
-                {cardsData.map((card) => {
+                {cardsData?.map((card) => {
+                    const isFlipped = flippedCardId === card.reportId;
                     const filterLabels = filterGatherer({
                         weatherKeywords: card.weatherKeywords,
                         rainKeywords: card.rainKeywords,
@@ -202,30 +208,70 @@ export default function ReportCardSection() {
                         pastISO: card.createdAt,
                         nowDate: currentTime,
                     });
-                    return flippedCardId === card.reportId ? (
-                        <BackReportCard
+
+                    return (
+                        <div
                             key={card.reportId}
-                            comment={card.content}
-                            timeAgo={timeAgo}
-                            likeCount={card.likeCount}
-                            filterLabels={filterLabels}
-                            onClick={() => setFlippedCardId(null)}
-                            onHeartClick={() => cardLikeMutation.mutate({})}
-                        />
-                    ) : (
-                        <FrontReportCard
-                            key={card.reportId}
-                            comment={card.content}
-                            timeAgo={timeAgo}
-                            filterLabels={filterLabels}
-                            onClick={() => setFlippedCardId(card.reportId)}
-                        />
+                            css={[card3DStyle, isFlipped && card3DFlippedStyle]}
+                        >
+                            <div css={cardFaceFrontStyle}>
+                                <FrontReportCard
+                                    comment={card.content}
+                                    timeAgo={timeAgo}
+                                    filterLabels={filterLabels}
+                                    onClick={() =>
+                                        setFlippedCardId(card.reportId)
+                                    }
+                                />
+                            </div>
+                            <div css={cardFaceBackStyle}>
+                                <BackReportCard
+                                    comment={card.content}
+                                    timeAgo={timeAgo}
+                                    likeCount={card.likeCount}
+                                    filterLabels={filterLabels}
+                                    onClick={() => setFlippedCardId(null)}
+                                    onHeartClick={() =>
+                                        cardLikeMutation.mutate({})
+                                    }
+                                />
+                            </div>
+                        </div>
                     );
                 })}
             </div>
         </>
     );
 }
+
+const { colors } = theme;
+
+const card3DStyle = css`
+    display: grid;
+    grid-auto-rows: 1fr;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    will-change: transform;
+    width: max-content;
+`;
+
+const card3DFlippedStyle = css`
+    transform: rotateY(180deg);
+`;
+
+const faceBase = css`
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+`;
+
+const cardFaceFrontStyle = css`
+    ${faceBase};
+`;
+
+const cardFaceBackStyle = css`
+    ${faceBase};
+    transform: rotateY(180deg);
+`;
 
 const reportCardContainerStyle = css`
     display: flex;
@@ -245,7 +291,7 @@ const reportCardContainerStyle = css`
 
 const reportTitleStyle = css`
     width: max-content;
-    margin-top: 3rem;
+    margin-top: 1rem;
     margin-left: 2rem;
     display: flex;
     align-items: center;
