@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.shortterm.scheduler;
+package com.softeer.batch.forecast.chained.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -10,44 +10,45 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+import static com.softeer.batch.common.support.BatchNames.Jobs.SCHEDULED_CHAINED_FORECAST_JOB;
+import static com.softeer.batch.common.support.BatchNames.Jobs.STARTUP_CHAINED_FORECAST_JOB;
+
 @Slf4j
 @Component
 @Profile("!test")
-public class ShortForecastJobScheduler {
+public class ChainedJobScheduler {
 
     private final JobLauncher jobLauncher;
-    private final Job startupJob;
-    private final Job scheduledJob;
 
-    public ShortForecastJobScheduler(
+    private final Job chainedStartupJob;
+    private final Job chainedScheduledJob;
+
+    public ChainedJobScheduler(
             JobLauncher jobLauncher,
-            @Qualifier("StartUpShortForecastJob") Job startupJob,
-            @Qualifier("ScheduledShortForecastJob") Job scheduledJob
+            @Qualifier(STARTUP_CHAINED_FORECAST_JOB) Job chainedStartupJob,
+            @Qualifier(SCHEDULED_CHAINED_FORECAST_JOB) Job chainedScheduledJob
     ) {
         this.jobLauncher = jobLauncher;
-        this.startupJob = startupJob;
-        this.scheduledJob = scheduledJob;
+        this.chainedStartupJob = chainedStartupJob;
+        this.chainedScheduledJob = chainedScheduledJob;
     }
 
-    @Order(0)
     @EventListener(ApplicationReadyEvent.class)
-    public void startupForecastJob() {
+    public void runJobOnStartup() {
         try {
             log.info("Running startupForecastJob on application startup...");
-            JobExecution execution = jobLauncher.run(
-                    startupJob,
-                    new JobParametersBuilder()
-                            .addString("startupAt", LocalDateTime.now().toString())
-                            .addLong("unique", System.currentTimeMillis()) // 항상 새 인스턴스
-                            .toJobParameters()
-            );
-            log.info("StartUpShortForecastJob finished with status={}", execution.getStatus());
+            LocalDateTime now = LocalDateTime.now();
+
+            JobParameters params = new JobParametersBuilder()
+                    .addString("startupAt", now.toString())
+                    .toJobParameters();
+            JobExecution execution = jobLauncher.run(chainedStartupJob, params);
+            log.info("Startup job finished with status={}", execution.getStatus());
         } catch (Exception e) {
             log.error("Failed to run startupForecastJob on startup", e);
         }
@@ -60,13 +61,14 @@ public class ShortForecastJobScheduler {
     @Scheduled(cron = "0 2 2,5,8,11,14,17,20,23 * * *", zone = "Asia/Seoul")
     public void runForecastJob() throws Exception {
         LocalDateTime now = LocalDateTime.now();
+
         JobParameters params = new JobParametersBuilder()
                 .addString("scheduledAt", now.toString())
                 .addLong("unique", System.currentTimeMillis())
                 .toJobParameters();
 
-        log.info("Launching shortForecastJob at {}", now);
-        JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("ScheduledShortForecastJob finished with status={}", execution.getStatus());
+        log.info("Launching chainedForecastJob at {}", now);
+        JobExecution execution = jobLauncher.run(chainedScheduledJob, params);
+        log.info("ScheduledChainedForecastJob finished with status={}", execution.getStatus());
     }
 }
