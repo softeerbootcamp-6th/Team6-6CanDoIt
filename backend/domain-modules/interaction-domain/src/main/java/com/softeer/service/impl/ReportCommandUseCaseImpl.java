@@ -36,7 +36,7 @@ public class ReportCommandUseCaseImpl implements ReportCommandUseCase {
     }
 
     @Override
-    public void likeReport(long userId, long reportId) {
+    public void likeReport(long reportId, long userId) {
         ReportLikeId reportLikeId = new ReportLikeId(reportId, userId);
 
         boolean exists = reportCommandAdapter.existsReportLike(reportLikeId);
