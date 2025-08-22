@@ -27,7 +27,7 @@ import static com.softeer.batch.common.support.BatchNames.Steps.START_UP_SHORT_F
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class ShortForecastJobConfig {
+public class ShortForecastStepConfig {
 
     private static final int CHUNK_SIZE = 20;
 
