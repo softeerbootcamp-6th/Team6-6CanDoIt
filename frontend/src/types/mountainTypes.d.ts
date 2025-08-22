@@ -1,5 +1,5 @@
 export interface MountainData {
-    mountainId: string;
+    mountainId: number;
     mountainName: string;
     mountainImageUrl: string;
     mountainDescription: string;
@@ -12,6 +12,6 @@ export interface MountainData {
 }
 
 export interface MountainCourse {
-    courseId: string;
+    courseId: number;
     courseName: string;
 }
