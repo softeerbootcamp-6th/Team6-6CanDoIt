@@ -27,8 +27,6 @@ public class UltraForecastV1Writer implements ItemWriter<UltraForecastResponseLi
 
         ultraForecastJdbcWriter.batchUpdateForecast(items);
 
-        //33 sec not pipeline
-        //17 sec pipeline
-//        ultraForecastRedisWriter.pipelineUpdateUltraForecast(items);
+        ultraForecastRedisWriter.pipelineUpdateUltraForecast(items);
     }
 }
