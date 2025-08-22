@@ -85,7 +85,7 @@ public class ReportQuerydslRepository {
 
     private JPAQuery<Long> selectReport() {
         return queryFactory
-                .select(reportEntity.id)
+                .selectDistinct(reportEntity.id)
                 .from(reportEntity)
                 .innerJoin(courseEntity).on(courseEntity.id.eq(reportEntity.courseId))
                 .leftJoin(reportEtceteraKeywordEntity).on(reportEntity.id.eq(reportEtceteraKeywordEntity.id.reportId))
@@ -108,7 +108,7 @@ public class ReportQuerydslRepository {
                 .innerJoin(reportImage).on(reportImage.id.eq(reportEntity.imageId))
                 .innerJoin(courseEntity).on(courseEntity.id.eq(reportEntity.courseId))
                 .innerJoin(userEntity).on(userEntity.id.eq(reportEntity.userId))
-                .innerJoin(userImage).on(userEntity.imageEntity.id.eq(userImage.id))
+                .leftJoin(userImage).on(userEntity.imageEntity.id.eq(userImage.id))
                 .leftJoin(reportEtceteraKeywordEntity).on(reportEntity.id.eq(reportEtceteraKeywordEntity.id.reportId))
                 .leftJoin(etceteraKeywordEntity).on(reportEtceteraKeywordEntity.id.etceteraKeywordId.eq(etceteraKeywordEntity.id))
                 .leftJoin(reportRainKeywordEntity).on(reportEntity.id.eq(reportRainKeywordEntity.id.reportId))
