@@ -23,7 +23,7 @@ import static com.softeer.batch.common.support.BatchNames.Steps.STARTUP_MOUNTAIN
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class MountainForecastJobConfig {
+public class MountainForecastStepConfig {
 
     private static final int CHUNK_SIZE = 20;
 
