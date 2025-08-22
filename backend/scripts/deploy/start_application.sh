@@ -50,6 +50,7 @@ for svc in "${!services[@]}"; do
     nohup java -jar \
         -Dspring.profiles.active=prod \
         -Dserver.port=${port} \
+        -Duser.timezone=Asia/Seoul \
         "$LOCAL_PATH" > "$LOG_FILE" 2>&1 &
 
     echo "$svc started successfully. Log file: $LOG_FILE"
