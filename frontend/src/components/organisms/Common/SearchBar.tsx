@@ -4,14 +4,14 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import SearchBarText from '../../atoms/Text/SearchBarText.tsx';
-import { useState } from 'react';
-import { createHandleSubmit, createHandleToggleDropdown } from './utils.ts';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 type PageName = 'main' | 'report' | 'safety';
 type DropdownType = 'mountain' | 'course' | 'weekday' | null;
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
@@ -23,11 +23,10 @@ interface PropsState {
     courseOptions?: Option[];
     weekdayOptions?: Option[];
     onSubmit: (values: {
-        mountainId: string;
-        courseId?: string;
-        weekdayId?: string;
+        mountainId: number;
+        courseId?: number;
+        weekdayId?: number;
     }) => void;
-    onMountainChange?: (mountain: Option) => void;
 }
 
 export default function SearchBar(props: PropsState) {
@@ -35,11 +34,10 @@ export default function SearchBar(props: PropsState) {
         searchBarTitle,
         searchBarMessage,
         pageName = 'main',
-        mountainOptions,
+        mountainOptions = [],
         courseOptions = [],
         weekdayOptions = [],
         onSubmit,
-        onMountainChange,
     } = props;
 
     const [openedDropdownType, setOpenedDropdownType] =
@@ -50,24 +48,71 @@ export default function SearchBar(props: PropsState) {
     const [selectedWeekday, setSelectedWeekday] =
         useState<Option>(defaultWeekday);
 
+    const [searchParams, setSearchParams] = useSearchParams();
+    const mountainId = Number(searchParams.get('mountainid'));
+    const courseId = Number(searchParams.get('courseid'));
+    const weekdayId = Number(searchParams.get('weekdayid'));
+
+    useEffect(() => {
+        const mountain =
+            mountainOptions.find((option) => option.id === mountainId) ||
+            defaultMountain;
+        const course =
+            courseOptions.find((option) => option.id === courseId) ||
+            defaultCourse;
+        const weekday =
+            weekdayOptions.find((option) => option.id === weekdayId) ||
+            defaultWeekday;
+
+        setSelectedMountain(mountain);
+        setSelectedCourse(course);
+        setSelectedWeekday(weekday);
+    }, [
+        mountainId,
+        courseId,
+        weekdayId,
+        mountainOptions,
+        courseOptions,
+        weekdayOptions,
+    ]);
+
     const isMainPage = pageName === 'main';
     const isReportPage = pageName === 'report';
 
-    const handleToggleDropdown = createHandleToggleDropdown({
-        setOpenDropdown: setOpenedDropdownType,
-        openDropdown: openedDropdownType,
-    });
-    const handleSubmit = createHandleSubmit({
-        isMainPage,
-        isReportPage,
-        selectedMountainId: selectedMountain.id,
-        selectedCourseId: selectedCourse.id,
-        selectedWeekdayId: selectedWeekday.id,
-        onSubmit,
-    });
+    const toggleDropdownHandler = (dropdown: DropdownType) => {
+        setOpenedDropdownType(
+            openedDropdownType === dropdown ? null : dropdown,
+        );
+    };
+    const mountainChangeHandler = (mountain: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('mountainid', String(mountain.id));
+        next.delete('courseid');
+        setSearchParams(next);
+    };
+    const courseChangeHandler = (course: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('courseid', String(course.id));
+        setSearchParams(next);
+    };
+    const weekdayChangeHandler = (weekday: Option) => {
+        const next = new URLSearchParams(searchParams);
+        next.set('weekdayid', String(weekday.id));
+        setSearchParams(next);
+    };
+    const submitHandler = () => {
+        console.log(
+            `mountainId: ${selectedMountain.id}, courseId: ${selectedCourse.id}, weekdayId: ${selectedWeekday.id}`,
+        );
+        onSubmit({
+            mountainId: selectedMountain.id,
+            courseId: selectedCourse.id,
+            weekdayId: selectedWeekday.id,
+        });
+    };
     const onSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        handleSubmit();
+        submitHandler();
     };
 
     const dropdownProps = {
@@ -76,10 +121,10 @@ export default function SearchBar(props: PropsState) {
             options: mountainOptions,
             dropdownType: 'mountain',
             openedDropdownType: openedDropdownType,
-            handleToggleDropdown,
+            toggleDropdownHandler,
             onSelectValue: (selected: Option) => {
                 setSelectedMountain(selected);
-                onMountainChange?.(selected);
+                mountainChangeHandler(selected);
             },
         }),
         course: createDropdownProps({
@@ -87,16 +132,22 @@ export default function SearchBar(props: PropsState) {
             options: courseOptions,
             dropdownType: 'course',
             openedDropdownType: openedDropdownType,
-            handleToggleDropdown,
-            onSelectValue: setSelectedCourse,
+            toggleDropdownHandler,
+            onSelectValue: (selected: Option) => {
+                setSelectedCourse(selected);
+                courseChangeHandler(selected);
+            },
         }),
         weekday: createDropdownProps({
             title: '요일은?',
             options: weekdayOptions,
             dropdownType: 'weekday',
             openedDropdownType: openedDropdownType,
-            handleToggleDropdown,
-            onSelectValue: setSelectedWeekday,
+            toggleDropdownHandler,
+            onSelectValue: (selected: Option) => {
+                setSelectedWeekday(selected);
+                weekdayChangeHandler(selected);
+            },
         }),
     };
 
@@ -123,20 +174,21 @@ const createDropdownProps = ({
     options,
     dropdownType,
     openedDropdownType,
-    handleToggleDropdown,
+    toggleDropdownHandler,
     onSelectValue,
 }: {
     title: string;
     options: Option[];
     dropdownType: DropdownType;
     openedDropdownType: DropdownType;
-    handleToggleDropdown: (dropdown: DropdownType) => void;
+    toggleDropdownHandler: (dropdown: DropdownType) => void;
     onSelectValue: (selected: Option) => void;
 }) => ({
     title,
     options,
     isOpenOptions: openedDropdownType === dropdownType,
-    onToggle: () => handleToggleDropdown(dropdownType),
+    paramName: `${dropdownType}id`,
+    onToggle: () => toggleDropdownHandler(dropdownType),
     onSelect: onSelectValue,
 });
 
@@ -178,6 +230,6 @@ const searchButtonStyle = css`
     cursor: pointer;
 `;
 
-const defaultMountain: Option = { id: '0', name: '산' };
-const defaultCourse: Option = { id: '0', name: '코스' };
-const defaultWeekday: Option = { id: '0', name: '요일은?' };
+const defaultMountain: Option = { id: 0, name: '산' };
+const defaultCourse: Option = { id: 0, name: '코스' };
+const defaultWeekday: Option = { id: 0, name: '요일은?' };

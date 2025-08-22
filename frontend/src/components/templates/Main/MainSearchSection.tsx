@@ -1,13 +1,12 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
-import { useEffect } from 'react';
 import type {
     MountainCourse,
     MountainData,
 } from '../../../types/mountainTypes';
 import {
-    createHandleSubmit,
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
+    validate,
 } from './utils.ts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
@@ -17,27 +16,24 @@ interface PropsState {
 }
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
 export default function MainSearchSection(props: PropsState) {
     const { onFormValidChange } = props;
-    const [searchParams, setSearchParams] = useSearchParams();
-    const selectedMountainId = searchParams.get('mountainId');
+    const [searchParams] = useSearchParams();
+    const selectedMountainId = Number(searchParams.get('mountainid'));
 
-    const { data: mountainsData, failureReason: mountainFailReason } =
-        useApiQuery<MountainData[]>(
-            '/card/mountain',
-            {},
-            {
-                placeholderData: MountainsData,
-                retry: false,
-            },
-        );
-    const { data: coursesData, failureReason: courseFailReason } = useApiQuery<
-        MountainCourse[]
-    >(
+    const { data: mountainsData } = useApiQuery<MountainData[]>(
+        '/card/mountain',
+        {},
+        {
+            placeholderData: MountainsData,
+            retry: false,
+        },
+    );
+    const { data: coursesData } = useApiQuery<MountainCourse[]>(
         `/card/mountain/${selectedMountainId}/course`,
         {},
         {
@@ -47,19 +43,6 @@ export default function MainSearchSection(props: PropsState) {
         },
     );
 
-    const mountainChangeHandler = (mountain: Option) => {
-        setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            next.set('mountainId', mountain.id);
-            return next;
-        });
-    };
-
-    useEffect(() => {
-        console.log(mountainFailReason);
-        console.log(courseFailReason);
-    }, [mountainFailReason, courseFailReason]);
-
     const mountainOptions: Option[] = refactorMountainDataToOptions(
         mountainsData ?? [],
     );
@@ -68,10 +51,24 @@ export default function MainSearchSection(props: PropsState) {
     );
 
     const navigate = useNavigate();
-    const submitHandler = createHandleSubmit({
-        onFormValidChange,
-        navigate,
-    });
+    const submitHandler = (values: {
+        mountainId: number;
+        courseId?: number;
+        weekdayId?: number;
+    }) => {
+        const { mountainId, courseId = null, weekdayId = null } = values;
+
+        const error = validate(values);
+        if (error) {
+            onFormValidChange(false);
+            return;
+        }
+
+        onFormValidChange(true);
+        navigate(
+            `/forecast?mountainid=${mountainId}&courseid=${courseId}&weekdayid=${weekdayId}`,
+        );
+    };
 
     return (
         <SearchBar
@@ -82,16 +79,15 @@ export default function MainSearchSection(props: PropsState) {
             courseOptions={courseOptions}
             weekdayOptions={weekdayData}
             onSubmit={submitHandler}
-            onMountainChange={mountainChangeHandler}
         />
     );
 }
 
-const initCoursesData = [{ courseId: '1', courseName: '산을 선택해주세요' }];
+const initCoursesData = [{ courseId: 0, courseName: '산을 선택해주세요' }];
 
 const MountainsData = [
     {
-        mountainId: '1',
+        mountainId: 1,
         mountainName: '태백산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -103,7 +99,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '2',
+        mountainId: 2,
         mountainName: '지리산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -115,7 +111,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '3',
+        mountainId: 3,
         mountainName: '백두산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -127,7 +123,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '4',
+        mountainId: 4,
         mountainName: '한라산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -139,7 +135,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '5',
+        mountainId: 5,
         mountainName: '설악산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -151,7 +147,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '6',
+        mountainId: 6,
         mountainName: '가야산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -165,7 +161,7 @@ const MountainsData = [
 ];
 
 const weekdayData = [
-    { id: 'today', name: '오늘' },
-    { id: 'tomorrow', name: '내일' },
-    { id: 'dayaftertomorrow', name: '글피' },
+    { id: 1, name: '오늘' },
+    { id: 2, name: '내일' },
+    { id: 3, name: '글피' },
 ];

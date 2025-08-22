@@ -4,10 +4,11 @@ import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
@@ -15,32 +16,74 @@ interface PropsState {
     title: string;
     options: Option[];
     isOpenOptions?: boolean;
+    paramName?: string;
     onToggle: () => void;
     onSelect?: (option: Option) => void;
 }
 
 export default function Dropdown(props: PropsState) {
-    const { title, options, isOpenOptions = false, onToggle, onSelect } = props;
+    const {
+        title,
+        options,
+        isOpenOptions = false,
+        paramName,
+        onToggle,
+        onSelect,
+    } = props;
 
-    const [selector, setSelector] = useState({ id: '0', name: title });
+    const [selector, setSelector] = useState({ id: 0, name: title });
+    const [searchParams] = useSearchParams();
+    const outsideRef = useRef<HTMLDivElement | null>(null);
+
+    const outsideClickHandler = (event: MouseEvent) => {
+        if (
+            isOpenOptions &&
+            outsideRef.current &&
+            !outsideRef.current.contains(event.target as Node)
+        ) {
+            onToggle();
+        }
+    };
 
     useEffect(() => {
-        if (onSelect && selector.name !== title) {
-            onSelect(selector);
+        if (selector.name !== title) {
+            onSelect?.(selector);
         }
-    }, [selector, title, onSelect]);
+    }, [selector]);
+    useEffect(() => {
+        document.addEventListener('mouseup', outsideClickHandler);
+        return () =>
+            document.removeEventListener('mouseup', outsideClickHandler);
+    }, [onToggle]);
+    useEffect(() => {
+        if (!paramName || options.length === 0 || selector.id !== 0) return;
+        const paramValue = Number(searchParams.get(paramName));
+        if (!paramValue) return;
+        const matchedOption = options.find(
+            (option) => option.id === paramValue,
+        );
+        if (matchedOption) {
+            setSelector({
+                id: matchedOption.id,
+                name: matchedOption.name,
+            });
+        }
+    }, [paramName, options]);
 
-    const optionListProps = createOptionListProps({
-        options,
-        setSelector,
-        onToggle,
-    });
+    const optionListProps = options.map((option) => ({
+        key: option.id,
+        onClick: () => {
+            setSelector({ id: option.id, name: option.name });
+            onToggle();
+        },
+        children: option.name,
+    }));
 
     return (
-        <div css={dropdownStyle}>
+        <div ref={outsideRef} css={dropdownStyle}>
             <div css={selectorTitleStyle} onClick={onToggle}>
                 <SearchBarText>{selector.name}</SearchBarText>
-                <div css={selectorChevronButtonStyle}>
+                <div css={selectorChevronButtonStyle(isOpenOptions)}>
                     <Icon {...chevronIconProps} />
                 </div>
             </div>
@@ -61,27 +104,6 @@ export default function Dropdown(props: PropsState) {
             )}
         </div>
     );
-}
-
-function createOptionListProps({
-    options,
-    setSelector,
-    onToggle,
-}: {
-    options: Option[];
-    setSelector: React.Dispatch<
-        React.SetStateAction<{ id: string; name: string }>
-    >;
-    onToggle: () => void;
-}) {
-    return options.map((option) => ({
-        key: option.id,
-        onClick: () => {
-            setSelector({ id: option.id, name: option.name });
-            onToggle();
-        },
-        children: option.name,
-    }));
 }
 
 const chevronIconProps = {
@@ -108,12 +130,14 @@ const chevronButtonStyle = css`
     transform-origin: 50% 50%;
 `;
 
-const selectorChevronButtonStyle = css([
-    chevronButtonStyle,
-    `
-    transform: rotate(-90deg) scale(1.3);
+const selectorChevronButtonStyle = (isOpenOptions: boolean) =>
+    css([
+        chevronButtonStyle,
+        `
+    transform: rotate(${isOpenOptions ? 0 : -90}deg) scale(1.3);
+    transition: transform 200ms ease;
   `,
-]);
+    ]);
 
 const optionChevronButtonStyle = css([
     chevronButtonStyle,

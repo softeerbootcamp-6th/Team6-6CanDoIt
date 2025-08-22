@@ -14,6 +14,8 @@ import {
 } from './utils.ts';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import { theme } from '../../../theme/theme.ts';
 
 type ReportType = 'WEATHER' | 'SAFE';
 
@@ -43,9 +45,10 @@ export default function ReportCardSection() {
     const [reportType, setReportType] = useState<ReportType>('WEATHER');
     const [flippedCardId, setFlippedCardId] = useState<number | null>(null);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [validationError, setValidationError] = useState<string>('');
     const [searchParams] = useSearchParams();
-    const mountainId = searchParams.get('mountainid');
-    const courseId = searchParams.get('courseid');
+    const mountainId = Number(searchParams.get('mountainid'));
+    const courseId = Number(searchParams.get('courseid'));
 
     const title =
         reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
@@ -59,7 +62,7 @@ export default function ReportCardSection() {
             retry: false,
         },
     );
-    const { data: cardsData = initCardData } = useApiQuery<CardData[]>(
+    const { data: cardsData } = useApiQuery<CardData[]>(
         `/card/interaction/report/${courseId}`,
         { reportType },
         {
@@ -68,7 +71,7 @@ export default function ReportCardSection() {
         },
     );
     const reportMutation = useApiMutation<FormData, any>(
-        '/card/interaction/report',
+        `/card/interaction/report`,
         'POST',
         {
             onSuccess: () => {
@@ -93,11 +96,41 @@ export default function ReportCardSection() {
         },
     );
 
+    const formValidation = (formData: FormData) => {
+        const imageFile = formData.get('image') as File;
+        if (!imageFile || !imageFile.type.startsWith('image/')) {
+            return '이미지 파일을 업로드해주세요';
+        }
+
+        const content = formData.get('content') as string;
+        if (!content || content.trim() === '') {
+            return '제보 내용을 입력해주세요';
+        }
+
+        const weatherKeywords = formData.getAll('weatherKeywords');
+        const rainKeywords = formData.getAll('rainKeywords');
+        const etceteraKeywords = formData.getAll('etceteraKeywords');
+        if (
+            weatherKeywords.length === 0 &&
+            rainKeywords.length === 0 &&
+            etceteraKeywords.length === 0
+        ) {
+            return '키워드를 선택해주세요';
+        }
+
+        return '';
+    };
+
     const reportModalSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const form = e.currentTarget;
         const formData = new FormData(form);
+
+        const validationErr = formValidation(formData);
+        setValidationError(validationErr);
+        if (validationErr) return;
+
         const ids = (keyword: string) =>
             formData.getAll(keyword).map((id) => Number(id));
 
@@ -130,14 +163,19 @@ export default function ReportCardSection() {
         event.currentTarget.scrollLeft += Number(event.deltaY);
     };
 
-    if (!mountainId || !courseId) return null;
+    if (!mountainId || !courseId || mountainId === 0 || courseId === 0)
+        return null;
 
     return (
         <>
             <div css={reportTitleStyle}>
                 <HeadlineHeading HeadingTag='h2'>{title}</HeadlineHeading>
                 <ToggleButton
+                    isOn={reportType === 'SAFE'}
                     onClick={() => reportCardSectionToggleButtonHandler()}
+                    offBgColor={colors.grey[100]}
+                    onCircleColor={colors.status.normal.good}
+                    offCircleColor={colors.status.normal.bad}
                 />
                 <ChipButton
                     onClick={() => setIsReportModalOpen(true)}
@@ -152,9 +190,15 @@ export default function ReportCardSection() {
                     onClose={() => setIsReportModalOpen(false)}
                     onSubmit={reportModalSubmitHandler}
                 />
+                {validationError && (
+                    <Modal onClose={() => setValidationError('')}>
+                        {validationError}
+                    </Modal>
+                )}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
-                {cardsData.map((card) => {
+                {cardsData?.map((card) => {
+                    const isFlipped = flippedCardId === card.reportId;
                     const filterLabels = filterGatherer({
                         weatherKeywords: card.weatherKeywords,
                         rainKeywords: card.rainKeywords,
@@ -164,30 +208,70 @@ export default function ReportCardSection() {
                         pastISO: card.createdAt,
                         nowDate: currentTime,
                     });
-                    return flippedCardId === card.reportId ? (
-                        <BackReportCard
+
+                    return (
+                        <div
                             key={card.reportId}
-                            comment={card.content}
-                            timeAgo={timeAgo}
-                            likeCount={card.likeCount}
-                            filterLabels={filterLabels}
-                            onClick={() => setFlippedCardId(null)}
-                            onHeartClick={() => cardLikeMutation.mutate({})}
-                        />
-                    ) : (
-                        <FrontReportCard
-                            key={card.reportId}
-                            comment={card.content}
-                            timeAgo={timeAgo}
-                            filterLabels={filterLabels}
-                            onClick={() => setFlippedCardId(card.reportId)}
-                        />
+                            css={[card3DStyle, isFlipped && card3DFlippedStyle]}
+                        >
+                            <div css={cardFaceFrontStyle}>
+                                <FrontReportCard
+                                    comment={card.content}
+                                    timeAgo={timeAgo}
+                                    filterLabels={filterLabels}
+                                    onClick={() =>
+                                        setFlippedCardId(card.reportId)
+                                    }
+                                />
+                            </div>
+                            <div css={cardFaceBackStyle}>
+                                <BackReportCard
+                                    comment={card.content}
+                                    timeAgo={timeAgo}
+                                    likeCount={card.likeCount}
+                                    filterLabels={filterLabels}
+                                    onClick={() => setFlippedCardId(null)}
+                                    onHeartClick={() =>
+                                        cardLikeMutation.mutate({})
+                                    }
+                                />
+                            </div>
+                        </div>
                     );
                 })}
             </div>
         </>
     );
 }
+
+const { colors } = theme;
+
+const card3DStyle = css`
+    display: grid;
+    grid-auto-rows: 1fr;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    will-change: transform;
+    width: max-content;
+`;
+
+const card3DFlippedStyle = css`
+    transform: rotateY(180deg);
+`;
+
+const faceBase = css`
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+`;
+
+const cardFaceFrontStyle = css`
+    ${faceBase};
+`;
+
+const cardFaceBackStyle = css`
+    ${faceBase};
+    transform: rotateY(180deg);
+`;
 
 const reportCardContainerStyle = css`
     display: flex;
@@ -207,7 +291,7 @@ const reportCardContainerStyle = css`
 
 const reportTitleStyle = css`
     width: max-content;
-    margin-top: 3rem;
+    margin-top: 1rem;
     margin-left: 2rem;
     display: flex;
     align-items: center;

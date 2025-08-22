@@ -10,8 +10,6 @@ interface PropsState {
     onClick: () => void;
 }
 
-const { colors } = theme;
-
 export default function ToggleButton({
     onBgColor = colors.grey[100],
     offBgColor = colors.grey[70],
@@ -29,6 +27,8 @@ export default function ToggleButton({
         </button>
     );
 }
+
+const { colors } = theme;
 
 const buttonWrapperStyles = (
     isOn: boolean,

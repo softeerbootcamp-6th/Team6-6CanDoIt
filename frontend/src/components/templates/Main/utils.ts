@@ -8,6 +8,7 @@ export function refactorMountainsData(data: MountainData[]) {
     return data.map((mountain) => ({
         mountainId: mountain.mountainId,
         mountainName: mountain.mountainName,
+        mountainImageUrl: mountain.mountainImageUrl,
         mountainDescription: mountain.mountainDescription,
         weatherIconName: convertToIconName({
             precipitationType: mountain.weatherMetric.precipitationType,
@@ -19,7 +20,7 @@ export function refactorMountainsData(data: MountainData[]) {
 }
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 export function refactorMountainDataToOptions(
@@ -41,41 +42,13 @@ export function refactorCoursesDataToOptions(
 }
 
 export function validate(values: {
-    mountainId: string;
-    courseId?: string;
-    weekdayId?: string;
+    mountainId: number;
+    courseId?: number;
+    weekdayId?: number;
 }) {
-    const { mountainId, courseId = '0', weekdayId = '0' } = values;
-    if (mountainId === '0' || mountainId === 'null') return '산을 선택해주세요';
-    if (courseId === '0' || courseId === 'null') return '코스를 선택해주세요';
-    if (weekdayId === '0' || weekdayId === 'null') return '요일을 선택해주세요';
+    const { mountainId, courseId = 0, weekdayId = 0 } = values;
+    if (mountainId === 0) return '산을 선택해주세요';
+    if (courseId === 0) return '코스를 선택해주세요';
+    if (weekdayId === 0) return '요일을 선택해주세요';
     return null;
-}
-
-export function createHandleSubmit({
-    onFormValidChange,
-    navigate,
-}: {
-    onFormValidChange: (isValid: boolean) => void;
-    navigate: (path: string) => void;
-}) {
-    return (values: {
-        mountainId: string;
-        courseId?: string;
-        weekdayId?: string;
-    }) => {
-        const { mountainId, courseId = 'null', weekdayId = 'null' } = values;
-
-        const error = validate(values);
-        if (error) {
-            alert(error);
-            onFormValidChange(false);
-            return;
-        }
-
-        onFormValidChange(true);
-        navigate(
-            `/forecast?mountainid=${mountainId}&courseid=${courseId}&weekdayid=${weekdayId}`,
-        );
-    };
 }
