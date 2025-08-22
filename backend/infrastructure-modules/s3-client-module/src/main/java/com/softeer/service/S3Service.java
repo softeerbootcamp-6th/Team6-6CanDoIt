@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.net.URL;
 import java.util.UUID;
 
 @Component
@@ -27,6 +29,13 @@ public class S3Service {
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(data));
 
-        return key;
+        GetUrlRequest getUrlRequest = GetUrlRequest.builder()
+                .bucket(props.bucket())
+                .key(key)
+                .build();
+
+        URL url = s3Client.utilities().getUrl(getUrlRequest);
+
+        return url.toString();
     }
 }

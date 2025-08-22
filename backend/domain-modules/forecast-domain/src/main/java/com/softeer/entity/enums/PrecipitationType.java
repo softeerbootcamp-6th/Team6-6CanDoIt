@@ -7,7 +7,7 @@ public enum PrecipitationType {
     SNOW(3, "눈"),
     SHOWER(4, "소나기"),
     DRIZZLE(5, "빗방울"),
-    DRIZZLE_SNOW(6, "빗방울눈날림"),
+    DRIZZLE_SNOW(6, "진눈깨비"),
     SNOW_FLURRY(7, "눈날림");
 
     private final int code;
