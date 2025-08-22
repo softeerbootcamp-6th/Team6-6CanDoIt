@@ -14,7 +14,7 @@ export default function MainPage() {
             {isOpen && (
                 <div css={backgroundStyle} onClick={backgroundClickHandler} />
             )}
-            <div css={overBackgroundStyle}>
+            <div css={[overBackgroundStyle, isOpen && centeredStyle]}>
                 <MainSearchSection onFormValidChange={formValidChangeHandler} />
             </div>
             <MountainCardSection />
@@ -23,22 +23,33 @@ export default function MainPage() {
 }
 
 const backgroundStyle = css`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    inset: 0;
     opacity: 0.7;
     background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0) 100%);
+    z-index: 10;
+    transition: opacity 250ms ease;
 `;
 
 const overBackgroundStyle = css`
     position: relative;
-    z-index: 10;
+    z-index: 20;
+    width: max-content;
+    margin: 1rem auto;
 
     display: flex;
     flex-direction: column;
     gap: 2rem;
 
-    margin-bottom: 2rem;
+    transform: translate(0, 0);
+    transform-origin: center center;
+    transition:
+        transform 350ms ease,
+        box-shadow 250ms ease,
+        filter 250ms ease;
+    will-change: transform;
+`;
+
+const centeredStyle = css`
+    transform: translate(0, 3rem) scale(1.1);
 `;
