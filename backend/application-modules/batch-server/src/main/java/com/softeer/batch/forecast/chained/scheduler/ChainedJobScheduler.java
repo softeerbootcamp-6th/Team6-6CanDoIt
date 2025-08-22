@@ -69,6 +69,6 @@ public class ChainedJobScheduler {
 
         log.info("Launching chainedForecastJob at {}", now);
         JobExecution execution = jobLauncher.run(chainedScheduledJob, params);
-        log.info("ScheduledMountainForecastJob finished with status={}", execution.getStatus());
+        log.info("ScheduledChainedForecastJob finished with status={}", execution.getStatus());
     }
 }
