@@ -15,16 +15,16 @@ import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
 export default function ReportSearchSection() {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
-    const [searchParams, setSearchParams] = useSearchParams();
-    const mountainId = searchParams.get('mountainid');
-    const courseId = searchParams.get('courseid');
+    const [searchParams] = useSearchParams();
+    const mountainId = Number(searchParams.get('mountainid'));
+    const courseId = Number(searchParams.get('courseid'));
     const navigate = useNavigate();
 
     const { data: mountainsData } = useApiQuery<MountainData[]>(
@@ -60,14 +60,10 @@ export default function ReportSearchSection() {
         coursesData ?? initCoursesData,
     );
 
-    const mountainChangeHandler = (mountain: Option) => {
-        setSearchParams(`mountainid=${mountain.id}`);
-    };
-
     const submitHandler = (values: {
-        mountainId: string;
-        courseId?: string;
-        weekdayId?: string;
+        mountainId: number;
+        courseId?: number;
+        weekdayId?: number;
     }) => {
         navigate(
             `/report?mountainid=${values.mountainId}&courseid=${values.courseId}`,
@@ -81,7 +77,7 @@ export default function ReportSearchSection() {
 
     return (
         <div css={searchWrapperStyle}>
-            {mountainId && courseId && (
+            {mountainId && courseId && mountainId !== 0 && courseId !== 0 && (
                 <ChipButton hidden text='필터' iconName='filter-lines' />
             )}
 
@@ -93,11 +89,10 @@ export default function ReportSearchSection() {
                     mountainOptions={mountainOptions}
                     courseOptions={courseOptions}
                     onSubmit={submitHandler}
-                    onMountainChange={mountainChangeHandler}
                 />
             </div>
 
-            {mountainId && courseId && (
+            {mountainId && courseId && mountainId !== 0 && courseId !== 0 && (
                 <>
                     <ChipButton
                         onClick={filterClickHandler}
@@ -131,11 +126,11 @@ const searchBarStyle = css`
     width: 100%;
 `;
 
-const initCoursesData = [{ courseId: '1', courseName: '산을 선택해주세요' }];
+const initCoursesData = [{ courseId: 0, courseName: '산을 선택해주세요' }];
 
 const MountainsData = [
     {
-        mountainId: '1',
+        mountainId: 1,
         mountainName: '태백산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -147,7 +142,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '2',
+        mountainId: 2,
         mountainName: '지리산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -159,7 +154,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '3',
+        mountainId: 3,
         mountainName: '백두산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -171,7 +166,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '4',
+        mountainId: 4,
         mountainName: '한라산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
@@ -183,7 +178,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '5',
+        mountainId: 5,
         mountainName: '설악산',
         mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
         mountainDescription: '한겨울 설경이 아름다운 산입니다.',
@@ -195,7 +190,7 @@ const MountainsData = [
         },
     },
     {
-        mountainId: '6',
+        mountainId: 6,
         mountainName: '가야산',
         mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
         mountainDescription: '한국에서 두 번째로 높은 산입니다.',
