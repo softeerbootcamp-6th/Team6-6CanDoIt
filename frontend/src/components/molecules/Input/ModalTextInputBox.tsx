@@ -51,7 +51,7 @@ const textareaStyle = css`
     height: 100%;
     border: none;
     background: transparent;
-    color: ${colors.grey[0]};
+    color: ${colors.grey[100]};
     resize: none;
     outline: none;
 
