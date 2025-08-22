@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 interface Option {
-    id: string;
+    id: number;
     name: string;
 }
 
@@ -31,7 +31,7 @@ export default function Dropdown(props: PropsState) {
         onSelect,
     } = props;
 
-    const [selector, setSelector] = useState({ id: '0', name: title });
+    const [selector, setSelector] = useState({ id: 0, name: title });
     const [searchParams] = useSearchParams();
     const outsideRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,8 +56,8 @@ export default function Dropdown(props: PropsState) {
             document.removeEventListener('mouseup', outsideClickHandler);
     }, [onToggle]);
     useEffect(() => {
-        if (!paramName || options.length === 0 || selector.id !== '0') return;
-        const paramValue = searchParams.get(paramName);
+        if (!paramName || options.length === 0 || selector.id !== 0) return;
+        const paramValue = Number(searchParams.get(paramName));
         if (!paramValue) return;
         const matchedOption = options.find(
             (option) => option.id === paramValue,
@@ -70,17 +70,20 @@ export default function Dropdown(props: PropsState) {
         }
     }, [paramName, options]);
 
-    const optionListProps = createOptionListProps({
-        options,
-        setSelector,
-        onToggle,
-    });
+    const optionListProps = options.map((option) => ({
+        key: option.id,
+        onClick: () => {
+            setSelector({ id: option.id, name: option.name });
+            onToggle();
+        },
+        children: option.name,
+    }));
 
     return (
         <div ref={outsideRef} css={dropdownStyle}>
             <div css={selectorTitleStyle} onClick={onToggle}>
                 <SearchBarText>{selector.name}</SearchBarText>
-                <div css={selectorChevronButtonStyle}>
+                <div css={selectorChevronButtonStyle(isOpenOptions)}>
                     <Icon {...chevronIconProps} />
                 </div>
             </div>
@@ -101,27 +104,6 @@ export default function Dropdown(props: PropsState) {
             )}
         </div>
     );
-}
-
-function createOptionListProps({
-    options,
-    setSelector,
-    onToggle,
-}: {
-    options: Option[];
-    setSelector: React.Dispatch<
-        React.SetStateAction<{ id: string; name: string }>
-    >;
-    onToggle: () => void;
-}) {
-    return options.map((option) => ({
-        key: option.id,
-        onClick: () => {
-            setSelector({ id: option.id, name: option.name });
-            onToggle();
-        },
-        children: option.name,
-    }));
 }
 
 const chevronIconProps = {
@@ -148,12 +130,14 @@ const chevronButtonStyle = css`
     transform-origin: 50% 50%;
 `;
 
-const selectorChevronButtonStyle = css([
-    chevronButtonStyle,
-    `
-    transform: rotate(-90deg) scale(1.3);
+const selectorChevronButtonStyle = (isOpenOptions: boolean) =>
+    css([
+        chevronButtonStyle,
+        `
+    transform: rotate(${isOpenOptions ? 0 : -90}deg) scale(1.3);
+    transition: transform 200ms ease;
   `,
-]);
+    ]);
 
 const optionChevronButtonStyle = css([
     chevronButtonStyle,
