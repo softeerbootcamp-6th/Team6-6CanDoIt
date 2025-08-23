@@ -3,6 +3,7 @@ package com.softeer.batch.forecast.mountain.writer;
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.batch.common.writersupporter.SunTimeJdbcWriter;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
+import com.softeer.batch.forecast.mountain.redis.MountainForecastRedisWriter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -19,6 +20,7 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
 
     protected final ForecastJdbcWriter forecastWriterSupporter;
     protected final SunTimeJdbcWriter sunTimeJdbcWriter;
+    protected final MountainForecastRedisWriter mountainForecastRedisWriter;
 
     @Override
     public void write(Chunk<? extends MountainDailyForecast> chunk) {
@@ -56,6 +58,8 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
         if (!paramsToInsert.isEmpty()) {
             forecastWriterSupporter.batchUpdate(paramsToInsert.toArray(new SqlParameterSource[0]));
         }
+
+        mountainForecastRedisWriter.pipelineUpdateMountainForecast(chunk.getItems());
     }
 
     protected abstract List<Forecast> filterForecasts(List<Forecast> forecasts);
