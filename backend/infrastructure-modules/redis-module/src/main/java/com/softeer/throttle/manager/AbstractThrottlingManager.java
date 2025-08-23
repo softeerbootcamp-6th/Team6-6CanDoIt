@@ -29,6 +29,8 @@ public abstract class AbstractThrottlingManager {
     private final AtomicInteger successCount = new AtomicInteger();
 
     private final ReentrantLock configurationLock = new ReentrantLock();
+    private final ReentrantLock asyncUpdateLock = new ReentrantLock();  // 상향 조절 전용 락
+
     private final AtomicInteger lastUpdatedTps = new AtomicInteger();
 
     private volatile boolean shutdown = false;
@@ -39,13 +41,25 @@ public abstract class AbstractThrottlingManager {
         this.properties = properties;
         this.backoffStrategy = backoffStrategy;
 
-        this.retryExecutor = Executors.newScheduledThreadPool(5, r -> {
-            Thread t = new Thread(r, "throttling-retry-executor");
+        // TPS 기반으로 재시도 스레드풀 크기 계산
+        int retryThreadPoolSize = calculateRetryThreadPoolSize();
+        this.retryExecutor = Executors.newScheduledThreadPool(retryThreadPoolSize, r -> {
+            Thread t = new Thread(r, "throttling-retry-executor-" + System.nanoTime());
             t.setDaemon(true);
             return t;
         });
+
+        log.info("ThrottlingManager 초기화 완료. 재시도 스레드풀 크기: {}", retryThreadPoolSize);
     }
 
+    private int calculateRetryThreadPoolSize() {
+        // TPS 기반 동적 스레드풀 크기 계산
+        int maxTps = properties.maxTps();
+        int retryThreads = Math.max(4, Math.min(20, maxTps / 10));
+
+        log.debug("재시도 스레드풀 크기 계산. maxTps: {}, retryThreads: {}", maxTps, retryThreads);
+        return retryThreads;
+    }
 
     @PostConstruct
     public void initialize() {
@@ -205,9 +219,8 @@ public abstract class AbstractThrottlingManager {
                 // 락을 획득하지 못했다면 하향 조절 중일 가능성이 높음
                 // 잠시 대기 후 다시 시도
                 try {
-                    Thread.sleep(100); // 짧은 대기
+                    Thread.sleep(200); // 짧은 대기
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
                     throw new RuntimeException("getBucket 대기 중 인터럽트 발생", e);
                 }
                 return getBucket(key); // 재귀 호출
@@ -227,7 +240,7 @@ public abstract class AbstractThrottlingManager {
             return;
         }
 
-        if (configurationLock.tryLock()) {
+        if (asyncUpdateLock.tryLock()) {
             try {
                 if (lastUpdatedTps.get() == currentTpsValue) {
                     return;
