@@ -10,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -24,11 +23,7 @@ public abstract class AbstractThrottlingManager {
     private final ProxyManager<String> proxyManager;
     private final BackoffStrategy backoffStrategy;
 
-    private final ScheduledExecutorService retryExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r, "throttling-retry-executor");
-        t.setDaemon(true);
-        return t;
-    });
+    private final ScheduledExecutorService retryExecutor;
 
     protected final AtomicInteger currentTps = new AtomicInteger();
     private final AtomicInteger successCount = new AtomicInteger();
@@ -43,7 +38,14 @@ public abstract class AbstractThrottlingManager {
         this.proxyManager = proxyManager;
         this.properties = properties;
         this.backoffStrategy = backoffStrategy;
+
+        this.retryExecutor = Executors.newScheduledThreadPool(5, r -> {
+            Thread t = new Thread(r, "throttling-retry-executor");
+            t.setDaemon(true);
+            return t;
+        });
     }
+
 
     @PostConstruct
     public void initialize() {
@@ -94,7 +96,6 @@ public abstract class AbstractThrottlingManager {
             ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
 
             if (probe.isConsumed()) {
-                log.info("토큰 소비 성공. 작업 실행 시작. key: {}, attempt: {}", task.key(), task.attempt());
                 CompletableFuture<T> taskFuture;
                 try {
                     taskFuture = task.supplier().get();
@@ -159,7 +160,8 @@ public abstract class AbstractThrottlingManager {
 
                 if (currentTps.compareAndSet(oldTps, newTps)) {
                     log.info("TPS 상향 조정: {} -> {} ({}회 연속 성공)", oldTps, newTps, successCounter);
-                    updateBucketConfiguration();
+                    // 상향 조절 시에는 락 없이 업데이트
+                    updateBucketConfigurationAsync();
                 }
             }
         } else {
@@ -167,7 +169,9 @@ public abstract class AbstractThrottlingManager {
             newTps = Math.max(properties.minTps(), oldTps - properties.failStep());
 
             if (currentTps.compareAndSet(oldTps, newTps)) {
-                updateBucketConfiguration();
+                log.info("TPS 하향 조정: {} -> {} (실패로 인한 조정)", oldTps, newTps);
+                // 하향 조절 시에는 락을 걸어 getBucket() 호출을 잠시 차단
+                updateBucketConfigurationWithLock();
             }
         }
     }
@@ -176,37 +180,47 @@ public abstract class AbstractThrottlingManager {
 
     private Bucket getBucket(String key) {
         if (bucket == null) {
-            if (configurationLock.tryLock()) {
-                try {
-                    if (bucket == null) {
-                        log.debug("버킷 초기 생성. key: {}, 초기 TPS: {}", key, properties.initialTps());
+            configurationLock.lock();
+            try {
+                if (bucket == null) {
+                    log.debug("버킷 초기 생성. key: {}, 초기 TPS: {}", key, properties.initialTps());
 
-                        Bandwidth newBandwidth = createBandwidth();
+                    Bandwidth newBandwidth = createBandwidth();
 
-                        BucketConfiguration configuration = BucketConfiguration.builder()
-                                .addLimit(newBandwidth)
-                                .build();
+                    BucketConfiguration configuration = BucketConfiguration.builder()
+                            .addLimit(newBandwidth)
+                            .build();
 
-                        bucket = proxyManager.builder().build(key, () -> configuration);
-                        lastUpdatedTps.set(properties.initialTps());
-                        log.info("버킷 생성 완료. key: {}", key);
-                    }
-                } finally {
-                    configurationLock.unlock();
+                    bucket = proxyManager.builder().build(key, () -> configuration);
+                    lastUpdatedTps.set(properties.initialTps());
+                    log.info("버킷 생성 완료. key: {}", key);
                 }
-            } else {
+            } finally {
+                configurationLock.unlock();
+            }
+        } else {
+            // 버킷이 이미 존재하는 경우, 하향 조절 중인지 확인
+            // 하향 조절은 configurationLock.lock()을 사용하므로 tryLock으로 체크
+            if (!configurationLock.tryLock()) {
+                // 락을 획득하지 못했다면 하향 조절 중일 가능성이 높음
+                // 잠시 대기 후 다시 시도
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(100); // 짧은 대기
                 } catch (InterruptedException e) {
-                    throw new RuntimeException("버킷 생성 중 인터럽트 발생", e);
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("getBucket 대기 중 인터럽트 발생", e);
                 }
-                return getBucket(key);
+                return getBucket(key); // 재귀 호출
+            } else {
+                // 락을 획득했다면 즉시 해제하고 버킷 반환
+                configurationLock.unlock();
             }
         }
         return bucket;
     }
 
-    private void updateBucketConfiguration() {
+    // 상향 조절용 - 락 없이 비동기 업데이트
+    private void updateBucketConfigurationAsync() {
         int currentTpsValue = currentTps.get();
 
         if (lastUpdatedTps.get() == currentTpsValue) {
@@ -215,19 +229,14 @@ public abstract class AbstractThrottlingManager {
 
         if (configurationLock.tryLock()) {
             try {
-
                 if (lastUpdatedTps.get() == currentTpsValue) {
                     return;
                 }
 
-                log.info("버킷 설정 업데이트 시작. 이전 TPS: {} -> 새 TPS: {}", lastUpdatedTps.get(), currentTpsValue);
+                log.info("버킷 설정 업데이트 시작 (상향 조정). 이전 TPS: {} -> 새 TPS: {}",
+                        lastUpdatedTps.get(), currentTpsValue);
 
-                Bandwidth newBandwidth = Bandwidth.builder()
-                        .capacity(properties.maxTps())
-                        .refillGreedy(currentTpsValue, Duration.ofSeconds(1))
-                        .initialTokens(0)
-                        .build();
-
+                Bandwidth newBandwidth = createBandwidth();
                 BucketConfiguration newConfiguration = BucketConfiguration.builder()
                         .addLimit(newBandwidth)
                         .build();
@@ -235,16 +244,51 @@ public abstract class AbstractThrottlingManager {
                 if (bucket != null) {
                     bucket.replaceConfiguration(newConfiguration, TokensInheritanceStrategy.ADDITIVE);
                     lastUpdatedTps.set(currentTpsValue);
-                    log.info("버킷 설정 업데이트 완료. TPS: {}", currentTpsValue);
+                    log.info("버킷 설정 업데이트 완료 (상향 조정). TPS: {}", currentTpsValue);
                 }
 
             } catch (Exception e) {
-                log.error("버킷 설정 업데이트 실패. TPS: {}", currentTpsValue, e);
+                log.error("버킷 설정 업데이트 실패 (상향 조정). TPS: {}", currentTpsValue, e);
             } finally {
                 configurationLock.unlock();
             }
         } else {
-            log.debug("다른 스레드가 버킷 설정 업데이트 중. TPS: {}", currentTpsValue);
+            log.debug("다른 스레드가 버킷 설정 업데이트 중 (상향 조정 스킵). TPS: {}", currentTpsValue);
+        }
+    }
+
+    // 하향 조절용 - 락을 걸어 getBucket() 호출 차단
+    private void updateBucketConfigurationWithLock() {
+        int currentTpsValue = currentTps.get();
+
+        if (lastUpdatedTps.get() == currentTpsValue) {
+            return;
+        }
+
+        configurationLock.lock();
+        try {
+            if (lastUpdatedTps.get() == currentTpsValue) {
+                return;
+            }
+
+            log.info("버킷 설정 업데이트 시작 (하향 조정). 이전 TPS: {} -> 새 TPS: {}",
+                    lastUpdatedTps.get(), currentTpsValue);
+
+            Bandwidth newBandwidth = createBandwidth();
+            BucketConfiguration newConfiguration = BucketConfiguration.builder()
+                    .addLimit(newBandwidth)
+                    .build();
+
+            if (bucket != null) {
+                bucket.replaceConfiguration(newConfiguration, TokensInheritanceStrategy.ADDITIVE);
+                lastUpdatedTps.set(currentTpsValue);
+                log.info("버킷 설정 업데이트 완료 (하향 조정). TPS: {}", currentTpsValue);
+            }
+
+        } catch (Exception e) {
+            log.error("버킷 설정 업데이트 실패 (하향 조정). TPS: {}", currentTpsValue, e);
+        } finally {
+            configurationLock.unlock();
         }
     }
 }
