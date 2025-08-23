@@ -3,6 +3,7 @@ package com.softeer.batch.forecast.shortterm.writer;
 import com.softeer.batch.common.writersupporter.DailyTemperatureWriter;
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
+import com.softeer.batch.forecast.shortterm.redis.ShortForecastRedisWriter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -18,6 +19,7 @@ public abstract class AbstractShortForecastWriter implements ItemWriter<ShortFor
 
     protected final ForecastJdbcWriter forecastWriterSupporter;
     protected final DailyTemperatureWriter dailyTemperatureWriterSupporter;
+    protected final ShortForecastRedisWriter shortForecastRedisWriter;
 
     @Override
     public void write(Chunk<? extends ShortForecastList> chunk) throws Exception {
@@ -51,6 +53,8 @@ public abstract class AbstractShortForecastWriter implements ItemWriter<ShortFor
         if (dailyTemperatureBatch.length > 0) {
             dailyTemperatureWriterSupporter.batchUpdate(dailyTemperatureBatch);
         }
+
+        shortForecastRedisWriter.pipelineUpdateShortForecast(chunk.getItems());
     }
 
     protected abstract List<Forecast> filterForecasts(List<Forecast> forecasts);
