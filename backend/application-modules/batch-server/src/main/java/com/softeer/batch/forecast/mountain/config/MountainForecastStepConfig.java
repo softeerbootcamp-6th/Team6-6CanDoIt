@@ -2,6 +2,7 @@ package com.softeer.batch.forecast.mountain.config;
 
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.batch.forecast.mountain.dto.MountainIdentifier;
+import com.softeer.batch.forecast.mountain.listener.DailyTemperatureLoader;
 import com.softeer.batch.forecast.mountain.processor.MountainForecastProcessor;
 import com.softeer.batch.forecast.mountain.reader.MountainIdentifierReader;
 import com.softeer.batch.forecast.mountain.writer.ScheduledMountainForecastWriter;
@@ -35,6 +36,8 @@ public class MountainForecastStepConfig {
     private final ScheduledMountainForecastWriter scheduledWriter;
     private final StartUpMountainForecastWriter startupWriter;
 
+    private final DailyTemperatureLoader dailyTemperatureLoader;
+
     @Bean(name = STARTUP_MOUNTAIN_FORECAST_STEP)
     @JobScope
     public Step startupForecastStep() {
@@ -53,6 +56,7 @@ public class MountainForecastStepConfig {
                 .reader(mountainIdentifierReader)
                 .processor(mountainForecastProcessor)
                 .writer(writer)
+                .listener(dailyTemperatureLoader)
                 .build();
     }
 }
