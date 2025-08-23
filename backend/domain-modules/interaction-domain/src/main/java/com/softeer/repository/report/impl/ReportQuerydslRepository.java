@@ -128,9 +128,9 @@ public class ReportQuerydslRepository {
                                 reportImage.imageUrl,
                                 reportEntity.content,
                                 reportEntity.likeCount,
-                                GroupBy.list(weatherKeywordEntity.keyword),
-                                GroupBy.list(rainKeywordEntity.keyword),
-                                GroupBy.list(etceteraKeywordEntity.keyword)
+                                GroupBy.set(weatherKeywordEntity.keyword),
+                                GroupBy.set(rainKeywordEntity.keyword),
+                                GroupBy.set(etceteraKeywordEntity.keyword)
                         )
                 ));
     }
