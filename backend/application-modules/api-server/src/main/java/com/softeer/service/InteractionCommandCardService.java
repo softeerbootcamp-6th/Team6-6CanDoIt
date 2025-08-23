@@ -2,6 +2,7 @@ package com.softeer.service;
 
 import com.softeer.domain.ImageMeta;
 import com.softeer.dto.request.ReportCreateRequest;
+import com.softeer.time.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +54,7 @@ public class InteractionCommandCardService {
 
 
     public void upsertCardHistory(long userid, long courseId, LocalDateTime startDateTime) {
-        cardHistoryUseCase.upsertCardHistory(userid, courseId, startDateTime);
+        LocalDateTime forecastDate = TimeUtil.getBaseTime(startDateTime);
+        cardHistoryUseCase.upsertCardHistory(userid, courseId, forecastDate);
     }
 }
