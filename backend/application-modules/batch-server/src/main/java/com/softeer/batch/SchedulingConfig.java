@@ -11,7 +11,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(4); // Set the number of threads
+        taskScheduler.setPoolSize(6); // Set the number of threads
         taskScheduler.initialize();
         taskRegistrar.setScheduler(taskScheduler);
     }
