@@ -6,28 +6,31 @@ import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
 
 interface Props {
+    cardData: any;
     onClose: () => void;
 }
 
-export default function WeatherSummaryCardModal({ onClose }: Props) {
+export default function WeatherSummaryCardModal({ onClose, cardData }: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
-
     return (
         <div css={overlayStyles} onClick={onClose}>
             <WeatherSummaryCardHeader />
 
             <div
-                css={modalStyles(isFront)}
+                css={modalStyles(isFront, cardData.frontCard.mountainImageUrl)}
                 onClick={(e) => {
                     e.stopPropagation();
                     setIsFront((prev) => !prev);
                 }}
             >
                 <div className='front'>
-                    <FrontWeatherSummaryCard onClose={onClose} />
+                    <FrontWeatherSummaryCard
+                        cardData={cardData.frontCard}
+                        onClose={onClose}
+                    />
                 </div>
                 <div className='back'>
-                    <BackWeatherSummaryCard />
+                    <BackWeatherSummaryCard cardData={cardData.backCard} />
                 </div>
             </div>
         </div>
@@ -51,9 +54,9 @@ const overlayStyles = css`
     z-index: 2000;
 `;
 
-const modalStyles = (isFront: boolean) => css`
-    width: 20rem;
-    height: 34rem;
+const modalStyles = (isFront: boolean, mountainImageUrl?: string) => css`
+    width: 22rem;
+    height: 35rem;
     cursor: pointer;
     position: relative;
     transform-style: preserve-3d;
@@ -73,7 +76,9 @@ const modalStyles = (isFront: boolean) => css`
     }
 
     .front {
-        background: ${colors.grey[20]};
+        background: ${mountainImageUrl
+            ? `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${mountainImageUrl}) no-repeat center center / cover`
+            : colors.grey[20]};
         display: flex;
         flex-direction: column;
         justify-content: space-between;
