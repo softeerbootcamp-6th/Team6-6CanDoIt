@@ -290,7 +290,7 @@ public interface InteractionQueryCardApi {
     ```
     """
     )
-    @GetMapping("/report/{courseId}/me/like")
+    @GetMapping("/report/me/like")
     ResponseEntity<List<ReportCardResponse>> likedReports(@RequestParam(required = false) Integer pageSize,
                                               @RequestParam(required = false) Long lastId,
                                               @LoginUserId Long userId
