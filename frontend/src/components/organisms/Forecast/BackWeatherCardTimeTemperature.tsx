@@ -1,7 +1,20 @@
 import { css } from '@emotion/react';
 import TimeTimperatureLine from '../../molecules/Forecast/TimeTemperatureLine';
 import sidebarImg from '../../../assets/body-stepper.svg';
-export default function BackWeatherCardTimeTemperature() {
+
+interface PropsState {
+    locationTemperatureData: LocationTemperatureData[];
+}
+
+interface LocationTemperatureData {
+    title: string;
+    temperature: number;
+    wind: number;
+}
+
+export default function BackWeatherCardTimeTemperature({
+    locationTemperatureData,
+}: PropsState) {
     return (
         <div
             css={css`
@@ -26,9 +39,9 @@ export default function BackWeatherCardTimeTemperature() {
                     flex: 1;
                 `}
             >
-                <TimeTimperatureLine />
-                <TimeTimperatureLine />
-                <TimeTimperatureLine />
+                {locationTemperatureData.map((item) => (
+                    <TimeTimperatureLine key={item.title} lineData={item} />
+                ))}
             </div>
         </div>
     );

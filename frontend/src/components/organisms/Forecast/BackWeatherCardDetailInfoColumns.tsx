@@ -2,15 +2,29 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import BackWeathercardDetailInfoLine from '../../molecules/Forecast/BackWeatherCardDetailInfoLine';
 
-export default function BackWeatherCardDetailInfoColumns() {
+interface PropsState {
+    detailData: {
+        apparentTemperature: DetailData;
+        precipitationProbability: DetailData;
+        sky: DetailData;
+        humidity: DetailData;
+    };
+}
+
+interface DetailData {
+    title: string;
+    iconName: string;
+    value: string[] | number[];
+}
+
+export default function BackWeatherCardDetailInfoColumns({
+    detailData,
+}: PropsState) {
     return (
         <div css={wrapperStyles}>
-            <BackWeathercardDetailInfoLine />
-            <BackWeathercardDetailInfoLine />
-            <BackWeathercardDetailInfoLine />
-            <BackWeathercardDetailInfoLine />
-            <BackWeathercardDetailInfoLine />
-            <BackWeathercardDetailInfoLine />
+            {Object.values(detailData).map((item) => (
+                <BackWeathercardDetailInfoLine key={item.title} data={item} />
+            ))}
         </div>
     );
 }
