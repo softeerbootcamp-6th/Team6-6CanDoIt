@@ -3,7 +3,7 @@ import CommonText from '../../atoms/Text/CommonText';
 import { WeatherIndexVivid } from '../../atoms/Text/WeatherIndex';
 
 interface PropsState {
-    temperature: string;
+    temperature: number;
     hikingActivity: HikingActivity;
 }
 
