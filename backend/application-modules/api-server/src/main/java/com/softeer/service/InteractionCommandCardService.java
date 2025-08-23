@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -14,6 +15,7 @@ public class InteractionCommandCardService {
 
     private final ReportCommandUseCase reportCommandUseCase;
     private final ImageUseCase imageUseCase;
+    private final CardHistoryUseCase cardHistoryUseCase;
 
     public void createReport(
             ReportCreateRequest request,
@@ -47,5 +49,10 @@ public class InteractionCommandCardService {
 
     public void likeReport(Long reportId, Long userId) {
         reportCommandUseCase.likeReport(reportId, userId);
+    }
+
+
+    public void upsertCardHistory(long userid, long courseId, LocalDateTime startDateTime) {
+        cardHistoryUseCase.upsertCardHistory(userid, courseId, startDateTime);
     }
 }

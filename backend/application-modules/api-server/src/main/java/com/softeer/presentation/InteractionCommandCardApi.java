@@ -6,11 +6,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
 
 @Tag(name = "InteractionCommandCardApi", description = "제보와 카드 생성 조회 API")
 @RequestMapping("/card/interaction")
@@ -118,4 +117,44 @@ public interface InteractionCommandCardApi {
             @PathVariable(value = "reportId") Long reportId,
             @LoginUserId Long userId
     );
+
+
+    @Operation(
+            summary = "사용자 카드 이력 수정 또는 추가",
+            description = """
+    ### 📝 **카드 이력 수정 또는 추가 (Upsert)**
+
+    해당 API는 인증된 사용자가 특정 코스에 대한 **카드 이력을 수정하거나, 존재하지 않으면 새로 추가**하는 기능을 제공합니다.
+    이력 수정 시, **startDateTime**을 요청 파라미터로 전달해야 하며, 코스 ID가 없다면 새로 추가됩니다.
+
+    ---
+
+    #### 🔐 **Authorization Header**
+    - **Authorization** (필수): `Bearer {JWT_TOKEN}`
+      예: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...`
+      → 누락 시 아래 예외 발생:
+      ```json
+      {
+        "status": 401,
+        "code": "JWT-001",
+        "message": "로그인이 필요한 서비스입니다."
+      }
+      ```
+
+    ---
+
+    #### 🔗 **Path Parameter**
+    - **courseId** (필수): 수정하거나 추가할 카드 이력의 코스 ID
+
+    #### 🔍 **Query Parameters**
+    - **startDateTime** (필수): 수정하거나 추가할 카드 이력의 시작 시간 (ISO-8601)
+
+    ---
+
+    #### ✅ **성공 응답 (HTTP 200)**
+    - 내용 없음 (`200 OK`)
+    """
+    )
+    @PutMapping("/history/{courseId}")
+    ResponseEntity<Void> upsertCardHistory(@LoginUserId Long userId, @PathVariable long courseId, @RequestParam LocalDateTime startDateTime);
 }
