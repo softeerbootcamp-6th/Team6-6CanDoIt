@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CardHistoryUseCase {
     List<CardHistory> findUserCardHistory(long userId, CardHistoryPageable pageable);
-    void updateCardHistory(long userId, long courseId, LocalDateTime forecastDate);
+    void upsertCardHistory(long userId, long courseId, LocalDateTime forecastDate);
 }
