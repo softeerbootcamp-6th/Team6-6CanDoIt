@@ -1,6 +1,4 @@
 import { css } from '@emotion/react';
-import { getColor } from '../../../utils/utils.ts';
-import { theme } from '../../../theme/theme.ts';
 import MountainCardFooter from '../../molecules/MountainCard/MountainCardFooter.tsx';
 import MountainCardHeader from '../../molecules/MountainCard/MountainCardHeader.tsx';
 
@@ -54,8 +52,6 @@ const easingFunctions = {
     outBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
 };
 
-const { colors } = theme;
-
 const cardStyle = (mountainImageUrl: string) => css`
     display: flex;
     flex-direction: column;
@@ -64,10 +60,11 @@ const cardStyle = (mountainImageUrl: string) => css`
     width: 18.75rem;
     height: 36.25rem;
     box-sizing: border-box;
-    background: ${getColor({ colors, colorString: 'grey-50' })};
     border-radius: 1.5rem;
     padding: 1.25rem;
-    background-image: url(${mountainImageUrl});
+    background-image:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 30%),
+        url(${mountainImageUrl});
     background-size: cover;
 
     transition:
