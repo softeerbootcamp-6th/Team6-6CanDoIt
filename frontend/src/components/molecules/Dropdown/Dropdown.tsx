@@ -14,16 +14,18 @@ interface Option {
 
 interface PropsState {
     title: string;
+    initSelector: Option;
     options: Option[];
     isOpenOptions?: boolean;
     paramName?: string;
     onToggle: () => void;
-    onSelect?: (option: Option) => void;
+    onSelect?: (id: number) => void;
 }
 
 export default function Dropdown(props: PropsState) {
     const {
         title,
+        initSelector,
         options,
         isOpenOptions = false,
         paramName,
@@ -31,7 +33,7 @@ export default function Dropdown(props: PropsState) {
         onSelect,
     } = props;
 
-    const [selector, setSelector] = useState({ id: 0, name: title });
+    const [selector, setSelector] = useState(initSelector);
     const [searchParams] = useSearchParams();
     const outsideRef = useRef<HTMLDivElement | null>(null);
 
@@ -46,8 +48,11 @@ export default function Dropdown(props: PropsState) {
     };
 
     useEffect(() => {
+        setSelector(initSelector);
+    }, [initSelector]);
+    useEffect(() => {
         if (selector.name !== title) {
-            onSelect?.(selector);
+            onSelect?.(selector.id);
         }
     }, [selector]);
     useEffect(() => {

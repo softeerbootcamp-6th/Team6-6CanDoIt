@@ -9,7 +9,7 @@ import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
 } from '../Main/utils.ts';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import FilterModal from '../../organisms/Report/FilterModal.tsx';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
@@ -22,25 +22,43 @@ interface Option {
 export default function ReportSearchSection() {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const mountainId = Number(searchParams.get('mountainid'));
     const courseId = Number(searchParams.get('courseid'));
-    const navigate = useNavigate();
+
+    const [selectedMountainId, setSelectedMountainId] =
+        useState<number>(mountainId);
+    const [selectedCourseId, setSelectedCourseId] = useState<number>(courseId);
+    const mouuntainChangeHandler = (id: number) => {
+        setSelectedMountainId(id);
+        setSelectedCourseId(0);
+    };
+    const courseChangeHandler = (id: number) => {
+        setSelectedCourseId(id);
+    };
+    const submitHandler = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const next = new URLSearchParams(searchParams);
+        next.set('mountainid', String(selectedMountainId));
+        next.set('courseid', String(selectedCourseId));
+        setSearchParams(next);
+    };
 
     const { data: mountainsData } = useApiQuery<MountainData[]>(
         '/card/mountain',
         {},
         {
-            placeholderData: MountainsData,
+            //placeholderData: MountainsData,
             retry: false,
         },
     );
     const { data: coursesData } = useApiQuery<MountainCourse[]>(
-        `/card/mountain/${mountainId}/course`,
+        `/card/mountain/${selectedMountainId}/course`,
         {},
         {
-            placeholderData: initCoursesData,
-            enabled: !!mountainId,
+            //placeholderData: initCoursesData,
+            enabled: selectedMountainId !== 0,
             retry: false,
         },
     );
@@ -54,21 +72,11 @@ export default function ReportSearchSection() {
     );
 
     const mountainOptions: Option[] = refactorMountainDataToOptions(
-        mountainsData ?? MountainsData,
+        mountainsData ?? [],
     );
     const courseOptions: Option[] = refactorCoursesDataToOptions(
-        coursesData ?? initCoursesData,
+        coursesData ?? [],
     );
-
-    const submitHandler = (values: {
-        mountainId: number;
-        courseId?: number;
-        weekdayId?: number;
-    }) => {
-        navigate(
-            `/report?mountainid=${values.mountainId}&courseid=${values.courseId}`,
-        );
-    };
 
     const filterClickHandler = (e: React.MouseEvent<HTMLElement>) => {
         setFilterAnchor(e.currentTarget);
@@ -87,7 +95,11 @@ export default function ReportSearchSection() {
                     searchBarMessage='의 실시간 제보'
                     pageName='report'
                     mountainOptions={mountainOptions}
+                    selectedMountainId={selectedMountainId ?? 0}
+                    mountainChangeHandler={mouuntainChangeHandler}
                     courseOptions={courseOptions}
+                    selectedCourseId={selectedCourseId ?? 0}
+                    courseChangeHandler={courseChangeHandler}
                     onSubmit={submitHandler}
                 />
             </div>
@@ -125,83 +137,6 @@ const searchWrapperStyle = css`
 const searchBarStyle = css`
     width: 100%;
 `;
-
-const initCoursesData = [{ courseId: 0, courseName: '산을 선택해주세요' }];
-
-const MountainsData = [
-    {
-        mountainId: 1,
-        mountainName: '태백산',
-        mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
-        mountainDescription: '한겨울 설경이 아름다운 산입니다.',
-        weatherMetric: {
-            precipitationType: 'NONE',
-            sky: 'SUNNY',
-            surfaceTemperature: 23.5,
-            topTemperature: 18.2,
-        },
-    },
-    {
-        mountainId: 2,
-        mountainName: '지리산',
-        mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
-        mountainDescription: '한국에서 두 번째로 높은 산입니다.',
-        weatherMetric: {
-            precipitationType: 'RAIN',
-            sky: 'OVERCAST',
-            surfaceTemperature: 20.1,
-            topTemperature: 15.3,
-        },
-    },
-    {
-        mountainId: 3,
-        mountainName: '백두산',
-        mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
-        mountainDescription: '한겨울 설경이 아름다운 산입니다.',
-        weatherMetric: {
-            precipitationType: 'NONE',
-            sky: 'SUNNY',
-            surfaceTemperature: 23.5,
-            topTemperature: 18.2,
-        },
-    },
-    {
-        mountainId: 4,
-        mountainName: '한라산',
-        mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
-        mountainDescription: '한국에서 두 번째로 높은 산입니다.',
-        weatherMetric: {
-            precipitationType: 'RAIN',
-            sky: 'OVERCAST',
-            surfaceTemperature: 20.1,
-            topTemperature: 15.3,
-        },
-    },
-    {
-        mountainId: 5,
-        mountainName: '설악산',
-        mountainImageUrl: 'https://cdn.example.com/images/taebaek.png',
-        mountainDescription: '한겨울 설경이 아름다운 산입니다.',
-        weatherMetric: {
-            precipitationType: 'NONE',
-            sky: 'SUNNY',
-            surfaceTemperature: 23.5,
-            topTemperature: 18.2,
-        },
-    },
-    {
-        mountainId: 6,
-        mountainName: '가야산',
-        mountainImageUrl: 'https://cdn.example.com/images/jiri.png',
-        mountainDescription: '한국에서 두 번째로 높은 산입니다.',
-        weatherMetric: {
-            precipitationType: 'RAIN',
-            sky: 'OVERCAST',
-            surfaceTemperature: 20.1,
-            topTemperature: 15.3,
-        },
-    },
-];
 
 const filterKeywords = {
     weatherKeywords: [
