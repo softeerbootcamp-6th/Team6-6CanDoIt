@@ -9,8 +9,7 @@ dependencies {
 
     // batch-server dependencies
     implementation 'org.springframework.boot:spring-boot-starter-batch'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
+    implementation("com.bucket4j:bucket4j_jdk17-core:8.14.0")
 
     // infrastructure-modules
     implementation project(':infrastructure-modules:kma-adapter-module')

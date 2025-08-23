@@ -1,5 +1,6 @@
 package com.softeer.batch.forecast.ultra;
 
+import com.softeer.batch.forecast.ultra.v3.UltraForecastV3JobConfig;
 import com.softeer.time.ApiTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+import static com.softeer.batch.forecast.ultra.v3.UltraForecastV3JobConfig.*;
+
 @Slf4j
 @Component
 @Profile("!test")
@@ -24,7 +27,7 @@ public class UltraForecastJobScheduler {
 
     public UltraForecastJobScheduler(
             JobLauncher jobLauncher,
-            @Qualifier("ScheduledUltraForecastV1Job") Job scheduledJob
+            @Qualifier(SCHEDULED_ULTRA_FORECAST_V3_JOB) Job scheduledJob
     ) {
         this.jobLauncher = jobLauncher;
         this.scheduledJob = scheduledJob;
