@@ -10,7 +10,7 @@ import java.util.Set;
 
 public record Report(long id, ReportType reportType, LocalDateTime createdAt,
                      long userId, String nickname, String userImageUrl,
-                     String imageUrl, String content, int likeCount,
+                     String imageUrl, String content, int likeCount, boolean isLiked,
                      Set<WeatherKeyword> weatherKeywords, Set<RainKeyword> rainKeywords, Set<EtceteraKeyword> etceteraKeywords
                      ) {
 }
