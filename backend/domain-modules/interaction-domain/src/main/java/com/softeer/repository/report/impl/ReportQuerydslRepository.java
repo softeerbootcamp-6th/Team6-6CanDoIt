@@ -2,6 +2,7 @@ package com.softeer.repository.report.impl;
 
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.softeer.domain.Report;
@@ -33,9 +34,9 @@ public class ReportQuerydslRepository {
     private final JPAQueryFactory queryFactory;
 
     public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter,
-                                                     long courseId, ReportType reportType) {
+                                                     long courseId, ReportType reportType, long userId) {
 
-        List<Long> reportIds = selectReport()
+        List<Long> reportIds = selectReportIds()
                 .where(
                         reportEntity.type.eq(reportType),
                         courseEntity.id.eq(courseId),
@@ -46,12 +47,12 @@ public class ReportQuerydslRepository {
                 .limit(pageable.pageSize())
                 .fetch();
 
-        return loadReportsByIds(pageable, reportIds);
+        return loadReportsByIds(pageable, reportIds, userId);
     }
 
     public List<Report> findMyReports(ReportPageable pageable, long userId) {
 
-        List<Long> reportIds = selectReport()
+        List<Long> reportIds = selectReportIds()
                 .innerJoin(userEntity).on(userEntity.id.eq(reportEntity.userId))
                 .where(
                         pageable.where(),
@@ -63,12 +64,12 @@ public class ReportQuerydslRepository {
 
 
 
-        return loadReportsByIds(pageable, reportIds);
+        return loadReportsByIds(pageable, reportIds, userId);
     }
 
     public List<Report> findLikedReports(ReportPageable pageable, long userId) {
 
-        List<Long> reportIds = selectReport()
+        List<Long> reportIds = selectReportIds()
                 .innerJoin(userEntity).on(userEntity.id.eq(reportEntity.userId))
                 .innerJoin(reportLikeEntity).on(reportEntity.id.eq(reportLikeEntity.id.reportId))
                 .where(
@@ -80,10 +81,10 @@ public class ReportQuerydslRepository {
                 .fetch();
 
 
-        return loadReportsByIds(pageable, reportIds);
+        return loadReportsByIds(pageable, reportIds, userId);
     }
 
-    private JPAQuery<Long> selectReport() {
+    private JPAQuery<Long> selectReportIds() {
         return queryFactory
                 .selectDistinct(reportEntity.id)
                 .from(reportEntity)
@@ -96,7 +97,7 @@ public class ReportQuerydslRepository {
                 .leftJoin(weatherKeywordEntity).on(reportWeatherKeywordEntity.id.weatherKeywordId.eq(weatherKeywordEntity.id));
     }
 
-    private List<Report> loadReportsByIds(ReportPageable pageable, List<Long> reportIds) {
+    private List<Report> loadReportsByIds(ReportPageable pageable, List<Long> reportIds, Long userId) {
         if (reportIds.isEmpty()) {
             return Collections.emptyList();
         }
@@ -115,6 +116,7 @@ public class ReportQuerydslRepository {
                 .leftJoin(rainKeywordEntity).on(reportRainKeywordEntity.id.rainKeywordId.eq(rainKeywordEntity.id))
                 .leftJoin(reportWeatherKeywordEntity).on(reportEntity.id.eq(reportWeatherKeywordEntity.id.reportId))
                 .leftJoin(weatherKeywordEntity).on(reportWeatherKeywordEntity.id.weatherKeywordId.eq(weatherKeywordEntity.id))
+                .leftJoin(reportLikeEntity).on(joinReportLikeCondition(userId))
                 .where(reportEntity.id.in(reportIds))
                 .orderBy(pageable.orderBy())
                 .transform(GroupBy.groupBy(reportEntity.id).list(
@@ -128,10 +130,15 @@ public class ReportQuerydslRepository {
                                 reportImage.imageUrl,
                                 reportEntity.content,
                                 reportEntity.likeCount,
-                                GroupBy.list(weatherKeywordEntity.keyword),
-                                GroupBy.list(rainKeywordEntity.keyword),
-                                GroupBy.list(etceteraKeywordEntity.keyword)
+                                reportLikeEntity.id.reportId.isNotNull().as("isLiked"),
+                                GroupBy.set(weatherKeywordEntity.keyword),
+                                GroupBy.set(rainKeywordEntity.keyword),
+                                GroupBy.set(etceteraKeywordEntity.keyword)
                         )
                 ));
+    }
+
+    private BooleanExpression joinReportLikeCondition(long userId) {
+        return reportEntity.id.eq(reportLikeEntity.id.reportId).and(reportLikeEntity.id.userId.eq(userId));
     }
 }

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +20,8 @@ public class InteractionQueryCardService {
     private final ReportQueryUseCase reportQueryUseCase;
     private final CardHistoryUseCase cardHistoryUseCase;
 
-    public List<ReportCardResponse> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType) {
-        List<Report> reports = reportQueryUseCase.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType);
+    public List<ReportCardResponse> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType, Optional<Long> userId) {
+        List<Report> reports = reportQueryUseCase.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType, userId);
 
         return createReportCard(reports);
 

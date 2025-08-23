@@ -327,12 +327,6 @@ public interface WeatherCardApi {
     그리고 요청 날짜의 **일출/일몰 시각**, **등산지수 상태**를 카드 형태로 반환합니다.
     
     ---
-                    
-    #### 🔐 **Authorization Header**
-    - **Authorization** (필수): `Bearer {JWT_TOKEN}` \s
-    → 누락 시 `JWT-001`: `"로그인이 필요한 서비스입니다."` 예외 발생
-    
-    ---
     
     #### 🔗 **Path Variable**
     - **courseId** (필수): 코스 등산 일정을 조회할 코스의 id
@@ -404,7 +398,6 @@ public interface WeatherCardApi {
     @GetMapping("/mountain/course/{courseId}/schedule")
     ResponseEntity<CourseScheduleCardResponse> courseSchedule(
             @PathVariable("courseId") Long courseId,
-            @LoginUserId Long userId,
             @RequestParam LocalDateTime startDateTime
     );
 }

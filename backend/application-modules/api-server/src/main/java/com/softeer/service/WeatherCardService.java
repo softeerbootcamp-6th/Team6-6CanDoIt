@@ -27,7 +27,6 @@ public class WeatherCardService {
 
     private final MountainUseCase mountainUseCase;
     private final ForecastUseCase forecastUseCase;
-    private final CardHistoryUseCase cardHistoryUseCase;
 
     public List<HourlyWeatherResponse> findForecastsByMountainId(long mountainId, LocalDateTime startDatetime) {
         Mountain mountain = mountainUseCase.getMountainById(mountainId);
@@ -111,7 +110,7 @@ public class WeatherCardService {
         );
     }
 
-    public CourseScheduleCardResponse createCourseScheduleCard(Long courseId, Long userId, LocalDateTime startDateTime) {
+    public CourseScheduleCardResponse createCourseScheduleCard(Long courseId, LocalDateTime startDateTime) {
         CoursePlan coursePlan = mountainUseCase.getCoursePlan(courseId, LocalDate.from(startDateTime));
 
         HikingTime hikingTime = TimeUtil.getHikingTime(startDateTime, coursePlan.course().totalDuration());
@@ -144,8 +143,6 @@ public class WeatherCardService {
                 adjustedWindSpeed,
                 forecasts.arrivalForecast().humidityCondition().humidity()
         );
-
-        cardHistoryUseCase.updateCardHistory(userId, courseId, startDateTime);
 
         return new CourseScheduleCardResponse(
                 coursePlan,

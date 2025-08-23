@@ -14,18 +14,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ReportQueryUseCaseImpl implements ReportQueryUseCase {
 
+    private static final long UNABLE_USER_ID = -1;
+
     private final ReportQueryAdapter reportQueryAdapter;
 
     @Override
-    public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType) {
+    public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType, Optional<Long> userId) {
         if (Objects.isNull(reportType)) throw ExceptionCreator.create(ReportException.NO_REPORT_TYPE);
 
-        return reportQueryAdapter.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType);
+        return reportQueryAdapter.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType, userId.orElse(UNABLE_USER_ID));
     }
 
     @Override
