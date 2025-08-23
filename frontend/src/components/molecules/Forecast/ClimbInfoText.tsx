@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText';
+import { parseDuration } from '../../../utils/utils';
 
 interface PropsState {
     totalDuration: number;
@@ -10,13 +11,21 @@ export default function ClimbInfoText({
     totalDuration,
     totalDistance,
 }: PropsState) {
-    const { hour, min } = parseDuration(totalDuration);
+    function formatDurationText(totalDuration: number): string {
+        const { hour, min } = parseDuration(totalDuration);
+        const parts: string[] = [];
+
+        if (hour > 0) parts.push(`${hour}시간`);
+        if (min > 0) parts.push(`${min}분`);
+
+        return parts.join(' ');
+    }
+
+    const timeText = formatDurationText(totalDuration);
 
     return (
         <p css={textWrapperStyles}>
-            <CommonText
-                {...WhiteTextProps}
-            >{`${hour}시간 ${min}분`}</CommonText>
+            <CommonText {...WhiteTextProps}>{timeText}</CommonText>
             <CommonText {...TextProps}>동안</CommonText>
             <CommonText {...WhiteTextProps}>{`${totalDistance}km`}</CommonText>
             <CommonText {...TextProps}>를 올라야해요</CommonText>
@@ -43,9 +52,3 @@ const TextProps = {
     fontWeight: 'bold',
     fontSize: 'body',
 } as const;
-
-function parseDuration(totalDuration: number): { hour: number; min: number } {
-    const hour = Math.floor(totalDuration);
-    const min = Math.round((totalDuration - hour) * 60);
-    return { hour, min };
-}
