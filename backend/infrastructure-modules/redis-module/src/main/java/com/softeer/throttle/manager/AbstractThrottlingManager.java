@@ -263,7 +263,7 @@ public abstract class AbstractThrottlingManager {
             } catch (Exception e) {
                 log.error("버킷 설정 업데이트 실패 (상향 조정). TPS: {}", currentTpsValue, e);
             } finally {
-                configurationLock.unlock();
+                asyncUpdateLock.unlock();
             }
         } else {
             log.debug("다른 스레드가 버킷 설정 업데이트 중 (상향 조정 스킵). TPS: {}", currentTpsValue);
