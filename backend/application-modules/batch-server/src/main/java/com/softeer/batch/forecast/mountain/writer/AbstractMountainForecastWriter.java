@@ -28,11 +28,11 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
 
     private void writeSunTime(Chunk<? extends MountainDailyForecast> chunk) {
         SqlParameterSource[] sunTimeParams = chunk.getItems().stream()
-                .map(sunTimeJdbcWriter::createSunTimeParams)
+                .map(sunTimeJdbcWriter::mapSunTimeToSqlParams)
                 .flatMap(List::stream)
                 .toArray(SqlParameterSource[]::new);
 
-        sunTimeJdbcWriter.batchUpdateSunTime(sunTimeParams);
+        sunTimeJdbcWriter.batchUpdate(sunTimeParams);
     }
 
     private void writeForecast(Chunk<? extends MountainDailyForecast> chunk) {
@@ -54,7 +54,7 @@ public abstract class AbstractMountainForecastWriter implements ItemWriter<Mount
         }
 
         if (!paramsToInsert.isEmpty()) {
-            forecastWriterSupporter.batchUpdateForecast(paramsToInsert.toArray(new SqlParameterSource[0]));
+            forecastWriterSupporter.batchUpdate(paramsToInsert.toArray(new SqlParameterSource[0]));
         }
     }
 
