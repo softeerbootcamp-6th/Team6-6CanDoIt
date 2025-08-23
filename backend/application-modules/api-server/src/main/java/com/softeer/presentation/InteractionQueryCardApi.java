@@ -172,9 +172,6 @@ public interface InteractionQueryCardApi {
 
     ---
 
-    #### 🔗 **Path Parameter**
-    - **courseId** (필수): 리포트를 조회할 코스의 ID
-
     #### 🔍 **Query Parameters**
     - **pageSize** (선택): 한 번에 조회할 리포트 개수  
     - **lastId** (선택): 마지막으로 조회한 리포트 ID (커서 기반 페이징)
