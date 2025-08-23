@@ -30,14 +30,12 @@ public class WeatherCardServiceTest {
 
     private MountainUseCase mountainUseCase;
     private ForecastUseCase forecastUseCase;
-    private CardHistoryUseCase cardHistoryUseCase;
 
     @BeforeEach
     void setUp() {
         mountainUseCase = mock(MountainUseCase.class);
         forecastUseCase = mock(ForecastUseCase.class);
-        cardHistoryUseCase = mock(CardHistoryUseCase.class);
-        target = new WeatherCardService(mountainUseCase, forecastUseCase, cardHistoryUseCase);
+        target = new WeatherCardService(mountainUseCase, forecastUseCase);
     }
 
     @Test
