@@ -7,6 +7,7 @@ import BackReportCardHeader from '../../molecules/ReportCard/BackReportCardHeade
 interface PropsState {
     comment: string;
     timeAgo: string;
+    userImageUrl?: string;
     likeCount?: number;
     filterLabels: string[];
     onHeartClick: () => void;
@@ -17,6 +18,7 @@ export default function BackReportCard(props: PropsState) {
     const {
         comment,
         timeAgo,
+        userImageUrl = '',
         likeCount = 0,
         filterLabels,
         onHeartClick,
@@ -24,7 +26,10 @@ export default function BackReportCard(props: PropsState) {
     } = props;
     return (
         <ReportCardWrapper onClick={onClick}>
-            <BackReportCardHeader timeAgo={timeAgo} />
+            <BackReportCardHeader
+                userImageUrl={userImageUrl}
+                timeAgo={timeAgo}
+            />
             <CommonText {...textProps}>{comment}</CommonText>
             <HeartStat count={likeCount} onHeartClick={onHeartClick} />
             <LabelList labels={filterLabels} isCut={false} />

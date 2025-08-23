@@ -10,6 +10,7 @@ interface PropsState {
     filterLabels: string[];
     imgSrc?: string;
     imgAlt?: string;
+    userImageUrl?: string;
     onClick: () => void;
 }
 
@@ -20,13 +21,18 @@ export default function FrontReportCard(props: PropsState) {
         filterLabels,
         imgSrc = '',
         imgAlt = '',
+        userImageUrl = '',
         onClick,
     } = props;
     return (
         <ReportCardWrapper onClick={onClick}>
             <img src={imgSrc} alt={imgAlt} css={reportImgStyle} />
             <LabelList labels={filterLabels} />
-            <FrontCardFooter timeAgo={timeAgo} comment={comment} />
+            <FrontCardFooter
+                timeAgo={timeAgo}
+                comment={comment}
+                userImageUrl={userImageUrl}
+            />
         </ReportCardWrapper>
     );
 }
@@ -38,4 +44,5 @@ const reportImgStyle = css`
     height: 27.9375rem;
     border-radius: 2rem;
     background-color: ${colors.grey[80]};
+    object-fit: cover;
 `;
