@@ -73,7 +73,9 @@ public interface InteractionQueryCardApi {
                     요청 시, 리포트 타입 및 키워드 필터링, 페이징 쿼리를 적용할 수 있습니다.
                     
                     ---
-                    
+                    #### 🔐 **Authorization Header**
+                      - **Authorization** (선택): `Bearer {JWT_TOKEN}`
+                        
                     #### 🔗 **Path Parameter**
                     - **courseId** (필수): 리포트를 조회할 코스 ID
                     
