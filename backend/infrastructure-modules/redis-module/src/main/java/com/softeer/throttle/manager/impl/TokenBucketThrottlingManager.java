@@ -19,7 +19,7 @@ public class TokenBucketThrottlingManager extends AbstractThrottlingManager {
         return Bandwidth.builder()
                 .capacity(properties.maxTps())
                 .refillGreedy(currentTps.longValue(), Duration.ofSeconds(1))
-                .initialTokens(0)
+                .initialTokens(properties.initialTps())
                 .build();
     }
 }
