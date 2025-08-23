@@ -5,6 +5,7 @@ import com.softeer.common.ApiRequest;
 import com.softeer.config.ForecastApiType;
 import com.softeer.shortterm.dto.response.ShortForecastApiResponse;
 import com.softeer.shortterm.dto.response.ShortForecastBody;
+import com.softeer.shortterm.dto.response.ShortForecastHeader;
 import com.softeer.shortterm.dto.response.ShortForecastItem;
 import com.softeer.throttle.ex.ThrottleException;
 import com.softeer.throttle.ex.ThrottleExceptionStatus;
@@ -34,9 +35,11 @@ public abstract class AbstractShortForecastApiCaller extends AbstractKmaApiCalle
 
         if(Objects.isNull(response)) throw new ThrottleException(ThrottleExceptionStatus.NO_RETRY);
 
-        String resultCode = response.getHeader().resultCode();
+        ShortForecastHeader header = response.getHeader();
+        String resultCode = header.resultCode();
+        String resultMsg= header.resultMsg();
 
-        if(!resultCode.equals("00") && RETRYABLE_ERROR_CODES.contains(resultCode)) {
+        if(!resultCode.equals("00") && RETRYABLE_ERROR_MESSAGES.contains(resultMsg)) {
             throw new ThrottleException(ThrottleExceptionStatus.RETRY);
         }
 
