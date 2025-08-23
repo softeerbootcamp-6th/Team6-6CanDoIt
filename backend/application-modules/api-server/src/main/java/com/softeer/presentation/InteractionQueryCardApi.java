@@ -8,10 +8,7 @@ import com.softeer.service.ReportQueryUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -70,81 +67,86 @@ public interface InteractionQueryCardApi {
     @Operation(
             summary = "코스별 유저 리포트 목록 조회",
             description = """
-    ### 📝 **코스별 유저 리포트 카드 응답 정보**
-
-    해당 API는 특정 코스에 작성된 유저 리포트들을 **카드 형태로 리스트 반환**합니다.  
-    요청 시, 리포트 타입 및 키워드 필터링, 페이징 쿼리를 적용할 수 있습니다.
-
-    ---
-
-    #### 🔗 **Path Parameter**
-    - **courseId** (필수): 리포트를 조회할 코스 ID
-
-    #### 🔍 **Query Parameters**
-    - **reportType** (필수): 리포트 타입 (예: `WEATHER`, `SAFE`, `TRAIL`, `ETC`)  
-      → 값이 없을 경우 `RPT-001`: `"제보 타입을 선택해주세요."` 에러 발생  
-    - **pageSize** (선택): 한 번에 조회할 리포트 개수  
-    - **lastId** (선택): 마지막으로 조회된 리포트 ID (커서 기반 페이징)  
-    - **weatherKeywordIds** (선택): 날씨 키워드 필터링용 ID 목록  
-    - **rainKeywordIds** (선택): 비/강수 키워드 필터링용 ID 목록  
-    - **etceteraKeywordIds** (선택): 기타 키워드 필터링용 ID 목록
-
-    ---
-
-    #### 📌 **응답 필드 설명 (ReportCardResponse)**
-    - **reportId**: 리포트 ID  
-    - **reportType**: 리포트 종류 (예: WEATHER, SAFE 등)  
-    - **createdAt**: 작성 시각 (ISO-8601)  
-    - **nickname**: 작성자 닉네임  
-    - **userImageUrl**: 작성자 프로필 이미지  
-    - **imageUrl**: 리포트 이미지  
-    - **content**: 리포트 본문  
-    - **likeCount**: 좋아요 수  
-    - **weatherKeywords**: 날씨 키워드 설명 문자열 리스트  
-    - **rainKeywords**: 강수 키워드 설명 문자열 리스트  
-    - **etceteraKeywords**: 기타 키워드 설명 문자열 리스트
-
-    ---
-
-    #### ✅ **성공 응답 예시 (HTTP 200)**
-    ```json
-    [
-      {
-        "reportId": 101,
-        "reportType": "WEATHER",
-        "createdAt": "2025-08-18T09:12:00",
-        "nickname": "등산고수",
-        "userImageUrl": "https://cdn.example.com/users/u123.png",
-        "imageUrl": "https://cdn.example.com/reports/r101.jpg",
-        "content": "산 정상은 바람이 강해요. 주의하세요!",
-        "likeCount": 24,
-        "weatherKeywords": ["화창해요", "더워요"],
-        "rainKeywords": ["부슬비가 내려요"],
-        "etceteraKeywords": ["안개가 껴요"]
-      }
-    ]
-    ```
-
-    ---
-
-    #### ❌ **오류 응답 예시 (HTTP 400 - reportType 누락)**
-    ```json
-    {
-      "status": 400,
-      "code": "RPT-001",
-      "message": "제보 타입을 선택해주세요."
-    }
-    ```
-    """
+                    ### 📝 **코스별 유저 리포트 카드 응답 정보**
+                    
+                    해당 API는 특정 코스에 작성된 유저 리포트들을 **카드 형태로 리스트 반환**합니다.  
+                    요청 시, 리포트 타입 및 키워드 필터링, 페이징 쿼리를 적용할 수 있습니다.
+                    
+                    ---
+                    #### 🔐 **Authorization Header**
+                      - **Authorization** (선택): `Bearer {JWT_TOKEN}`
+                        
+                    #### 🔗 **Path Parameter**
+                    - **courseId** (필수): 리포트를 조회할 코스 ID
+                    
+                    #### 🔍 **Query Parameters**
+                    - **reportType** (필수): 리포트 타입 (예: `WEATHER`, `SAFE`, `TRAIL`, `ETC`)  
+                      → 값이 없을 경우 `RPT-001`: `"제보 타입을 선택해주세요."` 에러 발생  
+                    - **pageSize** (선택): 한 번에 조회할 리포트 개수  
+                    - **lastId** (선택): 마지막으로 조회된 리포트 ID (커서 기반 페이징)  
+                    - **weatherKeywordIds** (선택): 날씨 키워드 필터링용 ID 목록  
+                    - **rainKeywordIds** (선택): 비/강수 키워드 필터링용 ID 목록  
+                    - **etceteraKeywordIds** (선택): 기타 키워드 필터링용 ID 목록
+                    
+                    ---
+                    
+                    #### 📌 **응답 필드 설명 (ReportCardResponse)**
+                    - **reportId**: 리포트 ID  
+                    - **reportType**: 리포트 종류 (예: WEATHER, SAFE 등)  
+                    - **createdAt**: 작성 시각 (ISO-8601)  
+                    - **nickname**: 작성자 닉네임  
+                    - **userImageUrl**: 작성자 프로필 이미지  
+                    - **imageUrl**: 리포트 이미지  
+                    - **content**: 리포트 본문  
+                    - **likeCount**: 좋아요 수
+                    - **isLiked**: 사용자가 좋아요 체크  
+                    - **weatherKeywords**: 날씨 키워드 설명 문자열 리스트  
+                    - **rainKeywords**: 강수 키워드 설명 문자열 리스트  
+                    - **etceteraKeywords**: 기타 키워드 설명 문자열 리스트
+                    
+                    ---
+                    
+                    #### ✅ **성공 응답 예시 (HTTP 200)**
+                    ```json
+                    [
+                      {
+                        "reportId": 101,
+                        "reportType": "WEATHER",
+                        "createdAt": "2025-08-18T09:12:00",
+                        "nickname": "등산고수",
+                        "userImageUrl": "https://cdn.example.com/users/u123.png",
+                        "imageUrl": "https://cdn.example.com/reports/r101.jpg",
+                        "content": "산 정상은 바람이 강해요. 주의하세요!",
+                        "likeCount": 24,
+                        "isLiked" : false,
+                        "weatherKeywords": ["화창해요", "더워요"],
+                        "rainKeywords": ["부슬비가 내려요"],
+                        "etceteraKeywords": ["안개가 껴요"]
+                      }
+                    ]
+                    ```
+                    
+                    ---
+                    
+                    #### ❌ **오류 응답 예시 (HTTP 400 - reportType 누락)**
+                    ```json
+                    {
+                      "status": 400,
+                      "code": "RPT-001",
+                      "message": "제보 타입을 선택해주세요."
+                    }
+                    ```
+                    """
     )
     @GetMapping("/report/{courseId}")
     ResponseEntity<List<ReportCardResponse>> reports(@RequestParam(required = false) Integer pageSize,
-                                         @RequestParam(required = false) Long lastId,
-                                         @RequestParam(required = false) List<Integer> weatherKeywordIds,
-                                         @RequestParam(required = false) List<Integer> rainKeywordIds,
-                                         @RequestParam(required = false) List<Integer> etceteraKeywordIds,
-                                         @PathVariable long courseId,
-                                         @RequestParam ReportType reportType
+                                                     @RequestParam(required = false) Long lastId,
+                                                     @RequestParam(required = false) List<Integer> weatherKeywordIds,
+                                                     @RequestParam(required = false) List<Integer> rainKeywordIds,
+                                                     @RequestParam(required = false) List<Integer> etceteraKeywordIds,
+                                                     @PathVariable long courseId,
+                                                     @RequestParam ReportType reportType,
+                                                     @RequestHeader(required = false, value = "Authorization") String authorization
     );
 
 
@@ -172,9 +174,6 @@ public interface InteractionQueryCardApi {
 
     ---
 
-    #### 🔗 **Path Parameter**
-    - **courseId** (필수): 리포트를 조회할 코스의 ID
-
     #### 🔍 **Query Parameters**
     - **pageSize** (선택): 한 번에 조회할 리포트 개수  
     - **lastId** (선택): 마지막으로 조회한 리포트 ID (커서 기반 페이징)
@@ -189,7 +188,8 @@ public interface InteractionQueryCardApi {
     - **userImageUrl**: 작성자 프로필 이미지  
     - **imageUrl**: 리포트 이미지  
     - **content**: 리포트 본문  
-    - **likeCount**: 좋아요 수  
+    - **likeCount**: 좋아요 수
+    - **isLiked**: 사용자가 좋아요 체크  
     - **weatherKeywords**: 날씨 키워드 설명 리스트  
     - **rainKeywords**: 강수 키워드 설명 리스트  
     - **etceteraKeywords**: 기타 키워드 설명 리스트
@@ -208,6 +208,7 @@ public interface InteractionQueryCardApi {
         "imageUrl": "https://cdn.example.com/reports/110.jpg",
         "content": "비탈길에 낙엽이 많아요. 미끄럼 주의!",
         "likeCount": 12,
+        "isLiked" : true,
         "weatherKeywords": ["구름이 많아요"],
         "rainKeywords": [],
         "etceteraKeywords": ["시야가 흐려요"]
@@ -264,6 +265,7 @@ public interface InteractionQueryCardApi {
     - **imageUrl**: 리포트 이미지  
     - **content**: 리포트 본문  
     - **likeCount**: 좋아요 수  
+    - **isLiked**: 사용자가 좋아요 체크 
     - **weatherKeywords**: 날씨 키워드 설명 리스트  
     - **rainKeywords**: 강수 키워드 설명 리스트  
     - **etceteraKeywords**: 기타 키워드 설명 리스트
@@ -282,6 +284,7 @@ public interface InteractionQueryCardApi {
         "imageUrl": "https://cdn.example.com/reports/125.jpg",
         "content": "등산로에 나뭇가지가 많이 떨어져 있어요.",
         "likeCount": 17,
+        "isLiked" : true,
         "weatherKeywords": ["구름이 많아요"],
         "rainKeywords": [],
         "etceteraKeywords": ["미세먼지가 많아요"]
@@ -290,7 +293,7 @@ public interface InteractionQueryCardApi {
     ```
     """
     )
-    @GetMapping("/report/{courseId}/me/like")
+    @GetMapping("/report/me/like")
     ResponseEntity<List<ReportCardResponse>> likedReports(@RequestParam(required = false) Integer pageSize,
                                               @RequestParam(required = false) Long lastId,
                                               @LoginUserId Long userId

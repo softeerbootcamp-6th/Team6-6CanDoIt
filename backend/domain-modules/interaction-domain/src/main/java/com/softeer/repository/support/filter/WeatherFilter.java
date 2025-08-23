@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static com.softeer.entity.keyword.QWeatherKeywordEntity.*;
+import static com.softeer.entity.keyword.QReportWeatherKeywordEntity.*;
 
 public class WeatherFilter implements Where {
     private final List<Integer> weatherKeywordIds;
@@ -23,7 +23,7 @@ public class WeatherFilter implements Where {
 
         BooleanBuilder builder = new BooleanBuilder();
         for (Integer weatherKeywordId : weatherKeywordIds) {
-            builder.and(weatherKeywordEntity.id.eq(weatherKeywordId));
+            builder.and(reportWeatherKeywordEntity.id.weatherKeywordId.eq(weatherKeywordId));
         }
         return builder;
     }

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
@@ -60,7 +61,7 @@ public class UltraForecastV3JobConfig {
     }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V3_STEP)
-    @StepScope
+    @JobScope
     public Step scheduledShortForecastStep() {
         return new StepBuilder(SCHEDULED_ULTRA_FORECAST_V3_STEP, jobRepository)
                 .<Grid, CompletableFuture<UltraForecastResponseList>>chunk(CHUNK_SIZE, transactionManager)
@@ -75,27 +76,28 @@ public class UltraForecastV3JobConfig {
         return Executors.newFixedThreadPool(30);
     }
 
+    @Bean
+    public ThrottlingProperties throttlingProperties() {
+        return new ThrottlingProperties("UltraForecastV3", 10, 3, 30, 3);
+    }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V3_LEAKY_TOKEN)
     @StepScope
-    public LeakyTokenThrottlingManager leakyTokenThrottlingManager() {
-        ThrottlingProperties throttlingProperties = new ThrottlingProperties("UltraForecastV3", 10, 3, 30, 3);
+    public LeakyTokenThrottlingManager leakyTokenThrottlingManager(ThrottlingProperties throttlingProperties) {
         BackoffStrategy backoffStrategy = new BackoffStrategy(100, 400);
         return new LeakyTokenThrottlingManager(proxyManager, throttlingProperties, backoffStrategy);
     }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V3_TOKEN_BUCKET)
     @StepScope
-    public TokenBucketThrottlingManager tokenBucketThrottlingManager() {
-        ThrottlingProperties throttlingProperties = new ThrottlingProperties("UltraForecastV3", 10, 3, 30, 3);
+    public TokenBucketThrottlingManager tokenBucketThrottlingManager(ThrottlingProperties throttlingProperties) {
         BackoffStrategy backoffStrategy = new BackoffStrategy(100, 400);
         return new TokenBucketThrottlingManager(proxyManager, throttlingProperties, backoffStrategy);
     }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V3_FIXED_WINDOW)
     @StepScope
-    public FixedWindowThrottlingManager fixedWindowThrottlingManager() {
-        ThrottlingProperties throttlingProperties = new ThrottlingProperties("UltraForecastV3", 20, 3, 30, 3);
+    public FixedWindowThrottlingManager fixedWindowThrottlingManager(ThrottlingProperties throttlingProperties) {
         BackoffStrategy backoffStrategy = new BackoffStrategy(100, 400);
         return new FixedWindowThrottlingManager(proxyManager, throttlingProperties, backoffStrategy);
     }
@@ -105,6 +107,6 @@ public class UltraForecastV3JobConfig {
     public UltraForecastV3Processor ultraForecastV3Processor(UltraForecastApiCaller apiCaller,
                                                              ForecastMapper forecastMapper
                                                              ) {
-        return new UltraForecastV3Processor(apiCaller, forecastMapper, threadPoolV3(), leakyTokenThrottlingManager());
+        return new UltraForecastV3Processor(apiCaller, forecastMapper, threadPoolV3(), leakyTokenThrottlingManager(throttlingProperties()));
     }
 }

@@ -22,7 +22,7 @@ public class CardHistoryUseCaseImpl implements CardHistoryUseCase {
     }
 
     @Override
-    public void updateCardHistory(long userId, long courseId, LocalDateTime forecastDate) {
+    public void upsertCardHistory(long userId, long courseId, LocalDateTime forecastDate) {
         cardHistoryAdapter.touchOrCreate(userId, courseId, forecastDate);
     }
 }

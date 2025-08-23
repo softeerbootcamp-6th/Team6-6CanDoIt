@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static com.softeer.entity.keyword.QEtceteraKeywordEntity.*;
+import static com.softeer.entity.keyword.QReportEtceteraKeywordEntity.*;
 
 public class EtceteraFilter implements Where {
 
@@ -24,7 +24,7 @@ public class EtceteraFilter implements Where {
 
         BooleanBuilder builder = new BooleanBuilder();
         for (Integer etceteraKeywordId : etceteraKeywordIds) {
-            builder.and(etceteraKeywordEntity.id.eq(etceteraKeywordId));
+            builder.and(reportEtceteraKeywordEntity.id.etceteraKeywordId.eq(etceteraKeywordId));
         }
         return builder;
     }

@@ -7,10 +7,11 @@ import com.softeer.repository.support.filter.KeywordFilter;
 import com.softeer.repository.support.pageable.ReportPageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReportQueryUseCase {
     List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter,
-                                              long courseId, ReportType reportType);
+                                              long courseId, ReportType reportType, Optional<Long> userId);
     List<Report> findMyReports(ReportPageable reportPageable, long userId);
     List<Report> findLikedReports(ReportPageable reportPageable, long userId);
 

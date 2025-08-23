@@ -10,7 +10,7 @@ import java.util.List;
 
 public record ReportCardResponse(long reportId, ReportType reportType, LocalDateTime createdAt,
                                  String nickname, String userImageUrl,
-                                 String imageUrl, String content, int likeCount,
+                                 String imageUrl, String content, int likeCount, boolean isLiked,
                                  List<String> weatherKeywords, List<String> rainKeywords, List<String> etceteraKeywords
                                  ) {
 
@@ -29,7 +29,7 @@ public record ReportCardResponse(long reportId, ReportType reportType, LocalDate
 
         return new ReportCardResponse(report.id(), report.reportType(), report.createdAt(),
                 report.nickname(), report.userImageUrl(),
-                report.imageUrl(), report.content(), report.likeCount(),
+                report.imageUrl(), report.content(), report.likeCount(), report.isLiked(),
                 weatherKeywords, rainKeywords, etceteraKeywords
         );
     }

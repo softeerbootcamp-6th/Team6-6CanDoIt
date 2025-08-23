@@ -28,8 +28,8 @@ public class ReportQueryAdapterImpl implements ReportQueryAdapter {
 
 
     @Override
-    public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType) {
-        return reportQuerydslRepository.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType);
+    public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter, long courseId, ReportType reportType, long userId) {
+        return reportQuerydslRepository.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType, userId);
     }
 
     @Override

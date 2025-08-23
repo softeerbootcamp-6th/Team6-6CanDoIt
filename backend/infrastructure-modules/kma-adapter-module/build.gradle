@@ -11,7 +11,6 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation project(':infrastructure-modules:redis-module')
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
