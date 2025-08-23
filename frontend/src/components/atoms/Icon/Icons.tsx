@@ -8,12 +8,13 @@ interface PropsState {
     height: number;
     color: string;
     opacity?: number;
+    storkeWidth?: number;
 }
 
 const { colors } = theme;
 
 export default function Icon(props: PropsState) {
-    const { name, opacity, color, width, height } = props;
+    const { name, opacity, color, width, height, storkeWidth = 2 } = props;
 
     const pathData = PATH[name];
     if (!pathData) return null;
@@ -30,7 +31,7 @@ export default function Icon(props: PropsState) {
                 stroke={getColor({ colors, colorString: color })}
                 d={pathData}
                 strokeOpacity={opacity || 1}
-                strokeWidth='2'
+                strokeWidth={storkeWidth}
                 strokeLinecap='round'
                 strokeLinejoin='round'
             ></path>
