@@ -1,6 +1,7 @@
 package com.softeer.batch.forecast.shortterm.config;
 
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
+import com.softeer.batch.forecast.shortterm.listener.DailyTemperatureCollector;
 import com.softeer.batch.forecast.shortterm.processor.ShortForecastProcessor;
 import com.softeer.batch.forecast.shortterm.reader.ShortForecastReader;
 import com.softeer.batch.forecast.shortterm.writer.ScheduledShortForecastWriter;
@@ -37,6 +38,7 @@ public class ShortForecastStepConfig {
     private final ShortForecastProcessor shortForecastProcessor;
     private final StartUpShortForecastWriter startShortForecastWriter;
     private final ScheduledShortForecastWriter scheduledShortForecastWriter;
+    private final DailyTemperatureCollector dailyTemperatureCollector;
 
     @Bean(name = START_UP_SHORT_FORECAST_STEP)
     @JobScope
@@ -63,6 +65,7 @@ public class ShortForecastStepConfig {
                 .reader(shortForecastReader)
                 .processor(shortForecastProcessor)
                 .writer(writer)
+                .listener(dailyTemperatureCollector)
                 .build();
     }
 }
