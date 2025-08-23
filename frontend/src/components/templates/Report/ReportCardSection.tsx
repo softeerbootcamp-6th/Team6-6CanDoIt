@@ -3,7 +3,8 @@ import FrontReportCard from '../../organisms/Report/FrontReportCard.tsx';
 import { css } from '@emotion/react';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import ToggleButton from '../../atoms/Button/ToggleButton.tsx';
-import { type FormEvent, useState } from 'react';
+import Icon from '../../atoms/Icon/Icons.tsx';
+import { type FormEvent, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportModal from '../../organisms/Report/ReportModal.tsx';
@@ -16,8 +17,11 @@ import useApiQuery from '../../../hooks/useApiQuery.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { theme } from '../../../theme/theme.ts';
+import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
+import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 
 type ReportType = 'WEATHER' | 'SAFE';
+type ReportPages = InfiniteData<CardData[]>;
 
 interface CardData {
     reportId: number;
@@ -49,6 +53,33 @@ export default function ReportCardSection() {
     const [searchParams] = useSearchParams();
     const mountainId = Number(searchParams.get('mountainid'));
     const courseId = Number(searchParams.get('courseid'));
+    const pageSize = 10;
+
+    const parseFilterFromUrl = (
+        searchParams: URLSearchParams,
+        key: string,
+    ): number[] => {
+        const paramValue = searchParams.get(key);
+        if (!paramValue) return [];
+
+        try {
+            return paramValue
+                .replace(/[\[\]]/g, '')
+                .split(',')
+                .filter((id) => id !== '')
+                .map((id) => Number(id));
+        } catch (e) {
+            console.error(`Failed to parse filter ${key}:`, e);
+            return [];
+        }
+    };
+
+    const weatherKeywords = parseFilterFromUrl(searchParams, 'weatherKeywords');
+    const rainKeywords = parseFilterFromUrl(searchParams, 'rainKeywords');
+    const etceteraKeywords = parseFilterFromUrl(
+        searchParams,
+        'etceteraKeywords',
+    );
 
     const title =
         reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
@@ -62,14 +93,30 @@ export default function ReportCardSection() {
             retry: false,
         },
     );
-    const { data: cardsData } = useApiQuery<CardData[]>(
+
+    const {
+        data: cardsData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useApiInfiniteQuery<CardData>(
         `/card/interaction/report/${courseId}`,
-        { reportType },
         {
-            placeholderData: initCardData,
+            params: {
+                reportType,
+                weatherKeywords,
+                rainKeywords,
+                etceteraKeywords,
+            },
+            pageSize,
+            idField: 'reportId',
+        },
+        {
             retry: false,
         },
     );
+    const flattenedData = cardsData?.pages.flat();
+
     const reportMutation = useApiMutation<FormData, any>(
         `/card/interaction/report`,
         'POST',
@@ -83,15 +130,53 @@ export default function ReportCardSection() {
             },
         },
     );
+
+    const queryClient = useQueryClient();
+    const key = [
+        `/card/interaction/report/${courseId}`,
+        {
+            reportType,
+            weatherKeywords,
+            rainKeywords,
+            etceteraKeywords,
+            pageSize,
+        },
+    ] as const;
+    const previousDataRef = useRef<ReportPages | undefined>(undefined);
     const cardLikeMutation = useApiMutation(
         `/card/interaction/report/like/${flippedCardId}`,
         'POST',
         {
+            onMutate: async () => {
+                await queryClient.cancelQueries({
+                    queryKey: key,
+                });
+                const previousData = queryClient.getQueryData(key);
+                previousDataRef.current = previousData as ReportPages;
+                queryClient.setQueryData(key, (oldData: ReportPages) => {
+                    if (!oldData) return oldData;
+                    const newPages = oldData.pages.map((page: CardData[]) => {
+                        return page.map((card: CardData) => {
+                            if (card.reportId !== flippedCardId) return card;
+                            return {
+                                ...card,
+                                likeCount: card.likeCount
+                                    ? card.likeCount + 1
+                                    : 1,
+                            };
+                        });
+                    });
+                    return { ...oldData, pages: newPages };
+                });
+            },
             onSuccess: () => {
                 console.log('Like action successful');
             },
-            onError: (error) => {
-                console.error('Like action failed:', error);
+            onError: (e) => {
+                console.error('Report submission failed:', e);
+                if (previousDataRef.current) {
+                    queryClient.setQueryData(key, previousDataRef.current);
+                }
             },
         },
     );
@@ -197,7 +282,7 @@ export default function ReportCardSection() {
                 )}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
-                {cardsData?.map((card) => {
+                {flattenedData?.map((card) => {
                     const isFlipped = flippedCardId === card.reportId;
                     const filterLabels = filterGatherer({
                         weatherKeywords: card.weatherKeywords,
@@ -222,12 +307,15 @@ export default function ReportCardSection() {
                                     onClick={() =>
                                         setFlippedCardId(card.reportId)
                                     }
+                                    imgSrc={card.imageUrl}
+                                    userImageUrl={card.userImageUrl}
                                 />
                             </div>
                             <div css={cardFaceBackStyle}>
                                 <BackReportCard
                                     comment={card.content}
                                     timeAgo={timeAgo}
+                                    userImageUrl={card.userImageUrl}
                                     likeCount={card.likeCount}
                                     filterLabels={filterLabels}
                                     onClick={() => setFlippedCardId(null)}
@@ -239,12 +327,62 @@ export default function ReportCardSection() {
                         </div>
                     );
                 })}
+                <div css={loadMoreContainerStyle}>
+                    {hasNextPage && (
+                        <button
+                            css={loadMoreButtonStyle(isFetchingNextPage)}
+                            onClick={() => fetchNextPage()}
+                            disabled={isFetchingNextPage}
+                        >
+                            <Icon {...loadMoreIconProps} />
+                        </button>
+                    )}
+                </div>
             </div>
         </>
     );
 }
 
+const loadMoreIconProps = {
+    name: 'chevron-down',
+    width: 2,
+    height: 2,
+    color: 'grey-100',
+};
+
 const { colors } = theme;
+
+const loadMoreContainerStyle = css`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1rem;
+`;
+
+const loadMoreButtonStyle = (isLoading: boolean) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: none;
+    border: none;
+    cursor: ${isLoading ? 'default' : 'pointer'};
+    opacity: ${isLoading ? 0.5 : 1};
+    transform: rotate(-90deg) scale(1.3);
+    transition:
+        opacity 200ms ease,
+        transform 200ms ease;
+
+    &:hover {
+        transform: ${isLoading ? 'none' : 'scale(1.5) rotate(-90deg)'};
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+`;
 
 const card3DStyle = css`
     display: grid;
@@ -278,6 +416,7 @@ const reportCardContainerStyle = css`
     flex-direction: row;
     gap: 1rem;
     overflow-x: auto;
+    overflow-y: hidden;
     margin-left: 2rem;
     margin-top: 2rem;
 
@@ -318,123 +457,3 @@ const filterKeywords = {
         { id: 2, description: '시야가 흐려요' },
     ],
 };
-
-const initCardData = [
-    {
-        reportId: 101,
-        reportType: 'WEATHER',
-        createdAt: '2025-08-18T09:12:00',
-        nickname: '등산고수',
-        userImageUrl: 'https://cdn.example.com/users/u123.png',
-        imageUrl: 'https://cdn.example.com/reports/r101.jpg',
-        content: '산 정상은 바람이 강해요. 주의하세요!',
-        likeCount: 24,
-        weatherKeywords: ['화창해요', '더워요'],
-        rainKeywords: ['부슬비가 내려요'],
-        etceteraKeywords: ['안개가 껴요'],
-    },
-    {
-        reportId: 102,
-        reportType: 'SAFETY',
-        createdAt: '2025-08-18T10:05:00',
-        nickname: '안전지킴이',
-        userImageUrl: 'https://cdn.example.com/users/u456.png',
-        imageUrl: 'https://cdn.example.com/reports/r102.jpg',
-        content: '산길이 미끄러워요. 조심하세요!',
-        likeCount: 15,
-        weatherKeywords: ['구름이 많아요'],
-        rainKeywords: ['장대비가 쏟아져요'],
-        etceteraKeywords: ['미세먼지가 많아요'],
-    },
-    {
-        reportId: 103,
-        reportType: 'WEATHER',
-        createdAt: '2025-08-18T11:30:00',
-        nickname: '산악인',
-        userImageUrl: 'https://cdn.example.com/users/u789.png',
-        imageUrl: 'https://cdn.example.com/reports/r103.jpg',
-        content: '오늘은 바람이 많이 불어요. 모자 조심하세요!',
-        likeCount: 30,
-        weatherKeywords: ['바람'],
-        rainKeywords: [],
-        etceteraKeywords: ['시야가 흐려요'],
-    },
-    {
-        reportId: 104,
-        reportType: 'SAFETY',
-        createdAt: '2025-08-18T12:45:00',
-        nickname: '등산러버',
-        userImageUrl: 'https://cdn.example.com/users/u321.png',
-        imageUrl: 'https://cdn.example.com/reports/r104.jpg',
-        content: '산길에 돌이 많아요. 조심하세요!',
-        likeCount: 10,
-        weatherKeywords: ['추워요'],
-        rainKeywords: [],
-        etceteraKeywords: [],
-    },
-    {
-        reportId: 105,
-        reportType: 'WEATHER',
-        createdAt: '2025-08-18T13:20:00',
-        nickname: '자연사랑',
-        userImageUrl: 'https://cdn.example.com/users/u654.png',
-        imageUrl: 'https://cdn.example.com/reports/r105.jpg',
-        content: '오늘은 정말 맑아요! 경치가 최고예요.',
-        likeCount: 50,
-        weatherKeywords: ['화창해요'],
-        rainKeywords: [],
-        etceteraKeywords: [],
-    },
-    {
-        reportId: 106,
-        reportType: 'SAFETY',
-        createdAt: '2025-08-18T14:10:00',
-        nickname: '안전맨',
-        userImageUrl: 'https://cdn.example.com/users/u987.png',
-        imageUrl: 'https://cdn.example.com/reports/r106.jpg',
-        content: '산길에 낙석이 있어요. 조심하세요!',
-        likeCount: 20,
-        weatherKeywords: [],
-        rainKeywords: ['천둥 번개가 쳐요'],
-        etceteraKeywords: ['안개가 껴요'],
-    },
-    {
-        reportId: 107,
-        reportType: 'WEATHER',
-        createdAt: '2025-08-18T15:00:00',
-        nickname: '등산왕',
-        userImageUrl: 'https://cdn.example.com/users/u111.png',
-        imageUrl: 'https://cdn.example.com/reports/r107.jpg',
-        content: '오늘은 정말 더워요. 충분한 수분 섭취하세요!',
-        likeCount: 40,
-        weatherKeywords: ['더워요'],
-        rainKeywords: [],
-        etceteraKeywords: [],
-    },
-    {
-        reportId: 108,
-        reportType: 'SAFETY',
-        createdAt: '2025-08-18T16:30:00',
-        nickname: '안전지킴이',
-        userImageUrl: 'https://cdn.example.com/users/u222.png',
-        imageUrl: 'https://cdn.example.com/reports/r108.jpg',
-        content: '산길에 미끄러운 곳이 있어요. 조심하세요!',
-        likeCount: 18,
-        weatherKeywords: [],
-        rainKeywords: ['폭우가 내려요'],
-        etceteraKeywords: ['시야가 흐려요'],
-    },
-    {
-        reportId: 109,
-        reportType: 'WEATHER',
-        createdAt: '2025-08-18T17:15:00',
-        nickname: '자연사랑',
-        userImageUrl: 'https://cdn.example.com/users/u333.png',
-        imageUrl: 'https://cdn.example.com/reports/r109.jpg',
-        content: '오늘은 바람이 정말 시원해요. 기분이 좋아요!',
-        likeCount: 35,
-        weatherKeywords: ['바람'],
-        rainKeywords: [],
-        etceteraKeywords: [],
-    },
-];
