@@ -4,6 +4,7 @@ import com.softeer.batch.forecast.chained.context.ExecutionContextKeys;
 import com.softeer.batch.forecast.chained.dto.DailyTemperatureKey;
 import com.softeer.batch.forecast.chained.dto.DailyTemperatureValue;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
+import com.softeer.entity.ForecastRedisEntity;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.mapper.RecordMapper;
 import com.softeer.scan.RedisKeyGenerator;
@@ -63,14 +64,18 @@ public class MountainForecastRedisWriter {
                 try {
 
                     byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.MOUNTAIN, forecast.dateTime());
-                    Map<byte[], byte[]> value = recordMapper.toByteMap(forecast);
-
                     DailyTemperatureValue dailyTemperatureValue = dailyTempMap.get(new DailyTemperatureKey(item.gridId(), forecast.dateTime().toLocalDate()));
 
-                    byte[] fieldDailyTemp = "dailyTemperature".getBytes(StandardCharsets.UTF_8);
-                    byte[] serializedDailyTemp = recordMapper.serializeValue(dailyTemperatureValue);
-                    value.keySet().removeIf(k -> Arrays.equals(k, fieldDailyTemp));
-                    value.put(fieldDailyTemp, serializedDailyTemp);
+                    if (dailyTemperatureValue == null) return;
+
+                    ForecastRedisEntity forecastRedisEntity = new ForecastRedisEntity(
+                            forecast,
+                            dailyTemperatureValue.highestTemperature(),
+                            dailyTemperatureValue.lowestTemperature(),
+                            item.gridId()
+                    );
+
+                    Map<byte[], byte[]> value = recordMapper.toByteMap(forecastRedisEntity);
 
                     bulkData.put(key, value);
                 } catch (Exception e) {
