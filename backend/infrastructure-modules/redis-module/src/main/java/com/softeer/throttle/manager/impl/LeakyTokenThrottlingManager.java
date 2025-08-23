@@ -21,7 +21,7 @@ public class LeakyTokenThrottlingManager extends AbstractThrottlingManager {
         return Bandwidth.builder()
                 .capacity(1)
                 .refillGreedy(currentTps.longValue(), Duration.ofSeconds(1))
-                .initialTokens(0)
+                .initialTokens(1)
                 .build();
     }
 }
