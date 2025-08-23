@@ -75,7 +75,6 @@ export default function ForecastSearchSection() {
 
     return (
         <SearchBar
-            searchBarTitle='날씨예보 보기'
             searchBarMessage='를 오르는'
             pageName='main'
             mountainOptions={mountainOptions}
