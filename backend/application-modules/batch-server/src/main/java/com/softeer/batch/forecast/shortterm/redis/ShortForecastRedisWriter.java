@@ -1,6 +1,7 @@
 package com.softeer.batch.forecast.shortterm.redis;
 
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
+import com.softeer.entity.ForecastRedisEntity;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.mapper.RecordMapper;
 import com.softeer.scan.RedisKeyGenerator;
@@ -40,18 +41,18 @@ public class ShortForecastRedisWriter {
     private Map<byte[], Map<byte[], byte[]>> prepareBulkData(List<? extends ShortForecastList> items) {
         Map<byte[], Map<byte[], byte[]>> bulkData = new java.util.HashMap<>();
 
-        items.forEach(item -> {
+        items.forEach(item ->
             item.forecasts().forEach(forecast -> {
                 try {
                     byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.SHORT, forecast.dateTime());
-                    Map<byte[], byte[]> value = recordMapper.toByteMap(forecast);
+                    Map<byte[], byte[]> value = recordMapper.toByteMap(new ForecastRedisEntity(forecast, item.gridId()));
                     bulkData.put(key, value);
 
                 } catch (Exception e) {
                     log.error("Failed to prepare Redis data for grid ({}, {}) at {} {}", PREFIX, item.gridId(), ForecastType.SHORT, forecast.dateTime());
                 }
-            });
-        });
+            })
+        );
 
         return bulkData;
     }
