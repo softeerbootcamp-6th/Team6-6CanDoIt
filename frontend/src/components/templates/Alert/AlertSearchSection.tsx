@@ -1,6 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar';
 import { refactorMountainDataToOptions } from '../Main/utils.ts';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
+import useApiQuery from '../../../hooks/useApiQuery';
 import type { MountainData } from '../../../types/mountainTypes';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -32,7 +32,6 @@ export default function AlertSearchSection() {
         '/card/mountain',
         {},
         {
-            //placeholderData: MountainsData,
             retry: false,
         },
     );
