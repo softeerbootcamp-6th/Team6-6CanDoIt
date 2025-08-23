@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LogoWithNav from '../../molecules/Header/LogoWithNav';
 import IconNavList from '../../molecules/Header/IconNavList';
 import { LabelHeading } from '../../atoms/Heading/Heading';
@@ -9,18 +9,28 @@ export default function Header() {
     const location = useLocation();
     const isForecastPage = location.pathname.includes('/forecast');
 
+    const navigate = useNavigate();
+
     return (
         <header css={headerStyles}>
             <nav css={navStyles}>
                 {isForecastPage ? (
                     <>
-                        <Icon
-                            name='back'
-                            width={3}
-                            height={3}
-                            color='grey-100'
-                            storkeWidth={3}
-                        />
+                        <button
+                            css={css`
+                                all: unset;
+                                cursor: hover;
+                            `}
+                            onClick={() => navigate('/')}
+                        >
+                            <Icon
+                                name='back'
+                                width={3}
+                                height={3}
+                                color='grey-100'
+                                storkeWidth={3}
+                            />
+                        </button>
                         <LabelHeading HeadingTag='h1'>일기 예보</LabelHeading>
                         <IconNavList />
                     </>
