@@ -20,7 +20,7 @@ export default function MountainInfoPreview({
     return (
         <div css={wrapperStyles}>
             <div css={dummySteyls}>
-                <img src={courseImageUrl} />
+                <img src={courseImageUrl} width={400} height={400} />
             </div>
 
             <ClimbInfoText
@@ -47,5 +47,4 @@ const dummySteyls = css`
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    background: red;
 `;
