@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @StepScope
 @RequiredArgsConstructor
 public class ForecastJdbcWriter {
+
     private static final String INSERT_FORECAST =
             "INSERT INTO forecast (temperature, precipitation, sky, humidity, precipitation_type, wind_dir, wind_speed, date_time, type, precipitation_probability, snow_accumulation, grid_id) " +
                     "VALUES (:temperature, :precipitation, :sky, :humidity, :precipitationType, :windDir, :windSpeed, :dateTime, :type, :precipitationProbability, :snowAccumulation, :gridId) " +
@@ -20,26 +21,11 @@ public class ForecastJdbcWriter {
                     "temperature = VALUES(temperature), precipitation = VALUES(precipitation), sky = VALUES(sky), humidity = VALUES(humidity), precipitation_type = VALUES(precipitation_type), " +
                     "wind_dir = VALUES(wind_dir), wind_speed = VALUES(wind_speed), type = VALUES(type), precipitation_probability = VALUES(precipitation_probability), snow_accumulation = VALUES(snow_accumulation)";
 
-    private static final String INSERT_DAILY_TEMPERATURE =
-            "INSERT INTO daily_temperature (date, highest_temperature, lowest_temperature, grid_id) " +
-                    "VALUES (:date, :highestTemperature, :lowestTemperature, :gridId) " +
-                    "ON DUPLICATE KEY UPDATE " +
-                    "highest_temperature = VALUES(highest_temperature), " +
-                    "lowest_temperature = VALUES(lowest_temperature)";
-
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-
-
-    public void batchUpdateForecast(SqlParameterSource[] params) {
+    public void batchUpdate(SqlParameterSource[] params) {
         if (params != null && params.length > 0) {
             namedParameterJdbcTemplate.batchUpdate(INSERT_FORECAST, params);
-        }
-    }
-
-    public void batchUpdateDailyTemperature(SqlParameterSource[] params) {
-        if (params != null && params.length > 0) {
-            namedParameterJdbcTemplate.batchUpdate(INSERT_DAILY_TEMPERATURE, params);
         }
     }
 
