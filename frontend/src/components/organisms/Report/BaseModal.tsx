@@ -68,7 +68,7 @@ const overlayStyle = (anchorElement?: HTMLElement | null) =>
     css({
         position: 'fixed',
         inset: 0,
-        zIndex: 10,
+        zIndex: 20,
         backgroundColor: anchorElement ? undefined : colors.greyOpacity[10],
     });
 
