@@ -35,7 +35,7 @@ const overBackgroundStyle = css`
     position: relative;
     z-index: 20;
     width: max-content;
-    margin: 1rem auto;
+    margin: 0 auto;
 
     display: flex;
     flex-direction: column;
