@@ -49,7 +49,7 @@ public class WeatherCardController implements WeatherCardApi {
     }
 
     @Override
-    public ResponseEntity<CourseScheduleCardResponse> courseSchedule(Long courseId, Long userId, LocalDateTime startDateTime) {
-        return ResponseEntity.ok(weatherCardService.createCourseScheduleCard(courseId, userId, startDateTime));
+    public ResponseEntity<CourseScheduleCardResponse> courseSchedule(Long courseId, LocalDateTime startDateTime) {
+        return ResponseEntity.ok(weatherCardService.createCourseScheduleCard(courseId, startDateTime));
     }
 }
