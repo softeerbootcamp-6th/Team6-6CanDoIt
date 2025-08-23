@@ -3,13 +3,29 @@ import { theme } from '../../../theme/theme';
 import CommonText from '../../atoms/Text/CommonText';
 import Icon from '../../atoms/Icon/Icons';
 
-export default function BackWeathercardDetailInfoLine() {
+interface PropsState {
+    data: DetailData;
+}
+
+interface DetailData {
+    title: string;
+    iconName: string;
+    value: string[] | number[];
+}
+
+export default function BackWeathercardDetailInfoLine({ data }: PropsState) {
+    const { title, iconName, value } = data;
+
+    function formatValueArrow(value: (string | number)[]): string {
+        return value.join(' -> ');
+    }
+
     return (
         <div css={lineStyles}>
             <div css={lineStyles}>
                 <div css={iconWrapperStyles}>
                     <Icon
-                        name='clear-day'
+                        name={iconName}
                         width={1.5}
                         height={1.5}
                         color='grey-60'
@@ -21,7 +37,7 @@ export default function BackWeathercardDetailInfoLine() {
                     fontWeight='bold'
                     color='grey-30'
                 >
-                    체감온도
+                    {title}
                 </CommonText>
             </div>
             <CommonText
@@ -30,7 +46,7 @@ export default function BackWeathercardDetailInfoLine() {
                 fontWeight='medium'
                 color='grey-70'
             >
-                value value value
+                {formatValueArrow(value)}
             </CommonText>
         </div>
     );
