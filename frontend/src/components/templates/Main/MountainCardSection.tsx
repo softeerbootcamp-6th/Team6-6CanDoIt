@@ -14,7 +14,6 @@ export default function MountainCardSection() {
         '/card/mountain',
         {},
         {
-            //placeholderData: MountainsData,
             retry: false,
         },
     );
@@ -41,23 +40,19 @@ export default function MountainCardSection() {
             onMouseLeave={mouseLeaveHandler}
         >
             {data.map((mountain) => (
-                <>
-                    <MountainCard
-                        key={mountain.mountainName}
-                        onClick={() => {
-                            cardClickHandler(mountain.mountainId);
-                        }}
-                        onMouseEnter={() =>
-                            mounseEnterHandler(mountain.mountainId)
-                        }
-                        isHovered={hoveredCardId === mountain.mountainId}
-                        isDimmed={
-                            hoveredCardId !== null &&
-                            hoveredCardId !== mountain.mountainId
-                        }
-                        {...mountain}
-                    />
-                </>
+                <MountainCard
+                    key={mountain.mountainId}
+                    onClick={() => {
+                        cardClickHandler(mountain.mountainId);
+                    }}
+                    onMouseEnter={() => mounseEnterHandler(mountain.mountainId)}
+                    isHovered={hoveredCardId === mountain.mountainId}
+                    isDimmed={
+                        hoveredCardId !== null &&
+                        hoveredCardId !== mountain.mountainId
+                    }
+                    {...mountain}
+                />
             ))}
         </div>
     );
