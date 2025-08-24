@@ -10,6 +10,8 @@ spring:
     username: ${REDIS_USERNAME}
     password: ${REDIS_PASSWORD}
     ssl: false
+  jpa:
+    open-in-view: false
 jwt:
   access-token-expiration-ms: ${JWT_EXPIRATION_MS}
   secret-key: ${JWT_SECRET_KEY}
