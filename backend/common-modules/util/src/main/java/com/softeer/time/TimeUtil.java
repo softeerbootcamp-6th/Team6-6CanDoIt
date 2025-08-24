@@ -1,5 +1,6 @@
 package com.softeer.time;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -46,5 +47,13 @@ public final class TimeUtil {
                 dateTime.getYear(),
                 dateTime.getMonthValue(),
                 dateTime.getDayOfMonth());
+    }
+
+    public static Duration getRedisTtl(LocalDateTime targetTime) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        if (targetTime.isBefore(dateTime)) {
+            return Duration.ZERO;
+        }
+        return Duration.between(dateTime, targetTime);
     }
 }
