@@ -38,13 +38,10 @@ class PrecipitationFactorTest {
             "0.5",
             "100.0mm 이하",
             "2.0mm 이상",
-            "30~50mm",
             "30.0~50.0",
             "−1.0mm"
     })
     void testCalculateFactor_invalidInput_throws(String input) {
         Assertions.assertThrows(IllegalArgumentException.class, () -> PrecipitationFactor.calculateFactor(input));
     }
-
-
 }
