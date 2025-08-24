@@ -58,9 +58,10 @@ export default function MyLikeSection() {
 
     const queryClient = useQueryClient();
     const key = [
-        `/card/interaction/report/me`,
+        `/card/interaction/report/me/like`,
         {
             pageSize,
+            idField: 'reportId',
         },
     ] as const;
     const previousDataRef = useRef<ReportPages | undefined>(undefined);
