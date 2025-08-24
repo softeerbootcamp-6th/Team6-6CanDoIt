@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import LoginFormSection from '../../components/templates/Login/LoginFormSection.tsx';
-import MyPageTemplate from '../../components/templates/Login/MyPageTemplate.tsx';
+import MyPage from '../MyPage/MyPage.tsx';
 
 export default function LoginPage() {
     const hasToken =
@@ -9,7 +9,7 @@ export default function LoginPage() {
 
     return (
         <div css={wrapperStyles}>
-            {hasToken ? <MyPageTemplate /> : <LoginFormSection />}
+            {hasToken ? <MyPage /> : <LoginFormSection />}
         </div>
     );
 }

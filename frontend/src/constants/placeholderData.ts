@@ -170,4 +170,15 @@ const backCard = {
     hikingActivityStatus: '나쁨',
 } as const;
 
-export { detailInfoSectionData, summaryInfoSectionData, backCard, frontCard };
+const userInfoData = {
+    userNickName: '한사랑산악인',
+    userId: 'qweasdasdsda',
+};
+
+export {
+    userInfoData,
+    detailInfoSectionData,
+    summaryInfoSectionData,
+    backCard,
+    frontCard,
+};
