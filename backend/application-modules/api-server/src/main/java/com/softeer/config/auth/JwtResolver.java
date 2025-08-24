@@ -17,6 +17,7 @@ import java.security.Key;
 @EnableConfigurationProperties(JwtProperties.class)
 public class JwtResolver {
 
+    private static final String BEARER = "Bearer ";
     private static final String ROLE = "role";
 
     private final JwtProperties jwtProperties;
@@ -31,7 +32,7 @@ public class JwtResolver {
         String subject = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(extractToken(token))
                 .getBody()
                 .getSubject();
 
@@ -42,7 +43,7 @@ public class JwtResolver {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJws(token)
+                .parseClaimsJws(extractToken(token))
                 .getBody();
 
         return Role.valueOf(claims.get(ROLE, String.class));
@@ -58,5 +59,9 @@ public class JwtResolver {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    private String extractToken(String token) {
+        return token.substring(BEARER.length());
     }
 }

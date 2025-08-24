@@ -8,10 +8,8 @@ import java.util.Set;
 
 public abstract class AbstractKmaApiCaller<R> implements KmaApiCaller<R> {
 
-    protected static final Set<String> RETRYABLE_ERROR_CODES = Set.of(
-            "22",
-            "04"
-    );
+    protected static final Set<String> RETRYABLE_ERROR_MESSAGES = Set.of(
+            "LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR");
 
     protected final RestClient restClient;
     protected final ForecastApiType forecastApiType;

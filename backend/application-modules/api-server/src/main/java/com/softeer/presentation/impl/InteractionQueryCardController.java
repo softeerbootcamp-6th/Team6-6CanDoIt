@@ -1,5 +1,6 @@
 package com.softeer.presentation.impl;
 
+import com.softeer.config.auth.JwtResolver;
 import com.softeer.domain.CardHistory;
 import com.softeer.dto.response.card.ReportCardResponse;
 import com.softeer.entity.enums.ReportType;
@@ -11,15 +12,18 @@ import com.softeer.service.InteractionQueryCardService;
 import com.softeer.service.ReportQueryUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class InteractionQueryCardController implements InteractionQueryCardApi {
 
     private final InteractionQueryCardService interactionQueryCardService;
+    private final JwtResolver  jwtResolver;
 
     @Override
     public ResponseEntity<ReportQueryUseCase.KeywordGroup> Keywords() {
@@ -27,11 +31,24 @@ public class InteractionQueryCardController implements InteractionQueryCardApi {
     }
 
     @Override
-    public ResponseEntity<List<ReportCardResponse>> reports(Integer pageSize, Long lastId, List<Integer> weatherKeywordIds, List<Integer> rainKeywordIds, List<Integer> etceteraKeywordIds, long courseId, ReportType reportType) {
+    public ResponseEntity<List<ReportCardResponse>> reports(Integer pageSize, Long lastId, List<Integer> weatherKeywordIds, List<Integer> rainKeywordIds, List<Integer> etceteraKeywordIds,
+                                                            long courseId, ReportType reportType, String authorization) {
         ReportPageable pageable = ReportPageable.of(pageSize, lastId);
         KeywordFilter keywordFilter = new KeywordFilter(weatherKeywordIds, rainKeywordIds, etceteraKeywordIds);
 
-        return ResponseEntity.ok(interactionQueryCardService.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType));
+        Optional<Long> userIdOptional;
+
+        try {
+
+            if(!StringUtils.hasText(authorization)) userIdOptional = Optional.empty();
+            else {
+                long userId = jwtResolver.getUserId(authorization);
+                userIdOptional = Optional.of(userId);
+            }
+        } catch (Exception e){
+            userIdOptional = Optional.empty();
+        }
+        return ResponseEntity.ok(interactionQueryCardService.findReportsByCourseIdAndType(pageable, keywordFilter, courseId, reportType,  userIdOptional));
     }
 
     @Override

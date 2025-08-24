@@ -14,7 +14,7 @@ import java.util.List;
 public interface ReportQueryAdapter {
 
     List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter,
-                                              long courseId, ReportType reportType);
+                                              long courseId, ReportType reportType, long userId);
     List<Report> findMyReports(ReportPageable reportPageable, long userId);
     List<Report> findLikedReports(ReportPageable reportPageable, long userId);
 

@@ -17,7 +17,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class LoginUserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
   private static final String AUTHORIZATION_HEADER = "Authorization";
-  private static final String BEARER = "Bearer ";
 
   private final JwtResolver jwtResolver;
 
@@ -41,7 +40,6 @@ public class LoginUserIdArgumentResolver implements HandlerMethodArgumentResolve
       throw ExceptionCreator.create(JwtException.UNAUTHORIZED_USER); // 401
     }
 
-    jwtToken = extractToken(jwtToken);
     long userId = jwtResolver.getUserId(jwtToken);
     Role userRole = jwtResolver.getRole(jwtToken);
 
@@ -58,8 +56,4 @@ public class LoginUserIdArgumentResolver implements HandlerMethodArgumentResolve
   private boolean hasSufficientRole(Role userRole, Role requiredRole) {
     return userRole == requiredRole;
   }
-  private String extractToken(String token) {
-    return token.substring(BEARER.length());
-  }
-
 }

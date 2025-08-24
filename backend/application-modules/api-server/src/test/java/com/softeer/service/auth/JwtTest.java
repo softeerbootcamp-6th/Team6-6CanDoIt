@@ -61,7 +61,7 @@ class JwtTest {
         Token token = jwtGenerator.createAccessToken(userId, role);
 
         // then
-        Role reslovedRole = jwtResolver.getRole(token.value());
+        Role reslovedRole = jwtResolver.getRole(getToken(token));
         assertThat(reslovedRole).isEqualTo(role);
     }
 
@@ -75,7 +75,7 @@ class JwtTest {
         Token token = jwtGenerator.createAccessToken(userId, role);
 
         // then
-        Role reslovedRole = jwtResolver.getRole(token.value());
+        Role reslovedRole = jwtResolver.getRole(getToken(token));
         assertThat(reslovedRole).isEqualTo(role);
     }
 
@@ -87,9 +87,13 @@ class JwtTest {
         Token token = jwtGenerator.createAccessToken(userId, Role.MANAGER);
 
         // when
-        long resolvedUserId = jwtResolver.getUserId(token.value());
+        long resolvedUserId = jwtResolver.getUserId(getToken(token));
 
         // then
         assertThat(resolvedUserId).isEqualTo(resolvedUserId);
+    }
+
+    private String getToken(Token token) {
+        return "Bearer " + token.value();
     }
 }

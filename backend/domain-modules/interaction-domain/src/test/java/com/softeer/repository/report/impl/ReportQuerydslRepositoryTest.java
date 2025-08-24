@@ -19,6 +19,7 @@ class ReportQuerydslRepositoryTest {
 
     @Autowired
     private ReportQuerydslRepository sut;
+    private final long userId = 501;
 
     private ReportPageable latest(long lastId, int size) {
         return ReportPageable.of(size, lastId);
@@ -37,19 +38,19 @@ class ReportQuerydslRepositoryTest {
         // 첫 페이지: id DESC → 202, 201
         ReportPageable pageable = latest(Long.MAX_VALUE, size);
         var filter = new KeywordFilter(null, null, null); // 필터 없음
-        var page1 = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.WEATHER);
+        var page1 = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.WEATHER, userId);
 
         assertThat(page1).hasSize(2);
         assertThat(page1.get(0).id()).isEqualTo(202L);
         assertThat(page1.get(1).id()).isEqualTo(201L);
 
         ReportPageable pageable2 = latest(202L, size);
-        var page2 = sut.findReportsByCourseIdAndType(pageable2, filter, courseId, ReportType.WEATHER);
+        var page2 = sut.findReportsByCourseIdAndType(pageable2, filter, courseId, ReportType.WEATHER, userId);
         assertThat(page2.get(0).id()).isEqualTo(201L);
 
         // 다음 페이지: 커서 id=201 → id < 201 → 없음
         ReportPageable pageable3 = latest(201L, size);
-        var page3 = sut.findReportsByCourseIdAndType(pageable3, filter, courseId, ReportType.WEATHER);
+        var page3 = sut.findReportsByCourseIdAndType(pageable3, filter, courseId, ReportType.WEATHER, userId);
         assertThat(page3).isEmpty();
     }
 
@@ -84,8 +85,9 @@ class ReportQuerydslRepositoryTest {
 
         // 예시: KeywordFilter(weatherIds=null, rainIds=null, etcIds=List.of(9201))
         var filter = new KeywordFilter(null, null, List.of(9201)); // 구현체 시그에 맞춰 수정
-        var results = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.WEATHER);
+        var results = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.WEATHER, userId);
 
+        System.out.println(results);
         assertThat(results).extracting(r -> r.id()).containsExactly(201L);
     }
 
@@ -101,7 +103,7 @@ class ReportQuerydslRepositoryTest {
 
         // 예시: KeywordFilter(weatherIds=null, rainIds=null, etcIds=List.of(9201))
         var filter = new KeywordFilter(null, null, List.of(9201)); // 구현체 시그에 맞춰 수정
-        var results = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.SAFE);
+        var results = sut.findReportsByCourseIdAndType(pageable, filter, courseId, ReportType.SAFE, userId);
 
         assertThat(results).isEmpty();
     }
