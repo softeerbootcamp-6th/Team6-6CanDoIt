@@ -100,7 +100,7 @@ export default function Dropdown(props: PropsState) {
                             <Icon {...chevronIconProps} />
                         </div>
                     </div>
-                    <ul>
+                    <ul css={optionListStyle}>
                         {optionListProps.map((liProps) => (
                             <TextLi {...liProps} />
                         ))}
@@ -124,6 +124,7 @@ const dropdownStyle = css`
     position: relative;
     width: max-content;
     cursor: pointer;
+    border: none;
 `;
 
 const chevronButtonStyle = css`
@@ -178,6 +179,7 @@ const optionsStyle = css`
     width: max-content;
     padding: 1rem;
     border-radius: 1.5rem;
+    border: none;
     background-color: ${getColor({
         colors,
         colorString: 'greyOpacityWhite-70',
@@ -194,4 +196,28 @@ const optionTitleStyle = css`
         colors,
         colorString: 'grey-100',
     })};
+`;
+
+const optionListStyle = css`
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    line-height: 1.5;
+
+    max-height: 18.5rem;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+
+    padding-right: 1rem;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: ${colors.grey[100]};
+    }
+    &::-webkit-scrollbar-track {
+        background-color: ${colors.greyOpacityWhite[90]};
+    }
 `;
