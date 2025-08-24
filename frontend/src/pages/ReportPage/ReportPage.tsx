@@ -22,6 +22,8 @@ const pageContainerStyle = css`
     gap: 1rem;
     max-width: 100dvw;
     overflow-x: hidden;
+    padding-top: 1rem;
+    box-sizing: border-box;
 
     height: calc(100dvh - 5rem);
 
