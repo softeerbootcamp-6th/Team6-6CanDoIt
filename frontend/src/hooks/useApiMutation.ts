@@ -6,7 +6,7 @@ import {
     type UseMutationResult,
 } from '@tanstack/react-query';
 
-type Method = 'POST' | 'PUT' | 'DELETE';
+type Method = 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 const getToken = () =>
     localStorage.getItem('accessToken') ??
