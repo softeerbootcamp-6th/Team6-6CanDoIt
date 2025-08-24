@@ -1,6 +1,11 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import DetailSideBarContent from '../../molecules/Forecast/DetailSideBarContent';
+import {
+    convertToIconName,
+    covertToWeatherByIconName,
+    convertWeatherToKorean,
+} from '../../../utils/utils';
 
 export default function DetailSideBarContentColumn({
     weatherDetailContentData,
@@ -16,7 +21,14 @@ export default function DetailSideBarContentColumn({
         windSpeedDescription,
         humidity,
         humidityDescription,
+        precipitationType,
     } = weatherDetailContentData;
+
+    const weatherStatus = covertToWeatherByIconName(
+        convertToIconName({ precipitationType, sky }),
+    );
+
+    const koreanWeather = convertWeatherToKorean(weatherStatus);
 
     const weatherDetailItems = [
         {
@@ -34,7 +46,7 @@ export default function DetailSideBarContentColumn({
         {
             iconName: 'cloudy',
             title: '구름',
-            value: sky,
+            value: koreanWeather,
             description: skyDescription,
         },
         {

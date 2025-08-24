@@ -1,16 +1,21 @@
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText';
 
-export default function TimeTimperatureLine() {
+interface PropsState {
+    lineData: { title: string; temperature: number; wind: number };
+}
+
+export default function TimeTimperatureLine({ lineData }: PropsState) {
+    const { title, temperature, wind } = lineData;
     return (
         <div css={lineStyles}>
             <CommonText
                 TextTag='span'
-                fontSize='label'
+                fontSize='body'
                 fontWeight='bold'
                 color='grey-0'
             >
-                시작
+                {title}
             </CommonText>
             <CommonText
                 TextTag='span'
@@ -18,7 +23,7 @@ export default function TimeTimperatureLine() {
                 fontWeight='medium'
                 color='grey-20'
             >
-                20°C
+                {`${temperature}°C`}
             </CommonText>
             <CommonText
                 TextTag='span'
@@ -26,7 +31,7 @@ export default function TimeTimperatureLine() {
                 fontWeight='medium'
                 color='grey-20'
             >
-                13m/s
+                {`${wind}m/s`}
             </CommonText>
         </div>
     );
@@ -35,4 +40,15 @@ const lineStyles = css`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    & span:first-of-type {
+        flex: 0.5;
+    }
+
+    & span:not(:first-of-type) {
+        flex: 1;
+    }
+
+    & span {
+        text-align: left;
+    }
 `;

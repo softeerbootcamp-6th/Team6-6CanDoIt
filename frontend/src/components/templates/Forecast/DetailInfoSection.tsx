@@ -1,55 +1,143 @@
 import WeatherCard from '../../../components/organisms/Forecast/WeatherCard.tsx';
 import TimeSeletor from '../../../components/organisms/Forecast/TimeSeletor.tsx';
 import DetailTitle from '../../../components/molecules/Forecast/DetailTitle.tsx';
-import { css, keyframes } from '@emotion/react';
+import { css } from '@emotion/react';
 import bgImage from '../../../assets/Bg-fixed.png';
+import svg from '../../../assets/line.svg';
 import cloudImage from '../../../assets/Bg-scroll.png';
 import { WeatherIndexLight } from '../../atoms/Text/WeatherIndex.tsx';
 import { useState } from 'react';
 import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.tsx';
-import { DummyWeatherData } from './dummy.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { theme } from '../../../theme/theme.ts';
 import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
+import {
+    detailInfoSectionData,
+    summaryInfoSectionData,
+} from '../../../constants/placeholderData.ts';
+import { useSearchParams } from 'react-router-dom';
+import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
 
-const weatherDataList = [
-    {
-        title: '시작 지점',
-        weatherInfo: {
-            weatherIconName: 'rain',
-            weatherIconText: '비옴',
-            windSpeed: 2,
-        },
-    },
-    {
-        title: '시작 지점',
-        weatherInfo: {
-            weatherIconName: 'rain',
-            weatherIconText: '비옴',
-            windSpeed: 2,
-        },
-    },
-    {
-        title: '시작 지점',
-        weatherInfo: {
-            weatherIconName: 'rain',
-            weatherIconText: '비옴',
-            windSpeed: 2,
-        },
-    },
-];
+interface CourseForcast {
+    startCard: CardData;
+    arrivalCard: CardData;
+    adjustedArrivalCard: CardData;
+    descentCard: CardData;
+    courseAltitude: number;
+    recommendComment: string;
+    adjustedRecommendComment: string;
+}
+
+interface CardData {
+    dateTime: string;
+    hikingActivity: HikingActivityStatus;
+    temperature: number;
+    apparentTemperature: number;
+    temperatureDescription: string;
+    precipitation: string;
+    probabilityDescription: string;
+    precipitationType: string;
+    sky: string;
+    skyDescription: string;
+    windSpeed: number;
+    windSpeedDescription: string;
+    humidity: number;
+    humidityDescription: string;
+    highestTemperature: number;
+    lowestTemperature: number;
+    title?: string;
+}
+
+type HikingActivityStatus = '좋음' | '매우좋음' | '나쁨' | '보통';
+type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
+
+const placeholderData = detailInfoSectionData;
 
 export default function DetailInfoSection() {
+    const [searchParams] = useSearchParams();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isCard, setIsCard] = useState<boolean>(false);
+    const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
+    const [sidebarData, setSidebarData] = useState<{
+        backgroundType: Background;
+        title: string;
+        courseAltitude?: number;
+    } | null>(null);
+    const [scrollSeletedTime, setScrollSelectedTime] = useState<string>(
+        '2025-08-22T00:00:00',
+    );
+    const seletedTime = '2025-08-22T00:00:00';
+    const selectedCourseId = Number(searchParams.get('courseid'));
+    const selectedMountainId = Number(searchParams.get('mountainid'));
 
-    const handleCardClick = () => {
-        setIsOpen((prev) => !prev);
+    const { frontCard, backCard, refetch } = useForecastCardData(
+        selectedCourseId,
+        scrollSeletedTime,
+    );
+
+    const cardData = { frontCard, backCard };
+    const { data: courseForecastData = placeholderData } =
+        useApiQuery<CourseForcast>(
+            `/card/course/${selectedCourseId}/forecast`,
+            { startDateTime: scrollSeletedTime },
+            { placeholderData: placeholderData, enabled: true },
+        );
+
+    const { data: summaryInfoData } = useApiQuery<any>(
+        `/card/mountain/course/${selectedCourseId}`,
+        { dateTime: scrollSeletedTime },
+        {
+            placeholderData: summaryInfoSectionData,
+            retry: false,
+        },
+    );
+
+    const { duration } = summaryInfoData;
+
+    const {
+        startCard,
+        arrivalCard,
+        descentCard,
+        adjustedArrivalCard,
+        recommendComment,
+        adjustedRecommendComment,
+        courseAltitude,
+    } = courseForecastData;
+
+    const selectedArrivalCard = isToggleOn ? adjustedArrivalCard : arrivalCard;
+    startCard.title = '시작지점';
+    descentCard.title = '끝지점';
+    selectedArrivalCard.title = '최고점';
+
+    const weatherDataList = [
+        startCard,
+        isToggleOn ? adjustedArrivalCard : arrivalCard,
+        descentCard,
+    ];
+
+    const handleCardClick = (
+        backgroundType: Background,
+        title: string,
+        courseAltitude: number | undefined,
+    ) => {
+        setSidebarData({ backgroundType, title, courseAltitude });
+        setIsOpen(true);
     };
 
     const handleSidebarClose = () => {
         setIsOpen(false);
     };
+
+    const getForcastCardData = async () => {
+        await refetch();
+    };
+
+    function findSidebarCard(type: string, weatherDataList: any) {
+        if (type == '시작지점') return weatherDataList[0];
+        else if (type == '끝지점') return weatherDataList[2];
+        else return weatherDataList[1];
+    }
 
     return (
         <div css={wrapperStyles}>
@@ -57,7 +145,10 @@ export default function DetailInfoSection() {
                 <div css={contentSectionStyles}>
                     <button
                         css={storeBtnStyles}
-                        onClick={() => setIsCard(true)}
+                        onClick={() => {
+                            setIsCard(true);
+                            getForcastCardData();
+                        }}
                     >
                         <Icon
                             name='download-02'
@@ -71,32 +162,83 @@ export default function DetailInfoSection() {
                         css={animatedImageStyles}
                         alt='cloud'
                     />
-                    <DetailTitle />
+                    <DetailTitle
+                        scrollSeletedTime={scrollSeletedTime}
+                        recommendComment={
+                            isToggleOn
+                                ? adjustedRecommendComment
+                                : recommendComment
+                        }
+                    />
                     <div css={weatherSummaryWrapperStyles}>
                         <div css={weatherCardWrapperStyles}>
-                            {weatherDataList.map((data, index) => (
-                                <WeatherCard
-                                    key={index}
-                                    title={data.title}
-                                    weatherInfo={data.weatherInfo}
-                                    onClick={handleCardClick}
-                                />
-                            ))}
+                            {weatherDataList.map((data, index) => {
+                                const {
+                                    sky,
+                                    windSpeed,
+                                    skyDescription,
+                                    temperature,
+                                    precipitationType,
+                                } = data;
+                                return (
+                                    <WeatherCard
+                                        key={index}
+                                        title={data.title!}
+                                        weatherIconName={sky}
+                                        courseAltitude={
+                                            index === 1
+                                                ? courseAltitude
+                                                : undefined
+                                        }
+                                        weatherIconText={skyDescription}
+                                        windSpeed={windSpeed}
+                                        temperature={temperature}
+                                        precipitationType={precipitationType}
+                                        onClick={(
+                                            backgroundType,
+                                            title,
+                                            courseAltitude,
+                                        ) =>
+                                            handleCardClick(
+                                                backgroundType,
+                                                title,
+                                                courseAltitude,
+                                            )
+                                        }
+                                    />
+                                );
+                            })}
                         </div>
+                        <img css={lineImageStyles} src={svg}></img>
                         <WeatherIndexLight type='좋음' />
                     </div>
 
-                    <TimeSeletor />
+                    <TimeSeletor
+                        scrollSelectedTime={scrollSeletedTime}
+                        onToggle={() => setIsToggleOn((prev) => !prev)}
+                        isToggleOn={isToggleOn}
+                        time={Math.ceil(duration)}
+                        selectedTime={seletedTime}
+                        selectedMountainId={selectedMountainId}
+                        onTimeSelect={(time) => setScrollSelectedTime(time)}
+                    />
                 </div>
                 {isOpen && (
                     <WeatherDetailSideBar
-                        selectedWeatherData={DummyWeatherData}
-                        type='시작지점'
+                        courseAltitude={sidebarData?.courseAltitude}
+                        type={sidebarData?.title!}
                         onClose={handleSidebarClose}
+                        card={findSidebarCard(
+                            sidebarData?.title!,
+                            weatherDataList,
+                        )}
                     />
                 )}
                 {isCard && (
-                    <WeatherCardModal onClose={() => setIsCard(false)} />
+                    <WeatherCardModal
+                        cardData={cardData}
+                        onClose={() => setIsCard(false)}
+                    />
                 )}
             </div>
         </div>
@@ -104,15 +246,6 @@ export default function DetailInfoSection() {
 }
 
 const { colors } = theme;
-
-const float = keyframes`
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-`;
 
 const animatedImageStyles = css`
     position: absolute;
@@ -122,7 +255,6 @@ const animatedImageStyles = css`
     height: 85%;
     opacity: 0.8;
 
-    animation: ${float} 4s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
 `;
@@ -133,15 +265,15 @@ const weatherCardWrapperStyles = css`
     justify-content: space-evenly;
 
     & > :nth-of-type(1) {
-        transform: translateY(5rem);
+        transform: translateY(5.5rem);
     }
 
     & > :nth-of-type(2) {
-        transform: translateY(-5rem);
+        transform: translateY(-4.5rem);
     }
 
     & > :nth-of-type(3) {
-        transform: translateY(5rem);
+        transform: translateY(5.5rem);
     }
 `;
 
@@ -153,6 +285,9 @@ const weatherSummaryWrapperStyles = css`
 `;
 
 const wrapperStyles = css`
+    position: relative;
+    z-index: 100;
+    background-color: ${colors.grey[0]};
     width: 100%;
     padding-top: 5rem;
     box-sizing: border-box;
@@ -205,4 +340,12 @@ const storeBtnStyles = css`
     padding: 0 3px 5px 0;
     box-sizing: border-box;
     cursor: pointer;
+`;
+
+const lineImageStyles = css`
+    position: absolute;
+    top: 35%;
+    z-index: -1;
+    width: 60%;
+    height: 32%;
 `;

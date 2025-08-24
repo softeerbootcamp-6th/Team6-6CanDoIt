@@ -5,13 +5,31 @@ import { theme } from '../../../theme/theme.ts';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
+import { convertToIconName } from '../../../utils/utils.ts';
 
-const dummy = Array.from({ length: 34 });
+interface PropsState {
+    onToggle: () => void;
+    isToggleOn: boolean;
+    time: number;
+    selectedTime: string;
+    selectedMountainId: number;
+    onTimeSelect?: (time: string) => void;
+    scrollSelectedTime?: string;
+}
+
 const { colors, typography } = theme;
 
-export default function TimeSeletor() {
-    const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
+export default function TimeSeletor({
+    onToggle,
+    isToggleOn,
+    time,
+    selectedTime,
+    selectedMountainId,
+    onTimeSelect,
+    scrollSelectedTime,
+}: PropsState) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [startX, setStartX] = useState(0);
@@ -39,23 +57,88 @@ export default function TimeSeletor() {
         const scrollPos = container.scrollLeft;
 
         const nearestIndex = Math.round(scrollPos / (cellWidth + gap));
+
         container.scrollTo({
             left: nearestIndex * (cellWidth + gap),
             behavior: 'smooth',
         });
+
+        const visibleIndex = Math.min(nearestIndex, data.length - 1);
+        const selectedTime = data[visibleIndex]?.dateTime;
+
+        if (selectedTime && onTimeSelect) {
+            onTimeSelect(selectedTime);
+        }
     };
 
-    let size = 5;
+    const now = new Date();
+    const selectedDate = new Date(selectedTime);
+
+    let startTime: string;
+
+    if (selectedDate < now) {
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const date = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+
+        startTime = `${year}-${month}-${date}T${hours}:00:00`;
+    } else {
+        startTime = selectedTime;
+    }
+
+    const { data } = useApiQuery<any[]>(
+        `/card/mountain/${selectedMountainId}/forecast`,
+        { startDateTime: startTime },
+        {
+            retry: false,
+        },
+    );
+
     const dynamicScrollSizeStyles = css`
-        width: ${size * 5}rem;
+        width: ${time * 5.5 + 5}rem;
     `;
+
+    function getStartAndEndTimeHoursOnly(
+        scrollStartTimeStr: string | undefined,
+        duration: number,
+        startTimeStr: string,
+    ): [string, string] {
+        const seletedTime = scrollStartTimeStr
+            ? scrollStartTimeStr
+            : startTimeStr;
+        const startDate = new Date(seletedTime);
+        console.log(scrollStartTimeStr);
+
+        const formatTime = (date: Date) => {
+            const hours = date.getHours();
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+            return `${hour12}${period}`;
+        };
+
+        const startFormatted = formatTime(startDate);
+
+        const durationHours = Math.floor(duration);
+        const endDate = new Date(
+            startDate.getTime() + durationHours * 60 * 60 * 1000,
+        );
+        const endFormatted = formatTime(endDate);
+
+        return [startFormatted, endFormatted];
+    }
+
+    const [startHourTime, endHourTime] = useMemo(
+        () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time, startTime),
+        [scrollSelectedTime, time],
+    );
 
     return (
         <div css={timeSeletorStyles}>
             <div css={headerStyles}>
                 <div>
                     <SelectorTitleText>출발 시간 선택</SelectorTitleText>
-                    <span css={courseTimeStyles}>4시간 코스</span>
+                    <span css={courseTimeStyles}>{`${time}시간 코스`}</span>
                 </div>
                 <div>
                     <SelectorTitleText>고도 보정하기</SelectorTitleText>
@@ -74,7 +157,7 @@ export default function TimeSeletor() {
                     </div>
                     <ToggleButton
                         isOn={isToggleOn}
-                        onClick={() => setIsToggleOn((prev) => !prev)}
+                        onClick={() => onToggle()}
                     />
                 </div>
             </div>
@@ -86,8 +169,8 @@ export default function TimeSeletor() {
                     `}
                 >
                     <div css={[scrollStyles, dynamicScrollSizeStyles]}>
-                        <CommonText TextTag='span'>1AM</CommonText>
-                        <CommonText TextTag='span'>9PM</CommonText>
+                        <CommonText TextTag='span'>{startHourTime}</CommonText>
+                        <CommonText TextTag='span'>{endHourTime}</CommonText>
                     </div>
                 </div>
 
@@ -110,12 +193,15 @@ export default function TimeSeletor() {
                     onTouchMove={(e) => moveDrag(e.touches[0].pageX)}
                     onTouchEnd={endDrag}
                 >
-                    {dummy.map((_, idx) => (
+                    {data?.map((item, idx) => (
                         <WeatherCell
                             key={idx}
-                            time='2AM'
-                            iconName='clear-day'
-                            temperature={20}
+                            time={item.dateTime}
+                            iconName={convertToIconName({
+                                precipitationType: item.precipitationType,
+                                sky: item.sky,
+                            })}
+                            temperature={item.temperature}
                         />
                     ))}
                 </div>

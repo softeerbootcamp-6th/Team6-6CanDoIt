@@ -6,13 +6,23 @@ interface PropsState {
     text: string;
     iconName: string;
     color: string;
+    fontSize?: FontSize;
 }
 
-export default function TextWithIcon({ text, iconName, color }: PropsState) {
+type FontSize = 'body' | 'caption' | 'label' | 'title' | 'display' | 'headline';
+
+export default function TextWithIcon({
+    text,
+    iconName,
+    color,
+    fontSize = 'body',
+}: PropsState) {
     return (
         <div css={wrapperStyles}>
             <Icon name={iconName} width={1.5} height={1.5} color={color} />
-            <CommonText {...createTextProps(color)}>{text}</CommonText>
+            <CommonText {...createTextProps(color, fontSize)}>
+                {text}
+            </CommonText>
         </div>
     );
 }
@@ -23,11 +33,11 @@ const wrapperStyles = css`
     gap: 0.2rem;
 `;
 
-const createTextProps = (color: string) => {
+const createTextProps = (color: string, fontSize: FontSize = 'body') => {
     const textProps = {
         TextTag: 'span',
         fontWeight: 'bold',
-        fontSize: 'body',
+        fontSize,
         color,
     } as const;
     return textProps;

@@ -15,7 +15,7 @@ export default function WeatherCell({
 }: PropsState) {
     return (
         <div css={wrapperStyles}>
-            <SelectorText>{time}</SelectorText>
+            <SelectorText>{formatTime(time)}</SelectorText>
             <Icon
                 name={iconName}
                 width={1.5}
@@ -26,6 +26,41 @@ export default function WeatherCell({
             <SelectorText>{`${temperature}°C`}</SelectorText>
         </div>
     );
+}
+
+function formatTime(timeStr: string) {
+    const date = new Date(timeStr);
+    const now = new Date();
+
+    const dateOnly = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+    );
+    const nowDateOnly = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+    );
+
+    const diffDays = Math.floor(
+        (dateOnly.getTime() - nowDateOnly.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    const isMidnight = date.getHours() === 0 && date.getMinutes() === 0;
+
+    if (isMidnight) {
+        if (diffDays === 0) return '오늘';
+        else if (diffDays === 1) return '내일';
+        else if (diffDays === 2) return '모레';
+    }
+
+    let hours = date.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    if (hours === 0) hours = 12;
+    else if (hours > 12) hours -= 12;
+
+    return `${hours} ${ampm}`;
 }
 
 const wrapperStyles = css`

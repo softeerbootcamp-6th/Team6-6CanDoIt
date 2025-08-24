@@ -1,8 +1,33 @@
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText';
 import { WeatherIndexVivid } from '../../atoms/Text/WeatherIndex';
+import { formatDateToKorean } from '../../../utils/utils';
 
-export default function BackWeatherCardHeader() {
+interface PropsState {
+    headerData: {
+        date: string;
+        hikingActivity: WeatherType;
+        mountainName: string;
+        courseName: string;
+        startTime: string;
+        descentTime: string;
+        distance: number;
+    };
+}
+
+type WeatherType = '매우좋음' | '좋음' | '보통' | '나쁨';
+
+export default function BackWeatherCardHeader({ headerData }: PropsState) {
+    const {
+        date,
+        hikingActivity,
+        mountainName,
+        courseName,
+        startTime,
+        descentTime,
+        distance,
+    } = headerData;
+
     return (
         <div css={wrapperStyles}>
             <div css={lineStyles}>
@@ -12,9 +37,9 @@ export default function BackWeatherCardHeader() {
                     fontWeight='bold'
                     color='grey-30'
                 >
-                    7월 24일
+                    {formatDateToKorean(date)}
                 </CommonText>
-                <WeatherIndexVivid type='매우좋음' />
+                <WeatherIndexVivid type={hikingActivity} />
             </div>
             <div css={lineStyles}>
                 <CommonText
@@ -23,7 +48,7 @@ export default function BackWeatherCardHeader() {
                     fontWeight='medium'
                     color='grey-70'
                 >
-                    가야산 만물코스
+                    {`${mountainName} ${courseName} (${distance}km)`}
                 </CommonText>
                 <CommonText
                     TextTag='span'
@@ -31,11 +56,24 @@ export default function BackWeatherCardHeader() {
                     fontWeight='medium'
                     color='grey-70'
                 >
-                    9AM - 12PM
+                    {formatTimeRange(startTime, descentTime)}
                 </CommonText>
             </div>
         </div>
     );
+}
+
+function formatTimeRange(startTime: string, endTime: string): string {
+    const formatHour = (time: string) => {
+        const [hourStr] = time.split(':');
+        let hour = Number(hourStr);
+        const period = hour >= 12 ? 'PM' : 'AM';
+        if (hour > 12) hour -= 12;
+        if (hour === 0) hour = 12;
+        return `${hour}${period}`;
+    };
+
+    return `${formatHour(startTime)} ~ ${formatHour(endTime)}`;
 }
 
 const lineStyles = css`

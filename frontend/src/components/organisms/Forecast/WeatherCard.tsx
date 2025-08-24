@@ -3,42 +3,79 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import WeatherInfoColumn from '../../molecules/Forecast/WeatherInfoColumn.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import {
+    convertToIconName,
+    covertToWeatherByIconName,
+} from '../../../utils/utils.ts';
 
 interface PropsState {
     title: string;
-    weatherInfo: WeatherInfo;
-    onClick: () => void;
-}
-
-interface WeatherInfo {
     weatherIconName: string;
     weatherIconText: string;
     windSpeed: number;
+    temperature: number;
+    courseAltitude?: number;
+    precipitationType: string;
+    onClick: (
+        backgroundType: Background,
+        title: string,
+        courseAltitude?: number,
+    ) => void;
 }
+
+type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
 
 const { colors } = theme;
 
-// 배경색을 동적으로 입혀주고 이름 등은 백엔드와 협의 후 로직짜서 수정해야할듯.
 export default function WeatherCard({
     title,
-    weatherInfo,
+    weatherIconName,
+    weatherIconText,
+    windSpeed,
+    temperature,
+    courseAltitude,
+    precipitationType,
     onClick,
 }: PropsState) {
+    const convertedIconName = convertToIconName({
+        precipitationType,
+        sky: weatherIconName,
+    });
+
+    const backgroundType: Background =
+        covertToWeatherByIconName(convertedIconName);
+
     const dynamicBackgoundStyle = css`
-        background-color: ${colors.accentWeather.sunny};
+        background-color: ${colors.accentWeather[backgroundType]};
     `;
+
+    const weatherInfo = { convertedIconName, weatherIconText, windSpeed };
 
     return (
         <div css={[cardStyles, dynamicBackgoundStyle]}>
             <div css={headerStyles}>
-                <CommonText {...titleTextProps}>{title}</CommonText>
-                <button css={buttonStyles} onClick={onClick}>
+                <div css={titleStyles}>
+                    <CommonText {...titleTextProps}>{title}</CommonText>
+                    {courseAltitude && (
+                        <CommonText {...subTitleTextProps}>
+                            {`${courseAltitude}m`}
+                        </CommonText>
+                    )}
+                </div>
+                <button
+                    css={buttonStyles}
+                    onClick={() =>
+                        onClick(backgroundType, title, courseAltitude)
+                    }
+                >
                     <Icon {...iconProps} />
                 </button>
             </div>
             <div css={footerStyles}>
                 <WeatherInfoColumn {...weatherInfo} />
-                <CommonText {...temperatureTextProps}>20°C</CommonText>
+                <CommonText {...temperatureTextProps}>
+                    {temperature}°C
+                </CommonText>
             </div>
         </div>
     );
@@ -50,6 +87,12 @@ const titleTextProps = {
     fontWeight: 'bold',
     color: 'greyOpacity-20',
 } as const;
+const subTitleTextProps = {
+    TextTag: 'span',
+    fontSize: 'caption',
+    fontWeight: 'medium',
+    color: 'greyOpacity-60',
+} as const;
 
 const iconProps = {
     name: 'narrow-right',
@@ -57,6 +100,11 @@ const iconProps = {
     width: 2,
     height: 2,
 } as const;
+
+const titleStyles = css`
+    display: flex;
+    gap: 0.5rem;
+`;
 
 const temperatureTextProps = {
     TextTag: 'span',
@@ -71,8 +119,8 @@ const cardStyles = css`
     justify-content: space-between;
 
     box-sizing: border-box;
-    width: 13rem;
-    height: 9.5rem;
+    width: 15rem;
+    height: 10rem;
 
     padding: 0.75rem 0;
 

@@ -1,7 +1,33 @@
 import { css } from '@emotion/react';
 import CommonText from '../../atoms/Text/CommonText';
+import { parseDuration } from '../../../utils/utils';
 
-export default function FrontWeatherCardFooter() {
+interface PropsState {
+    data: FooterData;
+}
+
+interface FooterData {
+    mountainName: string;
+    distance: number;
+    courseName: string;
+    duration: number;
+}
+
+export default function FrontWeatherCardFooter({ data }: PropsState) {
+    const { mountainName, distance, courseName, duration } = data;
+
+    function formatDurationText(duration: number): string {
+        const { hour, min } = parseDuration(duration);
+        const parts: string[] = [];
+
+        if (hour > 0) parts.push(`${hour}시간`);
+        if (min > 0) parts.push(`${min}분`);
+
+        return parts.join(' ');
+    }
+
+    const timeText = formatDurationText(duration);
+
     return (
         <div>
             <CommonText
@@ -10,7 +36,7 @@ export default function FrontWeatherCardFooter() {
                 fontWeight='bold'
                 color='grey-100'
             >
-                가야산
+                {mountainName}
             </CommonText>
             <div css={wrapperStyles}>
                 <CommonText
@@ -19,7 +45,7 @@ export default function FrontWeatherCardFooter() {
                     fontWeight='medium'
                     color='greyOpacityWhite-50'
                 >
-                    만물상 코스 8.9km
+                    {`${courseName} ${distance}km`}
                 </CommonText>
                 <CommonText
                     TextTag='span'
@@ -27,7 +53,7 @@ export default function FrontWeatherCardFooter() {
                     fontWeight='medium'
                     color='greyOpacityWhite-50'
                 >
-                    4시간 30분
+                    {timeText}
                 </CommonText>
             </div>
         </div>

@@ -19,12 +19,11 @@ export default function useApiQuery<TResponse = any>(
         'queryKey' | 'queryFn'
     >,
 ): UseQueryResult<TResponse, Error> {
-    const queryFn = async ({
-        queryKey,
-    }: {
-        queryKey: [string, Record<string, any>?];
-    }) => {
-        const [_url, params] = queryKey;
+    const token =
+        localStorage.getItem('accessToken') ??
+        sessionStorage.getItem('accessToken');
+
+    const queryFn = async (): Promise<TResponse> => {
         const queryString =
             params && Object.keys(params).length
                 ? '?' +
@@ -33,16 +32,20 @@ export default function useApiQuery<TResponse = any>(
                   ).toString()
                 : '';
 
-        const res = await fetch(`${API_BASE_URL}${_url}${queryString}`, {
+        const res = await fetch(`${API_BASE_URL}${url}${queryString}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
         });
+
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
             throw new Error(errorData.message || 'API 요청 실패');
         }
 
-        return res.json();
+        return res.json() as Promise<TResponse>;
     };
 
     return useQuery<

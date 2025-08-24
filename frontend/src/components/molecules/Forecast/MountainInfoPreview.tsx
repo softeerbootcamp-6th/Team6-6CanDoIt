@@ -6,24 +6,28 @@ interface PropsState {
     totalDuration: number;
     totalDistance: number;
     courseImageUrl: string;
+    sunriseTime: string;
+    sunsetTime: string;
 }
 
 export default function MountainInfoPreview({
     totalDuration,
     totalDistance,
     courseImageUrl,
+    sunriseTime,
+    sunsetTime,
 }: PropsState) {
     return (
         <div css={wrapperStyles}>
             <div css={dummySteyls}>
-                <img src={courseImageUrl} />
+                <img src={courseImageUrl} width={400} height={400} />
             </div>
 
             <ClimbInfoText
                 totalDistance={totalDistance}
                 totalDuration={totalDuration}
             />
-            <SunSchedule sunriseTime='05:22' sunsetTime='17:02' />
+            <SunSchedule sunriseTime={sunriseTime} sunsetTime={sunsetTime} />
         </div>
     );
 }
@@ -43,5 +47,4 @@ const dummySteyls = css`
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    background: red;
 `;
