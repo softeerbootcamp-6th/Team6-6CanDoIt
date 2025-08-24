@@ -18,6 +18,7 @@ kma:
     key:
       mountain: ${secrets.KMA_API_KEY_MOUNTAIN}
       short: ${secrets.KMA_API_KEY_SHORT}
+      ultra: ${secrets.KMA_API_KEY_ULTRA}
 
 forecast:
   mapping:

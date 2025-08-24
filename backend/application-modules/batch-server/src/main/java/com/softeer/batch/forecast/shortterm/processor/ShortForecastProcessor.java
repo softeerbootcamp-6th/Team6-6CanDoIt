@@ -1,6 +1,7 @@
 package com.softeer.batch.forecast.shortterm.processor;
 
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
+import com.softeer.batch.forecast.shortterm.listener.DailyTemperatureCollector;
 import com.softeer.batch.mapper.ForecastMapper;
 import com.softeer.domain.DailyTemperature;
 import com.softeer.domain.Forecast;
@@ -39,13 +40,17 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
     private final ShortForecastApiCaller kmaApiCaller;
     private final ForecastMapper forecastMapper;
     private final SimpleRetryHandler simpleRetryHandler;
+    private final DailyTemperatureCollector dailyTemperatureCollector;
 
     public ShortForecastProcessor(ShortForecastApiCaller kmaApiCaller,
                                   ForecastMapper forecastMapper,
-                                  @Qualifier(SHORT_SIMPLE_RETRY_HANDLER) SimpleRetryHandler simpleRetryHandler) {
+                                  @Qualifier(SHORT_SIMPLE_RETRY_HANDLER) SimpleRetryHandler simpleRetryHandler,
+                                    DailyTemperatureCollector dailyTemperatureCollector
+    ) {
         this.kmaApiCaller = kmaApiCaller;
         this.forecastMapper = forecastMapper;
         this.simpleRetryHandler = simpleRetryHandler;
+        this.dailyTemperatureCollector = dailyTemperatureCollector;
     }
 
     @Value("${kma.api.key.short}")
@@ -102,6 +107,13 @@ public class ShortForecastProcessor implements ItemProcessor<Grid, ShortForecast
 
             if (!dailyTemperatureMap.containsKey(date)) continue;
             hourlyForecasts.add(createForecastObject(entry.getKey(), shortForecastItems, dailyTemperatureMap.get(date)));
+
+            dailyTemperatureCollector.collect(
+                    grid.id(),
+                    date,
+                    dailyTemperatureMap.get(date).highestTemperature(),
+                    dailyTemperatureMap.get(date).lowestTemperature()
+            );
         }
 
         hourlyForecasts.sort(Comparator.comparing(Forecast::dateTime));

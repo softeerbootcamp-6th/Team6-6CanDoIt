@@ -1,7 +1,9 @@
 package com.softeer.batch.forecast.shortterm.writer;
 
+import com.softeer.batch.common.writersupporter.DailyTemperatureWriter;
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.batch.forecast.shortterm.dto.ShortForecastList;
+import com.softeer.batch.forecast.shortterm.redis.ShortForecastRedisWriter;
 import com.softeer.domain.Forecast;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.Chunk;
@@ -16,7 +18,8 @@ import java.util.stream.Collectors;
 public abstract class AbstractShortForecastWriter implements ItemWriter<ShortForecastList> {
 
     protected final ForecastJdbcWriter forecastWriterSupporter;
-
+    protected final DailyTemperatureWriter dailyTemperatureWriterSupporter;
+    protected final ShortForecastRedisWriter shortForecastRedisWriter;
 
     @Override
     public void write(Chunk<? extends ShortForecastList> chunk) throws Exception {
@@ -25,43 +28,33 @@ public abstract class AbstractShortForecastWriter implements ItemWriter<ShortFor
                     List<Forecast> filtered = filterForecasts(item.forecasts());
 
                     return filtered.stream()
-                            .map(f -> forecastWriterSupporter
-                                    .mapForecastToSqlParams(f, item.gridId()));
+                            .map(forecast -> forecastWriterSupporter
+                                    .mapForecastToSqlParams(forecast, item.gridId()));
                 })
                 .toArray(MapSqlParameterSource[]::new);
 
-
         MapSqlParameterSource[] dailyTemperatureBatch = chunk.getItems().stream()
-                .flatMap(forecastList ->
-                        forecastList.forecasts().stream()
+                .flatMap(item ->
+                        item.forecasts().stream()
                                 .collect(Collectors.groupingBy(f -> f.dateTime().toLocalDate()))
                                 .entrySet().stream()
                                 .map(entry -> {
                                     LocalDate date = entry.getKey();
                                     List<Forecast> forecasts = entry.getValue();
-                                    double highest = forecasts.stream()
-                                            .map(forecast -> forecast.dailyTemperature().highestTemperature())
-                                            .findFirst().get();
-                                    double lowest = forecasts.stream()
-                                            .map(forecast -> forecast.dailyTemperature().lowestTemperature())
-                                            .findFirst().get();
 
-                                    return new MapSqlParameterSource()
-                                            .addValue("date", date)
-                                            .addValue("highestTemperature", highest)
-                                            .addValue("lowestTemperature", lowest)
-                                            .addValue("gridId", forecastList.gridId());
+                                    return dailyTemperatureWriterSupporter.mapDailyTemperatureToSqlParams(date, forecasts, item.gridId());
                                 })
-
                 ).toArray(MapSqlParameterSource[]::new);
 
         if (batch.length > 0) {
-            forecastWriterSupporter.batchUpdateForecast(batch);
+            forecastWriterSupporter.batchUpdate(batch);
         }
 
         if (dailyTemperatureBatch.length > 0) {
-            forecastWriterSupporter.batchUpdateDailyTemperature(dailyTemperatureBatch);
+            dailyTemperatureWriterSupporter.batchUpdate(dailyTemperatureBatch);
         }
+
+        shortForecastRedisWriter.pipelineUpdateShortForecast(chunk.getItems());
     }
 
     protected abstract List<Forecast> filterForecasts(List<Forecast> forecasts);
