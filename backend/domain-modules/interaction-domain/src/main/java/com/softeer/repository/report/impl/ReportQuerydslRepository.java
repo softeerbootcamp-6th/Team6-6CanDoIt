@@ -119,13 +119,7 @@ public class ReportQuerydslRepository {
         return queryFactory
                 .selectDistinct(reportEntity.id)
                 .from(reportEntity)
-                .innerJoin(courseEntity).on(courseEntity.id.eq(reportEntity.courseId))
-                .leftJoin(reportEtceteraKeywordEntity).on(reportEntity.id.eq(reportEtceteraKeywordEntity.id.reportId))
-                .leftJoin(etceteraKeywordEntity).on(reportEtceteraKeywordEntity.id.etceteraKeywordId.eq(etceteraKeywordEntity.id))
-                .leftJoin(reportRainKeywordEntity).on(reportEntity.id.eq(reportRainKeywordEntity.id.reportId))
-                .leftJoin(rainKeywordEntity).on(reportRainKeywordEntity.id.rainKeywordId.eq(rainKeywordEntity.id))
-                .leftJoin(reportWeatherKeywordEntity).on(reportEntity.id.eq(reportWeatherKeywordEntity.id.reportId))
-                .leftJoin(weatherKeywordEntity).on(reportWeatherKeywordEntity.id.weatherKeywordId.eq(weatherKeywordEntity.id));
+                .innerJoin(courseEntity).on(courseEntity.id.eq(reportEntity.courseId));
     }
 
     private List<Report> loadReportsByIds(ReportPageable pageable, List<Long> reportIds, Long userId) {
