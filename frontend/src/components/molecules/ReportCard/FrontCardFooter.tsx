@@ -6,12 +6,17 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 interface PropsState {
     timeAgo: string;
     comment: string;
+    userImageUrl?: string;
 }
 
-export default function FrontCardFooter({ timeAgo, comment }: PropsState) {
+export default function FrontCardFooter({
+    timeAgo,
+    comment,
+    userImageUrl,
+}: PropsState) {
     return (
         <div css={frontCardFooterStyle}>
-            <CircleImage />
+            <CircleImage src={userImageUrl} />
             <TwoLinesEllipsis>{comment}</TwoLinesEllipsis>
             <CommonText {...timeAgoProps}>{timeAgo}</CommonText>
         </div>

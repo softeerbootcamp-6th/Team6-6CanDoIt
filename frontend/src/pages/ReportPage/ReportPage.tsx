@@ -69,10 +69,11 @@ const pageContainerStyle = css`
 
 const searchSectionStyle = css`
     width: 100dvw;
-    margin: 1rem 0 0 0;
+    margin: 0;
     height: max-content;
 `;
 
 const cardSectionStyle = css`
     overflow-x: auto;
+    overflow-y: hidden;
 `;

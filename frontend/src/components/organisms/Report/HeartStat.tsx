@@ -10,7 +10,13 @@ interface propsState {
 export default function HeartStat({ count, onHeartClick }: propsState) {
     return (
         <div css={heartStyle}>
-            <button css={buttonStyle} onClick={onHeartClick}>
+            <button
+                css={buttonStyle}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onHeartClick();
+                }}
+            >
                 <Icon {...heartIconProps} />
             </button>
             <CommonText TextTag='span' fontSize='body' fontWeight='bold'>

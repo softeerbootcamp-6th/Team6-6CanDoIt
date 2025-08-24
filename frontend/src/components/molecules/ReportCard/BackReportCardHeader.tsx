@@ -4,12 +4,16 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 
 interface PropsState {
     timeAgo: string;
+    userImageUrl?: string;
 }
 
-export default function BackReportCardHeader({ timeAgo }: PropsState) {
+export default function BackReportCardHeader({
+    timeAgo,
+    userImageUrl,
+}: PropsState) {
     return (
         <div css={backReportCardHeaderStyle}>
-            <CircleImage size='3.75rem' />
+            <CircleImage src={userImageUrl} size='3.75rem' />
             <CommonText {...timeAgoProps}>{timeAgo}</CommonText>
         </div>
     );
