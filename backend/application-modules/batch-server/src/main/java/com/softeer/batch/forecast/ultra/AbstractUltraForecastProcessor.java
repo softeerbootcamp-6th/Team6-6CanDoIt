@@ -27,7 +27,7 @@ public abstract class AbstractUltraForecastProcessor  {
         this.forecastMapper = forecastMapper;
     }
 
-    @Value("${kma.api.key.short}")
+    @Value("${kma.api.key.ultra}")
     protected String serviceKey;
 
     @Value("#{jobParameters[dateTime]}")

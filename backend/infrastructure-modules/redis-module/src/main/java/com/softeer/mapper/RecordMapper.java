@@ -98,4 +98,11 @@ public class RecordMapper {
 
         return map;
     }
+
+    public byte[] serializeValue(Object object) {
+        if (object == null) {
+            return new byte[0];
+        }
+        return valueSerializer.serialize(object);
+    }
 }

@@ -2,6 +2,7 @@ package com.softeer.batch.forecast.mountain.writer;
 
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.batch.common.writersupporter.SunTimeJdbcWriter;
+import com.softeer.batch.forecast.mountain.redis.MountainForecastRedisWriter;
 import com.softeer.domain.Forecast;
 import com.softeer.time.TimeUtil;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -15,8 +16,12 @@ import java.util.stream.Collectors;
 @StepScope
 public class StartUpMountainForecastWriter extends AbstractMountainForecastWriter {
 
-    public StartUpMountainForecastWriter(ForecastJdbcWriter forecastJdbcWriter, SunTimeJdbcWriter sunTimeJdbcWriter) {
-        super(forecastJdbcWriter, sunTimeJdbcWriter);
+    public StartUpMountainForecastWriter(
+            ForecastJdbcWriter forecastJdbcWriter,
+            SunTimeJdbcWriter sunTimeJdbcWriter,
+            MountainForecastRedisWriter mountainForecastRedisWriter
+    ) {
+        super(forecastJdbcWriter, sunTimeJdbcWriter, mountainForecastRedisWriter);
     }
 
     @Override
