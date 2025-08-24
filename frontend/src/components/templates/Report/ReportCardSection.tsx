@@ -106,9 +106,9 @@ export default function ReportCardSection() {
         {
             params: {
                 reportType,
-                weatherKeywords,
-                rainKeywords,
-                etceteraKeywords,
+                weatherKeywordIds: weatherKeywords,
+                rainKeywordIds: rainKeywords,
+                etceteraKeywordIds: etceteraKeywords,
             },
             pageSize,
             idField: 'reportId',
@@ -129,9 +129,9 @@ export default function ReportCardSection() {
                         `/card/interaction/report/${courseId}`,
                         {
                             reportType,
-                            weatherKeywords,
-                            rainKeywords,
-                            etceteraKeywords,
+                            weatherKeywordIds: weatherKeywords,
+                            rainKeywordIds: rainKeywords,
+                            etceteraKeywordIds: etceteraKeywords,
                             pageSize,
                         },
                     ],
@@ -155,9 +155,9 @@ export default function ReportCardSection() {
         `/card/interaction/report/${courseId}`,
         {
             reportType,
-            weatherKeywords,
-            rainKeywords,
-            etceteraKeywords,
+            weatherKeywordIds: weatherKeywords,
+            rainKeywordIds: rainKeywords,
+            etceteraKeywordIds: etceteraKeywords,
             pageSize,
         },
     ] as const;
