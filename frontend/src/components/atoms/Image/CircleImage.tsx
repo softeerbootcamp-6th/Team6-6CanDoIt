@@ -12,7 +12,14 @@ export default function CircleImage({
     src = '',
     alt = '',
 }: PropsState) {
-    return <img src={src} alt={alt} css={reporterStyle({ size })} />;
+    return (
+        <img
+            src={src}
+            alt={alt}
+            css={reporterStyle({ size })}
+            draggable={false}
+        />
+    );
 }
 
 const { colors } = theme;
@@ -22,4 +29,5 @@ const reporterStyle = ({ size }: { size: string }) => css`
     height: ${size};
     border-radius: 50%;
     background-color: ${colors.grey[80]};
+    object-fit: cover;
 `;

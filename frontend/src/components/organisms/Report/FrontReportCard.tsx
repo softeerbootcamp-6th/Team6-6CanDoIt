@@ -26,7 +26,12 @@ export default function FrontReportCard(props: PropsState) {
     } = props;
     return (
         <ReportCardWrapper onClick={onClick}>
-            <img src={imgSrc} alt={imgAlt} css={reportImgStyle} />
+            <img
+                src={imgSrc}
+                alt={imgAlt}
+                css={reportImgStyle}
+                draggable={false}
+            />
             <LabelList labels={filterLabels} />
             <FrontCardFooter
                 timeAgo={timeAgo}
