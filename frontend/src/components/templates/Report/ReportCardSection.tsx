@@ -19,6 +19,8 @@ import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { theme } from '../../../theme/theme.ts';
 import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
+import { validateAccessToken } from '../../../utils/utils.ts';
+import ReportPendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 
 type ReportType = 'WEATHER' | 'SAFE';
 type ReportPages = InfiniteData<CardData[]>;
@@ -32,6 +34,7 @@ interface CardData {
     imageUrl: string;
     content: string;
     likeCount?: number;
+    isLiked?: boolean;
     weatherKeywords?: string[];
     rainKeywords?: string[];
     etceteraKeywords?: string[];
@@ -89,7 +92,6 @@ export default function ReportCardSection() {
         '/card/interaction/keyword',
         {},
         {
-            placeholderData: filterKeywords,
             retry: false,
         },
     );
@@ -121,12 +123,29 @@ export default function ReportCardSection() {
         `/card/interaction/report`,
         'POST',
         {
-            onSuccess: () => {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries({
+                    queryKey: [
+                        `/card/interaction/report/${courseId}`,
+                        {
+                            reportType,
+                            weatherKeywords,
+                            rainKeywords,
+                            etceteraKeywords,
+                            pageSize,
+                        },
+                    ],
+                });
                 setIsReportModalOpen(false);
                 setFlippedCardId(null);
             },
-            onError: (error) => {
-                console.error('Report submission failed:', error);
+            onError: (error: any) => {
+                setIsReportModalOpen(false);
+                error instanceof TypeError
+                    ? setValidationError(
+                          '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+                      )
+                    : setValidationError(error.message);
             },
         },
     );
@@ -158,11 +177,16 @@ export default function ReportCardSection() {
                     const newPages = oldData.pages.map((page: CardData[]) => {
                         return page.map((card: CardData) => {
                             if (card.reportId !== flippedCardId) return card;
+                            const wasLiked = card.isLiked === true;
+                            const prev = card.likeCount ?? 0;
+                            const next = Math.max(
+                                0,
+                                prev + (wasLiked ? -1 : 1),
+                            );
                             return {
                                 ...card,
-                                likeCount: card.likeCount
-                                    ? card.likeCount + 1
-                                    : 1,
+                                likeCount: next,
+                                isLiked: !wasLiked,
                             };
                         });
                     });
@@ -216,6 +240,11 @@ export default function ReportCardSection() {
         setValidationError(validationErr);
         if (validationErr) return;
 
+        if (!validateAccessToken()) {
+            setValidationError('로그인이 필요합니다.');
+            return;
+        }
+
         const ids = (keyword: string) =>
             formData.getAll(keyword).map((id) => Number(id));
 
@@ -263,14 +292,20 @@ export default function ReportCardSection() {
                     offCircleColor={colors.status.normal.bad}
                 />
                 <ChipButton
-                    onClick={() => setIsReportModalOpen(true)}
+                    onClick={() => {
+                        if (!validateAccessToken()) {
+                            setValidationError('로그인이 필요합니다.');
+                            return;
+                        }
+                        setIsReportModalOpen(true);
+                    }}
                     text='제보하기'
                     iconName='edit-03'
                 />
                 <ReportModal
                     title='실시간 날씨 제보하기'
                     description='실시간 날씨를 제보하려면 코스 근처에 있어야 해요. 사진은 6시간 이내에 촬영된 사진만 업로드 가능해요.'
-                    filterColumn={filterColumn ?? filterKeywords}
+                    filterColumn={filterColumn ?? []}
                     isOpen={isReportModalOpen}
                     onClose={() => setIsReportModalOpen(false)}
                     onSubmit={reportModalSubmitHandler}
@@ -280,6 +315,7 @@ export default function ReportCardSection() {
                         {validationError}
                     </Modal>
                 )}
+                {reportMutation.isPending && <ReportPendingModal />}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
                 {flattenedData?.map((card) => {
@@ -319,9 +355,16 @@ export default function ReportCardSection() {
                                     likeCount={card.likeCount}
                                     filterLabels={filterLabels}
                                     onClick={() => setFlippedCardId(null)}
-                                    onHeartClick={() =>
-                                        cardLikeMutation.mutate({})
-                                    }
+                                    isLiked={card.isLiked}
+                                    onHeartClick={() => {
+                                        if (!validateAccessToken()) {
+                                            setValidationError(
+                                                '로그인이 필요합니다.',
+                                            );
+                                            return;
+                                        }
+                                        cardLikeMutation.mutate({});
+                                    }}
                                 />
                             </div>
                         </div>
@@ -437,23 +480,3 @@ const reportTitleStyle = css`
     justify-content: center;
     gap: 1.5rem;
 `;
-
-const filterKeywords = {
-    weatherKeywords: [
-        { id: 0, description: '화창해요' },
-        { id: 1, description: '구름이 많아요' },
-        { id: 2, description: '더워요' },
-        { id: 3, description: '추워요' },
-    ],
-    rainKeywords: [
-        { id: 0, description: '부슬비가 내려요' },
-        { id: 1, description: '장대비가 쏟아져요' },
-        { id: 2, description: '천둥 번개가 쳐요' },
-        { id: 3, description: '폭우가 내려요' },
-    ],
-    etceteraKeywords: [
-        { id: 0, description: '안개가 껴요' },
-        { id: 1, description: '미세먼지가 많아요' },
-        { id: 2, description: '시야가 흐려요' },
-    ],
-};

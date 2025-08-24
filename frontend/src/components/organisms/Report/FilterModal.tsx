@@ -1,4 +1,3 @@
-import ModalHeaderButtons from '../../molecules/Modal/ModalHeaderButton.tsx';
 import FilterModalContent from '../../molecules/Modal/FilterModalContent.tsx';
 import BaseModal from './BaseModal.tsx';
 import { useState } from 'react';
@@ -29,10 +28,29 @@ export default function FilterModal(props: PropsState) {
     } = props;
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const parseFilterFromUrl = (
+        searchParams: URLSearchParams,
+        key: string,
+    ): number[] => {
+        const paramValue = searchParams.get(key);
+        if (!paramValue) return [];
+
+        try {
+            return paramValue
+                .replace(/[\[\]]/g, '')
+                .split(',')
+                .filter((id) => id !== '')
+                .map((id) => Number(id));
+        } catch (e) {
+            console.error(`Failed to parse filter ${key}:`, e);
+            return [];
+        }
+    };
+
     const [selectedKeywords, setSelectedKeywords] = useState<SelectedColumn>({
-        weatherKeywords: [],
-        rainKeywords: [],
-        etceteraKeywords: [],
+        weatherKeywords: parseFilterFromUrl(searchParams, 'weatherKeywords'),
+        rainKeywords: parseFilterFromUrl(searchParams, 'rainKeywords'),
+        etceteraKeywords: parseFilterFromUrl(searchParams, 'etceteraKeywords'),
     });
 
     const updateSelectedKeywords = (
@@ -73,7 +91,6 @@ export default function FilterModal(props: PropsState) {
         <BaseModal
             title={title}
             description={description}
-            modalHeaderChildren={modalHeaderChildren}
             footerFirstButtonText='전체 취소'
             footerSecondButtonText='필터 적용'
             isOpen={isOpen}
@@ -90,13 +107,6 @@ export default function FilterModal(props: PropsState) {
         </BaseModal>
     );
 }
-
-const modalHeaderButtonProps = {
-    firstButtonText: '실시간 날씨',
-    secondButtonText: '실시간 안전',
-};
-
-const modalHeaderChildren = <ModalHeaderButtons {...modalHeaderButtonProps} />;
 
 const keywords: Keyword[] = [
     'weatherKeywords',

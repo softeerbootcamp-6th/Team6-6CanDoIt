@@ -10,6 +10,7 @@ interface PropsState {
     userImageUrl?: string;
     likeCount?: number;
     filterLabels: string[];
+    isLiked?: boolean;
     onHeartClick: () => void;
     onClick: () => void;
 }
@@ -21,6 +22,7 @@ export default function BackReportCard(props: PropsState) {
         userImageUrl = '',
         likeCount = 0,
         filterLabels,
+        isLiked = false,
         onHeartClick,
         onClick,
     } = props;
@@ -31,7 +33,11 @@ export default function BackReportCard(props: PropsState) {
                 timeAgo={timeAgo}
             />
             <CommonText {...textProps}>{comment}</CommonText>
-            <HeartStat count={likeCount} onHeartClick={onHeartClick} />
+            <HeartStat
+                count={likeCount}
+                onHeartClick={onHeartClick}
+                isLiked={isLiked}
+            />
             <LabelList labels={filterLabels} isCut={false} />
         </ReportCardWrapper>
     );

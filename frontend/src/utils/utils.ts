@@ -107,3 +107,22 @@ export const convertWeatherToKorean = (weather: Background): string => {
             return '맑음';
     }
 };
+
+export const validateAccessToken = () => {
+    const accessToken =
+        localStorage.getItem('accessToken') ??
+        sessionStorage.getItem('accessToken');
+
+    if (!accessToken) return false;
+
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    if (payload.exp < currentTime) {
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+        return false;
+    }
+
+    return true;
+};
