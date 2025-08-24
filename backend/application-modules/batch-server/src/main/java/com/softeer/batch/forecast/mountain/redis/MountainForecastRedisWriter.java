@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class MountainForecastRedisWriter {
     }
 
     private List<RedisTtlWrite> prepareBulkData(List<? extends MountainDailyForecast> items) {
-        List<RedisTtlWrite> bulkData = new java.util.ArrayList<>();
+        List<RedisTtlWrite> bulkData = new ArrayList<>();
 
         items.forEach(item ->
             item.hourlyForecasts().forEach(forecast -> {

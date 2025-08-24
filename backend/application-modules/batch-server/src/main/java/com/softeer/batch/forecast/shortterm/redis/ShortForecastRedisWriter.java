@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class ShortForecastRedisWriter {
     }
 
     private List<RedisTtlWrite> prepareBulkData(List<? extends ShortForecastList> items) {
-        List<RedisTtlWrite> bulkData = new java.util.ArrayList<>();
+        List<RedisTtlWrite> bulkData = new ArrayList<>();
 
         items.forEach(item ->
             item.forecasts().forEach(forecast -> {
