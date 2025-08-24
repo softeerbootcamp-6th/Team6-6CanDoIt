@@ -3,6 +3,7 @@ package com.softeer.presentation.impl;
 import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
 import com.softeer.dto.request.UpdateNicknameRequest;
+import com.softeer.dto.response.UserProfileResponse;
 import com.softeer.presentation.UserApi;
 import com.softeer.config.auth.Token;
 import com.softeer.service.UserService;
@@ -56,5 +57,10 @@ public class UserController implements UserApi {
         userService.updateImage(userId, imageFile);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<UserProfileResponse> getUserProfile(Long userId) {
+        return ResponseEntity.ok(userService.getUserProfile(userId));
     }
 }

@@ -1,6 +1,5 @@
 package com.softeer.batch.forecast.ultra;
 
-import com.softeer.batch.forecast.ultra.v3.UltraForecastV3JobConfig;
 import com.softeer.time.ApiTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -33,7 +32,7 @@ public class UltraForecastJobScheduler {
         this.scheduledJob = scheduledJob;
     }
 
-    @Scheduled(cron = "30 5,15,25,35,45,55 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "15 5,15,25,35,45,55 * * * *", zone = "Asia/Seoul")
     public void runForecastJob() throws Exception {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTime = ApiTimeUtil.getBatchAlignedUltraBaseTime(now);
@@ -43,6 +42,6 @@ public class UltraForecastJobScheduler {
 
         log.info("Launching ScheduledUltraForecast Job at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("ScheduledUltraForecastV1Job finished with status={}", execution.getStatus());
+        log.info("ScheduledUltraForecastV3Job finished with status={}", execution.getStatus());
     }
 }

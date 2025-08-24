@@ -54,6 +54,13 @@ public class SignUseCaseImpl implements SignUseCase {
                 .orElseThrow(() -> ExceptionCreator.create(UserException.WRONG_LOGIN_ID_OR_PASSWORD, "loginId : " + signInCommand.loginId() + " password : " + signInCommand.password()));
     }
 
+    @Override
+    public User loadUserByUserId(long userId) {
+        return userAdapter.loadUserByUserId(userId)
+                .map(UserEntity::toDomain)
+                .orElseThrow(() -> ExceptionCreator.create(UserException.NOT_FOUND_USER, "userId : " + userId));
+    }
+
     private void validateSignUpRequest(String nickname, String loginId, String password) {
         nickNameChecker.check(nickname);
         loginIdChecker.check(loginId);

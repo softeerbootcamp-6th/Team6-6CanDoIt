@@ -18,7 +18,9 @@ public enum UserException implements ExceptionInterface {
 
     DUPLICATED_NICKNAME_OR_LOGIN_ID(HttpStatus.BAD_REQUEST, "USER-009", "이미 등록된 닉네임 또는 아이디입니다."),
 
-    WRONG_LOGIN_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "USR-010", "아이디 또는 패스워드를 잘못 입력하셨습니다.")
+    WRONG_LOGIN_ID_OR_PASSWORD(HttpStatus.BAD_REQUEST, "USR-010", "아이디 또는 패스워드를 잘못 입력하셨습니다."),
+
+    NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "USR-011", "유저가 존재하지 않습니다.")
 
 
     ;

@@ -1,46 +1,31 @@
 package com.softeer.repository.support.filter;
-
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
-import com.softeer.repository.support.Where;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class KeywordFilter implements Where {
+public class KeywordFilter  {
 
-    private final Where weatherFilter;
-    private final Where rainFilter;
-    private final Where etceteraFilter;
+    private final List<Integer> weatherKeywordIds;
+    private final List<Integer> rainKeywordIds;
+    private final List<Integer> etceteraKeywordIds;
 
     public KeywordFilter(List<Integer> weatherKeywordIds,
                          List<Integer> rainKeywordIds,
                          List<Integer> etceteraKeywordIds) {
-        // null-safe
-        weatherKeywordIds  = Objects.isNull(weatherKeywordIds)  ? Collections.emptyList() : weatherKeywordIds;
-        rainKeywordIds     = Objects.isNull(rainKeywordIds)     ? Collections.emptyList() : rainKeywordIds;
-        etceteraKeywordIds = Objects.isNull(etceteraKeywordIds) ? Collections.emptyList() : etceteraKeywordIds;
-
-        // 개별 필터 구성
-        this.weatherFilter  = new WeatherFilter(weatherKeywordIds);
-        this.rainFilter     = new RainFilter(rainKeywordIds);
-        this.etceteraFilter = new EtceteraFilter(etceteraKeywordIds); // 기존 구현 재사용
+        this.weatherKeywordIds  = Objects.isNull(weatherKeywordIds)  ? Collections.emptyList() : weatherKeywordIds;
+        this.rainKeywordIds     = Objects.isNull(rainKeywordIds)     ? Collections.emptyList() : rainKeywordIds;
+        this.etceteraKeywordIds = Objects.isNull(etceteraKeywordIds) ? Collections.emptyList() : etceteraKeywordIds;
     }
 
-    @Override
-    public Predicate where() {
-        BooleanBuilder b = new BooleanBuilder();
+    public List<Integer> weatherKeywordIds() {
+        return weatherKeywordIds;
+    }
 
-        Predicate w = weatherFilter.where();
-        if (w != null) b.and(w);
+    public List<Integer> rainKeywordIds() {
+        return rainKeywordIds;
+    }
 
-        Predicate r = rainFilter.where();
-        if (r != null) b.and(r);
-
-        Predicate e = etceteraFilter.where();
-        if (e != null) b.and(e);
-
-        return b.getValue();
+    public List<Integer> etceteraKeywordIds() {
+        return etceteraKeywordIds;
     }
 }
