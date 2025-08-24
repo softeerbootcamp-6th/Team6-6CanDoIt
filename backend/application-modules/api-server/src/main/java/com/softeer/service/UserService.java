@@ -6,6 +6,7 @@ import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
 import com.softeer.config.auth.JwtGenerator;
 import com.softeer.config.auth.Token;
+import com.softeer.dto.response.UserProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final SignUseCase signUseCase;
     private final JwtGenerator jwtGenerator;
     private final ProfileCommandUseCase profileCommandUseCase;
@@ -59,5 +61,10 @@ public class UserService {
         }
 
         profileCommandUseCase.updateProfileImage(userId, imageId);
+    }
+
+    public UserProfileResponse getUserProfile(long userId) {
+        User user = signUseCase.loadUserByUserId(userId);
+        return new UserProfileResponse(user);
     }
 }
