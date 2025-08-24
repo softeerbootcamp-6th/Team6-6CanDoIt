@@ -10,7 +10,7 @@ export default function LabelList({ labels, isCut = true }: propsState) {
     return (
         <div css={isCut ? cutFilterLabelsStyle : uncutFilterLabelsStyle}>
             {labels.map((label) => (
-                <FilterLabelTextBox>{label}</FilterLabelTextBox>
+                <FilterLabelTextBox key={label}>{label}</FilterLabelTextBox>
             ))}
         </div>
     );
