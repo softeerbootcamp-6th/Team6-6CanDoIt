@@ -16,6 +16,7 @@ interface UserData {
 export default function MyInfoSection() {
     const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
     const inputNickNameRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { data: myInfoData } = useApiQuery<UserData>(
         `/user`,
@@ -32,6 +33,15 @@ export default function MyInfoSection() {
         onSuccess: () => setIsEditingNickName(false),
         onError: () => alert('잠시 후 다시 시도해주세요'),
     });
+
+    const updateProfileImageMutation = useApiMutation<FormData, any>(
+        '/user/image', // 실제 API 엔드포인트 /user/nickname → /user/image 같은 실제 엔드포인트로 바꿔야 함
+        'PATCH',
+        {
+            onSuccess: () => alert('프로필 이미지가 변경되었습니다!'),
+            onError: (err: any) => alert(err.message || '업로드 실패'),
+        },
+    );
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,6 +69,19 @@ export default function MyInfoSection() {
         } catch (err: any) {
             alert(err.message);
         }
+    };
+
+    const handleFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('imageFile', file);
+
+        updateProfileImageMutation.mutate(formData);
     };
 
     if (!myInfoData) return <div>loading!!</div>;
@@ -121,7 +144,16 @@ export default function MyInfoSection() {
                     </CommonText>
                 </div>
             </div>
-            <button css={buttonStyles}>개인 정보 변경</button>
+            <button css={buttonStyles} onClick={handleFileClick}>
+                사진 변경
+            </button>
+            <input
+                type='file'
+                accept='image/*'
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
         </div>
     );
 }
