@@ -1,14 +1,27 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import CommonText from '../../atoms/Text/CommonText';
+import dummyImg from '../../../assets/mainImg.png';
 
-const { colors, typography } = theme;
+interface PropsState {
+    userData: UserData;
+}
 
-export default function MyInfoSection() {
+interface UserData {
+    userNickName: string;
+    userId: string;
+    userImage?: string;
+}
+
+export default function MyInfoSection({ userData }: PropsState) {
+    const { userNickName, userId, userImage = dummyImg } = userData;
+
     return (
         <div css={wrapperStyles}>
             <div css={profileWrapper}>
-                <span>이미지 칸</span>
+                <div css={imgWrappStyles}>
+                    <img src={userImage} css={imgStyles}></img>
+                </div>
                 <div css={profileTextWrapper}>
                     <div>
                         <CommonText
@@ -17,7 +30,7 @@ export default function MyInfoSection() {
                             fontWeight='bold'
                             color='grey-100'
                         >
-                            한사랑 산악인
+                            {userNickName}
                         </CommonText>
 
                         <a css={linkStyles}>닉네임 변경</a>
@@ -28,27 +41,32 @@ export default function MyInfoSection() {
                         fontWeight='medium'
                         color='grey-60'
                     >
-                        aasd2265@dlfivl
+                        {userId}
                     </CommonText>
                 </div>
             </div>
-            <button>개인 정보 변경</button>
+            <button css={buttonStyles}>개인 정보 변경</button>
         </div>
     );
 }
 
+const { colors, typography } = theme;
+
 const wrapperStyles = css`
     color: ${colors.grey[100]};
+    background-color: ${colors.grey[20]};
+    border-radius: 1.5rem;
     display: flex;
     height: 8.25rem;
     justify-content: space-between;
     align-items: center;
-    box-sizing: border-box;
     padding: 1rem 1.5rem;
+    box-sizing: border-box;
 `;
 
 const profileWrapper = css`
     display: flex;
+    align-items: center;
 `;
 
 const profileTextWrapper = css`
@@ -70,4 +88,36 @@ const linkStyles = css`
     text-decoration-thickness: auto;
     text-underline-offset: auto;
     text-underline-position: from-font;
+`;
+
+const buttonStyles = css`
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: ${typography.fontSize.caption};
+    font-weight: ${typography.fontWeight.bold};
+    background-color: ${colors.grey[90]};
+    border-radius: 0.75rem;
+    height: 3.5rem;
+    width: 10rem;
+    line-height: 150%;
+    color: ${colors.grey[20]};
+`;
+
+const imgWrappStyles = css`
+    width: 6rem;
+    height: 6rem;
+    border-radius: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+`;
+
+const imgStyles = css`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 `;
