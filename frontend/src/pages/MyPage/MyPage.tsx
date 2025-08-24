@@ -1,10 +1,10 @@
 import { css } from '@emotion/react';
-import MyPageTemplate from '../../components/templates/Login/MyPageTemplate';
+import MyInfoSection from '../../components/templates/MyPage/MyInfoSection';
 
 export default function MyPage() {
     return (
         <div css={wrapperStyles}>
-            <MyPageTemplate />
+            <MyInfoSection />
         </div>
     );
 }
