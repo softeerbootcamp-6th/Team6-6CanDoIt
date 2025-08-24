@@ -1,23 +1,29 @@
 import Icon from '../../atoms/Icon/Icons.tsx';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
+import { theme } from '../../../theme/theme.ts';
 
 interface propsState {
     count: number;
+    isLiked?: boolean;
     onHeartClick: () => void;
 }
 
-export default function HeartStat({ count, onHeartClick }: propsState) {
+export default function HeartStat({
+    count,
+    isLiked = false,
+    onHeartClick,
+}: propsState) {
     return (
         <div css={heartStyle}>
             <button
-                css={buttonStyle}
+                css={buttonStyle(isLiked)}
                 onClick={(event) => {
                     event.stopPropagation();
                     onHeartClick();
                 }}
             >
-                <Icon {...heartIconProps} />
+                <Icon {...heartIconProps(isLiked)} />
             </button>
             <CommonText TextTag='span' fontSize='body' fontWeight='bold'>
                 {count}
@@ -26,14 +32,17 @@ export default function HeartStat({ count, onHeartClick }: propsState) {
     );
 }
 
-const heartIconProps = {
+const { colors } = theme;
+
+const heartIconProps = (isLiked: boolean) => ({
     name: 'heart-rounded',
+    fill: isLiked ? colors.primary.normal : 'none',
     width: 1.5,
     height: 1.5,
-    color: 'grey-100',
-};
+    color: isLiked ? 'grey-20' : 'grey-100',
+});
 
-const buttonStyle = css`
+const buttonStyle = (isLiked: boolean) => css`
     background: none;
     border: none;
     padding: 0;
@@ -41,6 +50,10 @@ const buttonStyle = css`
     display: flex;
     align-items: center;
     justify-content: center;
+    ${isLiked &&
+    `
+    transform: scale(1.3);
+  `}
 `;
 
 const heartStyle = css`
