@@ -1,5 +1,6 @@
 package com.softeer.batch.forecast.mountain.redis;
 
+import com.softeer.batch.common.dto.RedisTtlWrite;
 import com.softeer.batch.forecast.chained.context.ExecutionContextKeys;
 import com.softeer.batch.forecast.chained.dto.DailyTemperatureKey;
 import com.softeer.batch.forecast.chained.dto.DailyTemperatureValue;
@@ -8,6 +9,7 @@ import com.softeer.entity.ForecastRedisEntity;
 import com.softeer.entity.enums.ForecastType;
 import com.softeer.mapper.RecordMapper;
 import com.softeer.scan.RedisKeyGenerator;
+import com.softeer.time.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +17,7 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class MountainForecastRedisWriter {
 
     public void pipelineUpdateMountainForecast(List<? extends MountainDailyForecast> items) {
         try {
-            Map<byte[], Map<byte[], byte[]>> bulkData = prepareBulkData(items);
+            List<RedisTtlWrite> bulkData = prepareBulkData(items);
             executePipelinedOperations(bulkData);
             log.info("Successfully updated {} mountain forecast items to Redis", bulkData.size());
         } catch (Exception e) {
@@ -56,8 +57,8 @@ public class MountainForecastRedisWriter {
         }
     }
 
-    private Map<byte[], Map<byte[], byte[]>> prepareBulkData(List<? extends MountainDailyForecast> items) {
-        Map<byte[], Map<byte[], byte[]>> bulkData = new java.util.HashMap<>();
+    private List<RedisTtlWrite> prepareBulkData(List<? extends MountainDailyForecast> items) {
+        List<RedisTtlWrite> bulkData = new java.util.ArrayList<>();
 
         items.forEach(item ->
             item.hourlyForecasts().forEach(forecast -> {
@@ -76,8 +77,10 @@ public class MountainForecastRedisWriter {
                     );
 
                     Map<byte[], byte[]> value = recordMapper.toByteMap(forecastRedisEntity);
+                    Duration ttl = TimeUtil.getRedisTtl(forecast.dateTime().plusHours(1));
 
-                    bulkData.put(key, value);
+                    bulkData.add(new RedisTtlWrite(key, value, ttl));
+
                 } catch (Exception e) {
                     log.error("Failed to prepare Redis data for grid ({}, {}) at {} {}", PREFIX, item.gridId(), ForecastType.SHORT, forecast.dateTime());
                 }
@@ -87,13 +90,22 @@ public class MountainForecastRedisWriter {
         return bulkData;
     }
 
-    private void executePipelinedOperations(Map<byte[], Map<byte[], byte[]>> bulkData) {
+    private void executePipelinedOperations(
+            List<RedisTtlWrite> bulkData
+    ) {
         redisTemplate.executePipelined((RedisCallback<?>) connection -> {
-            bulkData.forEach((key, value) -> {
+            bulkData.forEach(op -> {
                 try {
-                    connection.hashCommands().hMSet(key, value);
+                    connection.hashCommands().hMSet(op.key(), op.value());
+
+                    Duration ttl = op.ttl();
+                    if (ttl != null && !ttl.isNegative() && !ttl.isZero()) {
+                        connection.keyCommands().pExpire(op.key(), ttl.toMillis());
+                    } else {
+                         connection.keyCommands().pExpire(op.key(), 1L);
+                    }
                 } catch (Exception e) {
-                    log.warn("Failed to execute pipelined operation for key: {}, skipping this item", new String(key), e);
+                    log.warn("Failed to execute pipelined operation for key: {}, skipping this item", new String(op.key()), e);
                 }
             });
             return null;
