@@ -105,6 +105,7 @@ const imageAttachmentStyle = css`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 `;
 
 const imageCaptionStyle = css`
