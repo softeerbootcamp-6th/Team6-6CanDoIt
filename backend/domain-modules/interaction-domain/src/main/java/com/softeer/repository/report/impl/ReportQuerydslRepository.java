@@ -8,6 +8,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.softeer.domain.Report;
 import com.softeer.entity.QImageEntity;
 import com.softeer.entity.enums.ReportType;
+import com.softeer.entity.keyword.QReportEtceteraKeywordEntity;
+import com.softeer.entity.keyword.QReportRainKeywordEntity;
+import com.softeer.entity.keyword.QReportWeatherKeywordEntity;
 import com.softeer.repository.support.filter.KeywordFilter;
 import com.softeer.repository.support.pageable.ReportPageable;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +39,16 @@ public class ReportQuerydslRepository {
     public List<Report> findReportsByCourseIdAndType(ReportPageable pageable, KeywordFilter keywordFilter,
                                                      long courseId, ReportType reportType, long userId) {
 
-        List<Long> reportIds = selectReportIds()
-                .where(
+        JPAQuery<Long> query = queryFactory.selectDistinct(reportEntity.id)
+                .from(reportEntity)
+                .innerJoin(courseEntity).on(courseEntity.id.eq(reportEntity.courseId));
+
+        addDynamicKeywordJoins(query, keywordFilter);
+
+        List<Long> reportIds = query.where(
                         reportEntity.type.eq(reportType),
                         courseEntity.id.eq(courseId),
-                        pageable.where(),
-                        keywordFilter.where()
+                        pageable.where()
                 )
                 .orderBy(pageable.orderBy())
                 .limit(pageable.pageSize())
@@ -62,8 +69,6 @@ public class ReportQuerydslRepository {
                 .limit(pageable.pageSize())
                 .fetch();
 
-
-
         return loadReportsByIds(pageable, reportIds, userId);
     }
 
@@ -82,6 +87,32 @@ public class ReportQuerydslRepository {
 
 
         return loadReportsByIds(pageable, reportIds, userId);
+    }
+
+    private void addDynamicKeywordJoins(JPAQuery<Long> query, KeywordFilter keywordFilter) {
+        List<Integer> weatherIds = keywordFilter.weatherKeywordIds();
+        if (!weatherIds.isEmpty()) {
+            for (int i = 0; i < weatherIds.size(); i++) {
+                QReportWeatherKeywordEntity qWke = new QReportWeatherKeywordEntity("wke" + i);
+                query.innerJoin(qWke).on(qWke.id.reportId.eq(reportEntity.id).and(qWke.id.weatherKeywordId.eq(weatherIds.get(i))));
+            }
+        }
+
+        List<Integer> rainIds = keywordFilter.rainKeywordIds();
+        if (!rainIds.isEmpty()) {
+            for (int i = 0; i < rainIds.size(); i++) {
+                QReportRainKeywordEntity qRke = new QReportRainKeywordEntity("rke" + i);
+                query.innerJoin(qRke).on(qRke.id.reportId.eq(reportEntity.id).and(qRke.id.rainKeywordId.eq(rainIds.get(i))));
+            }
+        }
+
+        List<Integer> etceteraIds = keywordFilter.etceteraKeywordIds();
+        if (!etceteraIds.isEmpty()) {
+            for (int i = 0; i < etceteraIds.size(); i++) {
+                QReportEtceteraKeywordEntity qEke = new QReportEtceteraKeywordEntity("eke" + i);
+                query.innerJoin(qEke).on(qEke.id.reportId.eq(reportEntity.id).and(qEke.id.etceteraKeywordId.eq(etceteraIds.get(i))));
+            }
+        }
     }
 
     private JPAQuery<Long> selectReportIds() {
