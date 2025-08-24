@@ -196,6 +196,7 @@ public interface UserApi {
     ```json
     {
       "nickname": "홍길동",
+      "loginId" : "baek01234",
       "imageUrl": "https://cdn.example.com/users/123/profile.png"
     }
     ```
