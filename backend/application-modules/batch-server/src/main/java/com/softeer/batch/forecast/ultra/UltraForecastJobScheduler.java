@@ -42,6 +42,6 @@ public class UltraForecastJobScheduler {
 
         log.info("Launching ScheduledUltraForecast Job at {}", now);
         JobExecution execution = jobLauncher.run(scheduledJob, params);
-        log.info("ScheduledUltraForecastV1Job finished with status={}", execution.getStatus());
+        log.info("ScheduledUltraForecastV3Job finished with status={}", execution.getStatus());
     }
 }
