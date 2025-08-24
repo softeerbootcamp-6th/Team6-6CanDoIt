@@ -16,6 +16,11 @@ export default function ModalTextInputBox(props: PropsState) {
             setText(e.target.value);
         }
     };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    };
 
     return (
         <div css={textInputBoxContainerStyle}>
@@ -24,6 +29,7 @@ export default function ModalTextInputBox(props: PropsState) {
                 name='content'
                 value={text}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
                 maxLength={maxLength}
                 placeholder={placeholder}
             />
