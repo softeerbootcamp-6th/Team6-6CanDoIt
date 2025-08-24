@@ -42,4 +42,9 @@ public class UserAdapterImpl implements UserAdapter {
     public void updateImage(long userId, long imageId) {
         userJpaRepository.updateImage(userId, imageId);
     }
+
+    @Override
+    public Optional<UserEntity> loadUserByUserId(long userId) {
+        return userJpaRepository.findById(userId);
+    }
 }

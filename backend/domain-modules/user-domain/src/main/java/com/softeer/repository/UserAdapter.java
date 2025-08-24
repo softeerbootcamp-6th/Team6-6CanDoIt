@@ -12,4 +12,5 @@ public interface UserAdapter {
 
     void updateNickname(long userId, String nickname);
     void updateImage(long userId, long imageId);
+    Optional<UserEntity> loadUserByUserId(long userId);
 }
