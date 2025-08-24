@@ -5,6 +5,7 @@ import com.softeer.dto.request.SignInRequest;
 import com.softeer.dto.request.SignUpRequest;
 import com.softeer.config.auth.Token;
 import com.softeer.dto.request.UpdateNicknameRequest;
+import com.softeer.dto.response.UserProfileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -167,4 +168,40 @@ public interface UserApi {
     )
     @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Void> updateNickname(@LoginUserId Long userId, @RequestParam MultipartFile imageFile);
+
+    @Operation(
+            summary = "사용자 프로필 조회",
+            description = """
+    ### 👤 **사용자 프로필 정보 조회**
+
+    인증된 사용자의 프로필 정보를 반환합니다.
+
+    ---
+
+    #### 🔐 **Authorization Header**
+    - **Authorization** (필수): `Bearer {JWT_TOKEN}`  
+      예: `Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6...`  
+      → 누락 시 아래 예외 발생:
+      ```json
+      {
+        "status": 401,
+        "code": "JWT-001",
+        "message": "로그인이 필요한 서비스입니다."
+      }
+      ```
+
+    ---
+
+    #### ✅ **성공 응답 (HTTP 200)**
+    ```json
+    {
+      "nickname": "홍길동",
+      "loginId" : "baek01234",
+      "imageUrl": "https://cdn.example.com/users/123/profile.png"
+    }
+    ```
+    """
+    )
+    @GetMapping
+    ResponseEntity<UserProfileResponse> getUserProfile(@LoginUserId Long userId);
 }
