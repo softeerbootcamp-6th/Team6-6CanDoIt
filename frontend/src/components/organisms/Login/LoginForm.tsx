@@ -87,10 +87,10 @@ const inputFields = [
     {
         id: 'email-input',
         icon: 'x-circle',
-        label: '이메일 주소',
+        label: '아이디',
         type: 'text',
         onIconClick: iconButtonHandler.clearTextByRef,
-        iconAriaLabel: '이메일 지우기',
+        iconAriaLabel: '아이디 지우기',
     },
     {
         id: 'password-input',
