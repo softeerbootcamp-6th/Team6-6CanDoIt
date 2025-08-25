@@ -1,0 +1,37 @@
+package com.softeer.batch.forecast.shortterm.writer.v2;
+
+import com.softeer.batch.common.writersupporter.DailyTemperatureWriter;
+import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
+import com.softeer.batch.forecast.shortterm.redis.ShortForecastRedisWriter;
+import com.softeer.domain.Forecast;
+import com.softeer.time.TimeUtil;
+import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+@StepScope
+public class StartUpShortForecastV2Writer extends AbstractShortForecastV2Writer {
+
+    public StartUpShortForecastV2Writer(
+            ForecastJdbcWriter forecastJdbcWriter,
+            DailyTemperatureWriter dailyTemperatureWriter,
+            ShortForecastRedisWriter shortForecastRedisWriter
+    ) {
+        super(forecastJdbcWriter, dailyTemperatureWriter, shortForecastRedisWriter);
+    }
+
+    @Override
+    protected List<Forecast> filterForecasts(List<Forecast> forecasts) {
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime rawThreeDaysLater = now.plusDays(3).withHour(0);
+        final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
+
+        return forecasts.stream()
+                .filter(hourly -> !hourly.dateTime().isAfter(threeDaysLater))
+                .collect(Collectors.toList());
+    }
+}

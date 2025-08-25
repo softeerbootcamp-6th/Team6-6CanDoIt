@@ -22,6 +22,9 @@ public final class BatchNames {
         // short forecast steps
         public static final String START_UP_SHORT_FORECAST_STEP = "StartUpShortForecastStep";
         public static final String SCHEDULED_SHORT_FORECAST_STEP = "ScheduledShortForecastStep";
+
+        public static final String SHORT_FORECAST_V2_EX_SERVICE =  "ShortForecastV2ExService";
+        public static final String SHORT_LEAKY_MANAGER = "ShortLeakyManager";
     }
 
     public static final class Handlers {
