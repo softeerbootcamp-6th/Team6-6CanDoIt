@@ -40,7 +40,7 @@ export default function DetailSideBarContentColumn({
         {
             iconName: 'rain',
             title: '강수 확률',
-            value: `${precipitation}%`,
+            value: precipitation,
             description: probabilityDescription,
         },
         {

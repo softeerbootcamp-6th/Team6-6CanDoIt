@@ -1,4 +1,3 @@
-import { backCard, frontCard } from '../constants/placeholderData';
 import useApiQuery from './useApiQuery';
 
 export const useForecastCardData = (
@@ -8,15 +7,14 @@ export const useForecastCardData = (
     const { data: frontData, refetch: refetchFront } = useApiQuery<any>(
         `/card/mountain/course/${selectedCourseId}`,
         { dateTime: seletedTime },
-        { retry: false, enabled: false, placeholderData: frontCard },
+        { retry: false, enabled: true },
     );
 
     const { data: backData, refetch: refetchBack } = useApiQuery<any>(
         `/card/mountain/course/${selectedCourseId}/schedule`,
         { startDateTime: seletedTime },
-        { retry: false, enabled: false, placeholderData: backCard },
+        { retry: false, enabled: true },
     );
-
     return {
         frontCard: frontData,
         backCard: backData,

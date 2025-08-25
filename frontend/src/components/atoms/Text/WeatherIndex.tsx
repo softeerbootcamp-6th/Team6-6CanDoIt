@@ -14,7 +14,7 @@ interface WeatherIdx {
 interface PropsState {
     type: WeatherType;
 }
-type WeatherType = '매우좋음' | '좋음' | '보통' | '나쁨';
+type WeatherType = '매우 좋음' | '좋음' | '약간 나쁨' | '나쁨';
 const { colors, typography } = theme;
 
 function WeatherIndex(props: WeatherIdx) {
@@ -71,7 +71,7 @@ function WeatherIndexVivid(props: PropsState) {
     let color;
 
     switch (type) {
-        case '매우좋음':
+        case '매우 좋음':
             color = colors.status.light.excellent;
             backGroundColor = colors.status.normal.excellent;
             break;
@@ -79,7 +79,7 @@ function WeatherIndexVivid(props: PropsState) {
             color = colors.status.light.good;
             backGroundColor = colors.status.normal.good;
             break;
-        case '보통':
+        case '약간 나쁨':
             color = colors.status.light.average;
             backGroundColor = colors.status.normal.average;
             break;
@@ -107,7 +107,7 @@ function WeatherIndexLight(props: PropsState) {
     let backGroundColor;
 
     switch (type) {
-        case '매우좋음':
+        case '매우 좋음':
             color = colors.status.normal.excellent;
             backGroundColor = colors.status.regular.excellent;
             break;
@@ -115,7 +115,7 @@ function WeatherIndexLight(props: PropsState) {
             color = colors.status.normal.good;
             backGroundColor = colors.status.regular.good;
             break;
-        case '보통':
+        case '약간 나쁨':
             color = colors.status.normal.average;
             backGroundColor = colors.status.regular.average;
             break;

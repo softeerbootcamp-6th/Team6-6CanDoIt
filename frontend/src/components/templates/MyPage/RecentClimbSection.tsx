@@ -14,7 +14,11 @@ interface RecentClimbData {
     courseName: string;
 }
 
-export default function RecentClimbSection() {
+interface PropsState {
+    onClick: (courseId: number, forecastDate: string) => void;
+}
+
+export default function RecentClimbSection({ onClick }: PropsState) {
     const { data: recentClimbData } = useApiQuery<RecentClimbData[]>(
         `/card/interaction/history`,
         { pageSize: 5 },
@@ -28,59 +32,62 @@ export default function RecentClimbSection() {
         return dateStr.split('T')[0].replace(/-/g, '.');
     };
 
+    if (!recentClimbData) return <div>loading....</div>;
+
     return (
         <div>
             <LabelHeading HeadingTag='h2'>최근 본 등산일정</LabelHeading>
             <div css={listStyles}>
                 {recentClimbData?.map((item, index) => {
-                    const {
-                        id,
-                        courseId,
-                        forecastDate,
-                        updatedAt,
-                        mountainName,
-                        courseName,
-                    } = item;
+                    const { forecastDate, mountainName, courseName, courseId } =
+                        item;
 
                     return (
-                        <div css={wrapperStyles} key={index}>
-                            <div css={headerStyles}>
-                                <CommonText
-                                    TextTag='span'
-                                    fontSize='caption'
-                                    fontWeight='medium'
-                                    color='grey-80'
-                                >
-                                    {formatDate(forecastDate)}
-                                </CommonText>
-                                <button css={buttonStyles}>
-                                    <Icon
-                                        name='narrow-right'
-                                        width={2}
-                                        height={2}
-                                        color='grey-0'
-                                    />
-                                </button>
+                        <>
+                            <div css={wrapperStyles} key={index}>
+                                <div css={headerStyles}>
+                                    <CommonText
+                                        TextTag='span'
+                                        fontSize='caption'
+                                        fontWeight='medium'
+                                        color='grey-80'
+                                    >
+                                        {formatDate(forecastDate)}
+                                    </CommonText>
+                                    <button
+                                        css={buttonStyles}
+                                        onClick={() =>
+                                            onClick(courseId, forecastDate)
+                                        }
+                                    >
+                                        <Icon
+                                            name='narrow-right'
+                                            width={2}
+                                            height={2}
+                                            color='grey-0'
+                                        />
+                                    </button>
+                                </div>
+                                <div css={contentWrapper}>
+                                    <CommonText
+                                        TextTag='span'
+                                        fontSize='body'
+                                        fontWeight='bold'
+                                        color='grey-100'
+                                    >
+                                        {mountainName}
+                                    </CommonText>
+                                    <CommonText
+                                        TextTag='span'
+                                        fontSize='body'
+                                        fontWeight='bold'
+                                        color='grey-100'
+                                    >
+                                        {courseName}
+                                    </CommonText>
+                                </div>
                             </div>
-                            <div css={contentWrapper}>
-                                <CommonText
-                                    TextTag='span'
-                                    fontSize='body'
-                                    fontWeight='bold'
-                                    color='grey-100'
-                                >
-                                    {mountainName}
-                                </CommonText>
-                                <CommonText
-                                    TextTag='span'
-                                    fontSize='body'
-                                    fontWeight='bold'
-                                    color='grey-100'
-                                >
-                                    {courseName}
-                                </CommonText>
-                            </div>
-                        </div>
+                        </>
                     );
                 })}
             </div>

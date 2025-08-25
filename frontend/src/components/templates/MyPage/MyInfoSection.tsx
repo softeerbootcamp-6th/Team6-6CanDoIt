@@ -2,38 +2,161 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import CommonText from '../../atoms/Text/CommonText';
 import dummyImg from '../../../assets/mainImg.png';
-
-interface PropsState {
-    userData: UserData;
-}
+import useApiQuery from '../../../hooks/useApiQuery';
+import { useRef, useState } from 'react';
+import useApiMutation from '../../../hooks/useApiMutation';
+import { useQueryClient } from '@tanstack/react-query';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UserData {
-    userNickName: string;
-    userId: string;
-    userImage?: string;
+    nickname: string;
+    loginId: string;
+    imageUrl?: string;
 }
 
-export default function MyInfoSection({ userData }: PropsState) {
-    const { userNickName, userId, userImage = dummyImg } = userData;
+export default function MyInfoSection() {
+    const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
+    const inputNickNameRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const queryClient = useQueryClient();
+
+    const { data: myInfoData } = useApiQuery<UserData>(
+        `/user`,
+        {},
+        {
+            retry: false,
+            enabled: true,
+        },
+    );
+
+    const updateNicknameMutation = useApiMutation<
+        { nickname: string },
+        UserData
+    >('/user/nickname', 'PATCH', {
+        onSuccess: (_data, variables) => {
+            setIsEditingNickName(false);
+
+            queryClient.setQueryData<UserData>(['/user', {}], (old) =>
+                old ? { ...old, nickname: variables.nickname } : old,
+            );
+
+            queryClient.invalidateQueries({ queryKey: ['/user', {}] });
+        },
+        onError: () => alert('잠시 후 다시 시도해주세요'),
+    });
+
+    const updateProfileImageMutation = useApiMutation<FormData, any>(
+        '/user/image',
+        'PATCH',
+        {
+            onSuccess: (_data, variables) => {
+                const file = variables.get('imageFile') as File;
+                if (!file) return;
+
+                const imageUrl = URL.createObjectURL(file);
+
+                queryClient.setQueryData<UserData>(['/user', {}], (old) =>
+                    old ? { ...old, imageUrl } : old,
+                );
+            },
+            onError: (err: any) => alert(err.message || '업로드 실패'),
+        },
+    );
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputNickNameRef.current) return;
+
+        try {
+            const res = await fetch(
+                `${API_BASE_URL}/user/nickname?nickname=${encodeURIComponent(inputNickNameRef.current.value)}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
+                    },
+                },
+            );
+
+            if (!res.ok) {
+                const error = await res.json();
+                if (error.errorCode === 'USR-002')
+                    error.message =
+                        '한글로 이루어진 단어만 가능합니다. 공백이있는지 확인해주세요';
+                throw new Error(error.message || '닉네임 중복 검사 실패');
+            }
+
+            updateNicknameMutation.mutate({
+                nickname: inputNickNameRef.current.value,
+            });
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
+
+    const handleFileClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('imageFile', file);
+
+        updateProfileImageMutation.mutate(formData);
+    };
+
+    if (!myInfoData) return <div>loading!!</div>;
+
+    const { nickname, loginId, imageUrl = dummyImg } = myInfoData;
 
     return (
         <div css={wrapperStyles}>
             <div css={profileWrapper}>
                 <div css={imgWrappStyles}>
-                    <img src={userImage} css={imgStyles}></img>
+                    <img src={imageUrl} css={imgStyles}></img>
                 </div>
                 <div css={profileTextWrapper}>
-                    <div>
-                        <CommonText
-                            TextTag='span'
-                            fontSize='label'
-                            fontWeight='bold'
-                            color='grey-100'
-                        >
-                            {userNickName}
-                        </CommonText>
-
-                        <a css={linkStyles}>닉네임 변경</a>
+                    <div
+                        css={css`
+                            display: flex;
+                        `}
+                    >
+                        {isEditingNickName ? (
+                            <form>
+                                <input
+                                    type='text'
+                                    css={inputStyles}
+                                    ref={inputNickNameRef}
+                                    defaultValue={nickname}
+                                />
+                                <button
+                                    css={changeButtonStyles}
+                                    onClick={handleSave}
+                                >
+                                    변경
+                                </button>
+                            </form>
+                        ) : (
+                            <CommonText
+                                TextTag='span'
+                                fontSize='label'
+                                fontWeight='bold'
+                                color='grey-100'
+                            >
+                                {nickname}
+                            </CommonText>
+                        )}
+                        {!isEditingNickName && (
+                            <button
+                                css={linkStyles}
+                                onClick={() => setIsEditingNickName(true)}
+                            >
+                                닉네임 변경
+                            </button>
+                        )}
                     </div>
                     <CommonText
                         TextTag='span'
@@ -41,11 +164,20 @@ export default function MyInfoSection({ userData }: PropsState) {
                         fontWeight='medium'
                         color='grey-60'
                     >
-                        {userId}
+                        {loginId}
                     </CommonText>
                 </div>
             </div>
-            <button css={buttonStyles}>개인 정보 변경</button>
+            <button css={buttonStyles} onClick={handleFileClick}>
+                사진 변경
+            </button>
+            <input
+                type='file'
+                accept='image/*'
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
         </div>
     );
 }
@@ -76,6 +208,7 @@ const profileTextWrapper = css`
 `;
 
 const linkStyles = css`
+    all: unset;
     color: ${colors.grey[60]};
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.medium};
@@ -120,4 +253,22 @@ const imgStyles = css`
     width: 100%;
     height: 100%;
     object-fit: cover;
+`;
+
+const inputStyles = css`
+    all: unset;
+    border-bottom: 1px solid ${colors.grey[40]};
+    font-size: 1rem;
+    flex: 1;
+    outline: none;
+`;
+
+const changeButtonStyles = css`
+    all: unset;
+    padding: 0.25rem 0.75rem;
+    font-size: ${typography.fontSize.caption};
+    font-weight: ${typography.fontWeight.bold};
+    color: ${colors.grey[60]};
+    border-radius: 0.5rem;
+    cursor: pointer;
 `;

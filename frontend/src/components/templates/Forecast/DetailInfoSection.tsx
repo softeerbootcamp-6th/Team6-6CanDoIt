@@ -11,13 +11,14 @@ import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { theme } from '../../../theme/theme.ts';
 import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
+import { useSearchParams } from 'react-router-dom';
+import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
+import useApiQuery from '../../../hooks/useApiQuery.ts';
+import { keepPreviousData } from '@tanstack/react-query';
 import {
     detailInfoSectionData,
     summaryInfoSectionData,
 } from '../../../constants/placeholderData.ts';
-import { useSearchParams } from 'react-router-dom';
-import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 interface CourseForcast {
     startCard: CardData;
@@ -49,10 +50,8 @@ interface CardData {
     title?: string;
 }
 
-type HikingActivityStatus = '좋음' | '매우좋음' | '나쁨' | '보통';
+type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나쁨';
 type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
-
-const placeholderData = detailInfoSectionData;
 
 export default function DetailInfoSection() {
     const [searchParams] = useSearchParams();
@@ -77,19 +76,22 @@ export default function DetailInfoSection() {
     );
 
     const cardData = { frontCard, backCard };
-    const { data: courseForecastData = placeholderData } =
+    const { data: courseForecastData = detailInfoSectionData } =
         useApiQuery<CourseForcast>(
             `/card/course/${selectedCourseId}/forecast`,
             { startDateTime: scrollSeletedTime },
-            { placeholderData: placeholderData, enabled: true },
+            {
+                placeholderData: keepPreviousData,
+                enabled: true,
+            },
         );
 
-    const { data: summaryInfoData } = useApiQuery<any>(
+    const { data: summaryInfoData = summaryInfoSectionData } = useApiQuery<any>(
         `/card/mountain/course/${selectedCourseId}`,
         { dateTime: scrollSeletedTime },
         {
-            placeholderData: summaryInfoSectionData,
             retry: false,
+            placeholderData: keepPreviousData,
         },
     );
 
@@ -210,7 +212,7 @@ export default function DetailInfoSection() {
                             })}
                         </div>
                         <img css={lineImageStyles} src={svg}></img>
-                        <WeatherIndexLight type='좋음' />
+                        <WeatherIndexLight type={startCard.hikingActivity} />
                     </div>
 
                     <TimeSeletor
@@ -238,6 +240,8 @@ export default function DetailInfoSection() {
                     <WeatherCardModal
                         cardData={cardData}
                         onClose={() => setIsCard(false)}
+                        scrollSelectedDate={scrollSeletedTime}
+                        selectedCourseId={selectedCourseId}
                     />
                 )}
             </div>

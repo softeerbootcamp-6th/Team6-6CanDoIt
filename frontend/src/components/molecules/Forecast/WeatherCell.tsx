@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import SelectorText from '../../atoms/Text/SelectorText.tsx';
+import { theme } from '../../../theme/theme.ts';
 
 interface PropsState {
     time: string;
@@ -13,9 +14,11 @@ export default function WeatherCell({
     temperature,
     iconName,
 }: PropsState) {
+    const newFormatTime = formatTime(time);
+
     return (
-        <div css={wrapperStyles}>
-            <SelectorText>{formatTime(time)}</SelectorText>
+        <div css={wrapperStyles(newFormatTime)}>
+            <SelectorText>{newFormatTime}</SelectorText>
             <Icon
                 name={iconName}
                 width={1.5}
@@ -63,7 +66,9 @@ function formatTime(timeStr: string) {
     return `${hours} ${ampm}`;
 }
 
-const wrapperStyles = css`
+const { colors } = theme;
+
+const wrapperStyles = (timeLabel: string) => css`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -72,4 +77,14 @@ const wrapperStyles = css`
     scroll-snap-align: start;
     width: 5rem;
     height: 7.875rem;
+
+    span:first-of-type {
+        background-color: ${timeLabel === '오늘' ||
+        timeLabel === '내일' ||
+        timeLabel === '모레'
+            ? colors.greyOpacityWhite[80]
+            : 'transparent'};
+        border-radius: 1.5rem;
+        width: 4rem;
+    }
 `;
