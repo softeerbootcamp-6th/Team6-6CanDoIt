@@ -50,7 +50,16 @@ export default function MyInfoSection() {
         '/user/image',
         'PATCH',
         {
-            onSuccess: () => alert('프로필 이미지가 변경되었습니다!'),
+            onSuccess: (_data, variables) => {
+                const file = variables.get('imageFile') as File;
+                if (!file) return;
+
+                const imageUrl = URL.createObjectURL(file);
+
+                queryClient.setQueryData<UserData>(['/user', {}], (old) =>
+                    old ? { ...old, imageUrl } : old,
+                );
+            },
             onError: (err: any) => alert(err.message || '업로드 실패'),
         },
     );
