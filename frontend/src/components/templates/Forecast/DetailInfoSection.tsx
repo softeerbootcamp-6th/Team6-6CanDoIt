@@ -63,12 +63,13 @@ export default function DetailInfoSection() {
         title: string;
         courseAltitude?: number;
     } | null>(null);
-    const [scrollSeletedTime, setScrollSelectedTime] = useState<string>(
-        '2025-08-22T00:00:00',
-    );
-    const seletedTime = '2025-08-22T00:00:00';
     const selectedCourseId = Number(searchParams.get('courseid'));
     const selectedMountainId = Number(searchParams.get('mountainid'));
+    const selectedWeekdayId = Number(searchParams.get('weekdayid'));
+
+    const [scrollSeletedTime, setScrollSelectedTime] = useState<string>(
+        getDayStartTime(selectedWeekdayId),
+    );
 
     const { frontCard, backCard, refetch } = useForecastCardData(
         selectedCourseId,
@@ -220,7 +221,6 @@ export default function DetailInfoSection() {
                         onToggle={() => setIsToggleOn((prev) => !prev)}
                         isToggleOn={isToggleOn}
                         time={Math.ceil(duration)}
-                        selectedTime={seletedTime}
                         selectedMountainId={selectedMountainId}
                         onTimeSelect={(time) => setScrollSelectedTime(time)}
                     />
@@ -247,6 +247,24 @@ export default function DetailInfoSection() {
             </div>
         </div>
     );
+}
+
+function getDayStartTime(dayOffset: number): string {
+    const now = new Date();
+    const targetDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + (dayOffset - 1),
+    );
+
+    const year = targetDate.getFullYear();
+    const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = targetDate.getDate().toString().padStart(2, '0');
+
+    const hour =
+        dayOffset === 1 ? now.getHours().toString().padStart(2, '0') : '00';
+
+    return `${year}-${month}-${day}T${hour}:00:00`;
 }
 
 const { colors } = theme;
