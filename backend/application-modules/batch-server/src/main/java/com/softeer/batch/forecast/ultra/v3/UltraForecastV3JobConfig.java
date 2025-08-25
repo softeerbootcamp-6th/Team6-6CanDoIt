@@ -78,7 +78,7 @@ public class UltraForecastV3JobConfig {
 
     @Bean
     public ThrottlingProperties throttlingProperties() {
-        return new ThrottlingProperties("UltraForecastV3", 10, 3, 30, 3);
+        return new ThrottlingProperties("UltraForecastV3", 20, 3, 30, 3);
     }
 
     @Bean(name = SCHEDULED_ULTRA_FORECAST_V3_LEAKY_TOKEN)
@@ -107,6 +107,6 @@ public class UltraForecastV3JobConfig {
     public UltraForecastV3Processor ultraForecastV3Processor(UltraForecastApiCaller apiCaller,
                                                              ForecastMapper forecastMapper
                                                              ) {
-        return new UltraForecastV3Processor(apiCaller, forecastMapper, threadPoolV3(), leakyTokenThrottlingManager(throttlingProperties()));
+        return new UltraForecastV3Processor(apiCaller, forecastMapper, threadPoolV3(), fixedWindowThrottlingManager(throttlingProperties()));
     }
 }
