@@ -7,7 +7,7 @@ interface PropsState {
     hikingActivity: HikingActivity;
 }
 
-type HikingActivity = '매우좋음' | '좋음' | '보통' | '나쁨';
+type HikingActivity = '매우 좋음' | '좋음' | '약간 나쁨' | '나쁨';
 
 export default function DetailSideBarSummary({
     temperature,
