@@ -102,7 +102,7 @@ export default function RegisterCheckBoxes({
 const allCheckBoxProps = {
     id: 'all-check-box',
     text: '모두 동의합니다.',
-    subTitle: '종성짱짱맨',
+    subTitle: '선택 동의 항목 포함',
     grey: 98 as ColorValueType,
     required: false,
 };

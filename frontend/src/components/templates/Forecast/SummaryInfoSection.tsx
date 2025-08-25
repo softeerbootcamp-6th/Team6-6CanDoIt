@@ -55,5 +55,5 @@ const wrapperStyles = css`
     height: calc(100dvh - 12.5rem);
     justify-content: space-between;
     box-sizing: border-box;
-    padding-bottom: 3rem;
+    padding-bottom: 1rem;
 `;

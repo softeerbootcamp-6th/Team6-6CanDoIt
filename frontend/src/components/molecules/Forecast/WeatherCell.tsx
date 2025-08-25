@@ -76,7 +76,7 @@ const wrapperStyles = (timeLabel: string) => css`
     flex: 0 0 auto;
     scroll-snap-align: start;
     width: 5rem;
-    height: 7.875rem;
+    height: 7rem;
 
     span:first-of-type {
         background-color: ${timeLabel === '오늘' ||
