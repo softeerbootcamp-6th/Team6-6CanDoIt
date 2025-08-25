@@ -30,7 +30,7 @@ interface ForecasetInfo {
     humidity: number;
 }
 
-type WeatherType = '매우좋음' | '좋음' | '보통' | '나쁨';
+type WeatherType = '매우 좋음' | '좋음' | '약간 나쁨' | '나쁨';
 
 export default function BackWeatherSummaryCard({ cardData }: PropsState) {
     const {

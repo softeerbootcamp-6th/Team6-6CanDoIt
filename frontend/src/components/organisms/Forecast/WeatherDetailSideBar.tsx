@@ -36,7 +36,7 @@ interface CardData {
 }
 
 type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
-type HikingActivityStatus = '좋음' | '매우좋음' | '나쁨' | '보통';
+type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나쁨';
 
 const { colors } = theme;
 
