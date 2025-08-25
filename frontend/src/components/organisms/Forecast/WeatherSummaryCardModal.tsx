@@ -6,6 +6,8 @@ import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
     cardData: any;
@@ -21,20 +23,34 @@ export default function WeatherSummaryCardModal({
     selectedCourseId,
 }: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const navigate = useNavigate();
     const storeMountainCardMutation = useApiMutation<any>(
         `/card/interaction/history/${selectedCourseId}`,
         'PUT',
         {
             onSuccess: () => {
                 alert('최근 본 등산목록에 추가되었습니다.');
+                onClose();
             },
-            onError: (err) => alert(`${err.message}`),
+            onError: (err) => {
+                if (
+                    !(
+                        localStorage.getItem('accessToken') ||
+                        sessionStorage.getItem('accessToken')
+                    )
+                ) {
+                    setErrorMessage('로그인이 필요한 서비스입니다.');
+                } else {
+                    alert('잠시후 다시 시도해주세요.');
+                }
+            },
         },
         { startDateTime: scrollSelectedDate },
     );
 
     return (
-        <div css={overlayStyles} onClick={onClose}>
+        <div css={overlayStyles}>
             <WeatherSummaryCardHeader />
 
             <div
@@ -55,7 +71,10 @@ export default function WeatherSummaryCardModal({
                 </div>
             </div>
             <button
-                onClick={() => storeMountainCardMutation.mutate({})}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    storeMountainCardMutation.mutate({});
+                }}
                 css={storeBtnStyles}
             >
                 <Icon
@@ -65,11 +84,49 @@ export default function WeatherSummaryCardModal({
                     color='grey-100'
                 />
             </button>
+            {errorMessage && (
+                <Modal
+                    onClose={() => {
+                        setErrorMessage('');
+                    }}
+                >
+                    <div
+                        css={css`
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2rem;
+                            align-items: center;
+                        `}
+                    >
+                        로그인이 필요한 서비스입니다.
+                        <button
+                            css={btnStyles}
+                            onClick={() => navigate('/login')}
+                        >
+                            로그인으로 이동
+                        </button>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 }
 
-const { colors } = theme;
+const { colors, typography } = theme;
+
+const btnStyles = css`
+    all: unset;
+    width: 10rem;
+    height: 2.5rem;
+    border-radius: 1rem;
+    background-color: ${colors.status.normal.excellent};
+    color: ${colors.grey[100]};
+    font-weight: ${typography.fontWeight.bold};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+`;
 
 const overlayStyles = css`
     position: fixed;
