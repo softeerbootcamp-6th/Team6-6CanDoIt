@@ -28,7 +28,7 @@ class PrecipitationConditionTest {
         if (type == PrecipitationType.NONE) {
             expectedDescription = "0%";
         } else {
-            expectedDescription = type.name() + " " + testProbability + ".0%";
+            expectedDescription = type.description() + " " + testProbability + ".0%";
         }
 
         assertEquals(expectedDescription, description);
