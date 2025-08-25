@@ -84,9 +84,9 @@ const inputFields = [
     {
         id: 'email-input',
         icon: 'x-circle',
-        label: '이메일 주소',
+        label: '아이디',
         type: 'text',
-        iconAriaLabel: '이메일 지우기',
+        iconAriaLabel: '아이디 지우기',
         onIconClick: iconButtonHandler.clearTextByRef,
         validations: [
             {

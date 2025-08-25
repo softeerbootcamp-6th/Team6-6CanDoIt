@@ -211,7 +211,7 @@ export default function DetailInfoSection() {
                                 );
                             })}
                         </div>
-                        <img css={lineImageStyles} src={svg}></img>
+                        <img css={lineImageStyles} src={svg} />
                         <WeatherIndexLight type={startCard.hikingActivity} />
                     </div>
 
@@ -269,15 +269,15 @@ const weatherCardWrapperStyles = css`
     justify-content: space-evenly;
 
     & > :nth-of-type(1) {
-        transform: translateY(5.5rem);
+        transform: translateY(4rem);
     }
 
     & > :nth-of-type(2) {
-        transform: translateY(-4.5rem);
+        transform: translateY(-3rem);
     }
 
     & > :nth-of-type(3) {
-        transform: translateY(5.5rem);
+        transform: translateY(4rem);
     }
 `;
 
@@ -348,7 +348,7 @@ const storeBtnStyles = css`
 
 const lineImageStyles = css`
     position: absolute;
-    top: 35%;
+    top: 36%;
     z-index: -1;
     width: 60%;
     height: 32%;
