@@ -1,0 +1,14 @@
+<svg
+    width='24'
+    height='154'
+    viewBox='0 0 20 182'
+    fill='none'
+    xmlns='http://www.w3.org/2000/svg'
+                >
+    <path
+        d='M7 9 L8 168 M7 2 A8 8 0 1 1 8 18 A8 8 0 1 1 8 2 M7 80 A8 8 0 1 1 8 96 A8 8 0 1 1 8 80 M7 160 A8 8 0 1 1 8 176 A8 8 0 1 1 8 160'
+        fill='#E4E2E6'
+        stroke='#E4E2E6'
+        strokeWidth='2'
+    />
+</svg>

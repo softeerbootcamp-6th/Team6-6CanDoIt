@@ -1,0 +1,18 @@
+export const DummyWeatherData = {
+    dateTime: '2025-08-12T06:00:00',
+    hikingActivity: '좋음',
+    temperature: 20.1,
+    apparentTemperature: 19.5,
+    temperatureDescription: '쾌적한 기온입니다.',
+    precipitation: '0.0',
+    probabilityDescription: '비 올 가능성 낮음',
+    precipitationType: 'NONE',
+    sky: 'SUNNY',
+    skyDescription: '맑은 하늘',
+    windSpeed: 1.2,
+    windSpeedDescription: '약한 바람',
+    humidity: 55.0,
+    humidityDescription: '적정 습도',
+    highestTemperature: 26.0,
+    lowestTemperature: 17.0,
+};

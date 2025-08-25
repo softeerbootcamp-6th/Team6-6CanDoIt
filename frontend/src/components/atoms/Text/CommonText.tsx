@@ -8,18 +8,31 @@ interface PropsState {
     TextTag: TextTagType;
     fontSize?: FontSizeType;
     fontWeight?: FontWeightType;
+    lineHeight?: number;
     color?: string;
     children: React.ReactNode;
+    flexColoumn?: boolean;
 }
 
 export default function CommonText(props: PropsState) {
-    const { TextTag, color, fontSize, fontWeight, children } = props;
+    const {
+        TextTag,
+        color,
+        fontSize,
+        fontWeight,
+        lineHeight,
+        children,
+        flexColoumn,
+    } = props;
 
     const textStyle = css`
+        ${flexColoumn &&
+        'display: flex; flex-direction: column; align-items: center;'}
         ${createTextStyle({
             fontSize,
             fontWeight,
             color,
+            lineHeight,
         })}
     `;
 

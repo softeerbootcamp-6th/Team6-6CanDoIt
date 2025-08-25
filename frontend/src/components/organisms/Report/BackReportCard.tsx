@@ -1,0 +1,52 @@
+import CommonText from '../../atoms/Text/CommonText.tsx';
+import HeartStat from './HeartStat.tsx';
+import LabelList from '../../molecules/ReportCard/LabelList.tsx';
+import ReportCardWrapper from './ReportCardWrapper.tsx';
+import BackReportCardHeader from '../../molecules/ReportCard/BackReportCardHeader.tsx';
+
+interface PropsState {
+    comment: string;
+    timeAgo: string;
+    userImageUrl?: string;
+    likeCount?: number;
+    filterLabels: string[];
+    isLiked?: boolean;
+    onHeartClick: () => void;
+    onClick: () => void;
+}
+
+export default function BackReportCard(props: PropsState) {
+    const {
+        comment,
+        timeAgo,
+        userImageUrl = '',
+        likeCount = 0,
+        filterLabels,
+        isLiked = false,
+        onHeartClick,
+        onClick,
+    } = props;
+    return (
+        <ReportCardWrapper onClick={onClick}>
+            <BackReportCardHeader
+                userImageUrl={userImageUrl}
+                timeAgo={timeAgo}
+            />
+            <CommonText {...textProps}>{comment}</CommonText>
+            <HeartStat
+                count={likeCount}
+                onHeartClick={onHeartClick}
+                isLiked={isLiked}
+            />
+            <LabelList labels={filterLabels} isCut={false} />
+        </ReportCardWrapper>
+    );
+}
+
+const textProps = {
+    TextTag: 'p',
+    fontSize: 'label',
+    fontWeight: 'medium',
+    color: 'grey-70',
+    lineHeight: 1.5,
+} as const;

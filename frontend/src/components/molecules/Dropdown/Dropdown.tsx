@@ -4,22 +4,91 @@ import { css } from '@emotion/react';
 import { getColor } from '../../../utils/utils.ts';
 import { theme } from '../../../theme/theme.ts';
 import Icon from '../../atoms/Icon/Icons.tsx';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-// 드롭다운의 제목, 옵션 리스트를 받고 렌더링
-interface propsState {
-    title: string;
-    options: string[];
-    isOpenOptions?: boolean;
+interface Option {
+    id: number;
+    name: string;
 }
 
-export default function Dropdown(props: propsState) {
-    const { title, options, isOpenOptions = 'false' } = props;
+interface PropsState {
+    title: string;
+    initSelector: Option;
+    options: Option[];
+    isOpenOptions?: boolean;
+    paramName?: string;
+    onToggle: () => void;
+    onSelect?: (id: number) => void;
+}
+
+export default function Dropdown(props: PropsState) {
+    const {
+        title,
+        initSelector,
+        options,
+        isOpenOptions = false,
+        paramName,
+        onToggle,
+        onSelect,
+    } = props;
+
+    const [selector, setSelector] = useState(initSelector);
+    const [searchParams] = useSearchParams();
+    const outsideRef = useRef<HTMLDivElement | null>(null);
+
+    const outsideClickHandler = (event: MouseEvent) => {
+        if (
+            isOpenOptions &&
+            outsideRef.current &&
+            !outsideRef.current.contains(event.target as Node)
+        ) {
+            onToggle();
+        }
+    };
+
+    useEffect(() => {
+        setSelector(initSelector);
+    }, [initSelector]);
+    useEffect(() => {
+        if (selector.name !== title) {
+            onSelect?.(selector.id);
+        }
+    }, [selector]);
+    useEffect(() => {
+        document.addEventListener('mouseup', outsideClickHandler);
+        return () =>
+            document.removeEventListener('mouseup', outsideClickHandler);
+    }, [onToggle]);
+    useEffect(() => {
+        if (!paramName || options.length === 0 || selector.id !== 0) return;
+        const paramValue = Number(searchParams.get(paramName));
+        if (!paramValue) return;
+        const matchedOption = options.find(
+            (option) => option.id === paramValue,
+        );
+        if (matchedOption) {
+            setSelector({
+                id: matchedOption.id,
+                name: matchedOption.name,
+            });
+        }
+    }, [paramName, options]);
+
+    const optionListProps = options.map((option) => ({
+        key: option.id,
+        onClick: () => {
+            setSelector({ id: option.id, name: option.name });
+            onToggle();
+        },
+        children: option.name,
+    }));
 
     return (
-        <div css={dropdownStyle}>
-            <div css={selectorTitleStyle}>
-                <SearchBarText>{title}</SearchBarText>
-                <div css={selectorChevronButtonStyle}>
+        <div ref={outsideRef} css={dropdownStyle}>
+            <div css={selectorTitleStyle} onClick={onToggle}>
+                <SearchBarText>{selector.name}</SearchBarText>
+                <div css={selectorChevronButtonStyle(isOpenOptions)}>
                     <Icon {...chevronIconProps} />
                 </div>
             </div>
@@ -31,9 +100,9 @@ export default function Dropdown(props: propsState) {
                             <Icon {...chevronIconProps} />
                         </div>
                     </div>
-                    <ul>
-                        {options.map((option) => (
-                            <TextLi>{option}</TextLi>
+                    <ul css={optionListStyle}>
+                        {optionListProps.map((liProps) => (
+                            <TextLi {...liProps} />
                         ))}
                     </ul>
                 </div>
@@ -54,6 +123,8 @@ const { colors } = theme;
 const dropdownStyle = css`
     position: relative;
     width: max-content;
+    cursor: pointer;
+    border: none;
 `;
 
 const chevronButtonStyle = css`
@@ -65,12 +136,14 @@ const chevronButtonStyle = css`
     transform-origin: 50% 50%;
 `;
 
-const selectorChevronButtonStyle = css([
-    chevronButtonStyle,
-    `
-    transform: rotate(-90deg) scale(1.3);
+const selectorChevronButtonStyle = (isOpenOptions: boolean) =>
+    css([
+        chevronButtonStyle,
+        `
+    transform: rotate(${isOpenOptions ? 0 : -90}deg) scale(1.3);
+    transition: transform 200ms ease;
   `,
-]);
+    ]);
 
 const optionChevronButtonStyle = css([
     chevronButtonStyle,
@@ -106,6 +179,7 @@ const optionsStyle = css`
     width: max-content;
     padding: 1rem;
     border-radius: 1.5rem;
+    border: none;
     background-color: ${getColor({
         colors,
         colorString: 'greyOpacityWhite-70',
@@ -122,4 +196,28 @@ const optionTitleStyle = css`
         colors,
         colorString: 'grey-100',
     })};
+`;
+
+const optionListStyle = css`
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    line-height: 1.5;
+
+    max-height: 18.5rem;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+
+    padding-right: 1rem;
+    box-sizing: border-box;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: ${colors.grey[100]};
+    }
+    &::-webkit-scrollbar-track {
+        background-color: ${colors.greyOpacityWhite[90]};
+    }
 `;
