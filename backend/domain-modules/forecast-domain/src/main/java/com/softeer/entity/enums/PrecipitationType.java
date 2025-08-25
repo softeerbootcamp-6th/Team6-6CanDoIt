@@ -17,6 +17,10 @@ public enum PrecipitationType {
         this.code = code;
         this.description = description;
     }
+
+    public String description() {
+        return description;
+    }
 }
 
 

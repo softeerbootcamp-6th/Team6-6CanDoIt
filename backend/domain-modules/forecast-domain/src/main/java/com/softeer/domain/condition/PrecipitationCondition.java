@@ -8,6 +8,6 @@ public record PrecipitationCondition(PrecipitationType precipitationType, String
     @Override
     public String displayDescription() {
         if(precipitationType == PrecipitationType.NONE) return "0%";
-        return precipitationType.name() + " " + precipitationProbability + "%";
+        return precipitationType.description() + " " + precipitationProbability + "%";
     }
 }
