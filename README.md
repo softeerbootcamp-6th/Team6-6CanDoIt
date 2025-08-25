@@ -37,26 +37,10 @@
 </table>
 
 # 기술 스택
-
-<table align="center">
-  <tr>
-    <td><strong>FE</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" />
-      <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" />
-      <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" />
-      <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=zotero&logoColor=white" />
-    </td>
-  </tr>
-  <tr>
-    <td><strong>BE</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" />
-      <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" />
-    </td>
-  </tr>
-</table>
-
+| FE | BE | 배포환경 |
+| --- | --- | --- |
+| <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" /> <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=zustand&logoColor=white" /> | <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" /> <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" /> <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" /> | <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white" /> <img src="https://img.shields.io/badge/Amazon_S3-569A31?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/CloudFront-FF4F8B?style=flat&logo=amazoncloudwatch&logoColor=white" /> <img src="https://img.shields.io/badge/Route_53-8C4FFF?style=flat&logo=amazonroute53&logoColor=white" /> <img src="https://img.shields.io/badge/CodeDeploy-6DB33F?style=flat&logo=amazonaws&logoColor=white" /> |
+</br>
 
 리드미 수정 방안
 
