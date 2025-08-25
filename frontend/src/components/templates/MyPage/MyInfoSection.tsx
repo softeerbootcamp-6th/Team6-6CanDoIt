@@ -5,6 +5,7 @@ import dummyImg from '../../../assets/mainImg.png';
 import useApiQuery from '../../../hooks/useApiQuery';
 import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation';
+import { useQueryClient } from '@tanstack/react-query';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UserData {
@@ -18,11 +19,14 @@ export default function MyInfoSection() {
     const inputNickNameRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const queryClient = useQueryClient();
+
     const { data: myInfoData } = useApiQuery<UserData>(
         `/user`,
         {},
         {
             retry: false,
+            enabled: true,
         },
     );
 
@@ -30,12 +34,20 @@ export default function MyInfoSection() {
         { nickname: string },
         UserData
     >('/user/nickname', 'PATCH', {
-        onSuccess: () => setIsEditingNickName(false),
+        onSuccess: (_data, variables) => {
+            setIsEditingNickName(false);
+
+            queryClient.setQueryData<UserData>(['/user', {}], (old) =>
+                old ? { ...old, nickname: variables.nickname } : old,
+            );
+
+            queryClient.invalidateQueries({ queryKey: ['/user', {}] });
+        },
         onError: () => alert('잠시 후 다시 시도해주세요'),
     });
 
     const updateProfileImageMutation = useApiMutation<FormData, any>(
-        '/user/image', // 실제 API 엔드포인트 /user/nickname → /user/image 같은 실제 엔드포인트로 바꿔야 함
+        '/user/image',
         'PATCH',
         {
             onSuccess: () => alert('프로필 이미지가 변경되었습니다!'),
@@ -60,6 +72,9 @@ export default function MyInfoSection() {
 
             if (!res.ok) {
                 const error = await res.json();
+                if (error.errorCode === 'USR-002')
+                    error.message =
+                        '한글로 이루어진 단어만 가능합니다. 공백이있는지 확인해주세요';
                 throw new Error(error.message || '닉네임 중복 검사 실패');
             }
 
