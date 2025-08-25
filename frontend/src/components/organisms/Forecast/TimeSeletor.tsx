@@ -63,8 +63,8 @@ export default function TimeSeletor({
             behavior: 'smooth',
         });
 
-        const visibleIndex = Math.min(nearestIndex, data.length - 1);
-        const selectedTime = data[visibleIndex]?.dateTime;
+        const visibleIndex = Math.min(nearestIndex, (data?.length ?? 1) - 1);
+        const selectedTime = data?.[visibleIndex]?.dateTime;
 
         if (selectedTime && onTimeSelect) {
             onTimeSelect(selectedTime);
