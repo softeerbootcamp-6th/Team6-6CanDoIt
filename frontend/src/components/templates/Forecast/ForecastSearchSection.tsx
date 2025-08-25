@@ -1,6 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar';
 import { useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import type {
     MountainCourse,
@@ -28,6 +28,22 @@ export default function ForecastSearchSection() {
     const [selectedWeekdayId, setSelectedWeekdayId] =
         useState<number>(weekdayId);
 
+    const { data: coursesData } = useApiQuery<MountainCourse[]>(
+        `/card/mountain/${selectedMountainId}/course`,
+        {},
+        {
+            enabled: selectedMountainId !== 0,
+            retry: false,
+        },
+    );
+    const { data: mountainsData } = useApiQuery<MountainData[]>(
+        '/card/mountain',
+        {},
+        {
+            retry: false,
+        },
+    );
+
     const mouuntainChangeHandler = (id: number) => {
         setSelectedMountainId(id);
         setSelectedCourseId(0);
@@ -48,30 +64,33 @@ export default function ForecastSearchSection() {
         setSearchParams(next);
     };
 
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
-        '/card/mountain',
-        {},
-        {
-            //placeholderData: MountainsData,
-            retry: false,
-        },
+    const mountainOptions: Option[] = useMemo(
+        () => refactorMountainDataToOptions(mountainsData ?? []),
+        [mountainsData],
     );
-    const { data: coursesData } = useApiQuery<MountainCourse[]>(
-        `/card/mountain/${selectedMountainId}/course`,
-        {},
-        {
-            //placeholderData: initCoursesData,
-            enabled: selectedMountainId !== 0,
-            retry: false,
-        },
+    const courseOptions = useMemo(
+        () => refactorCoursesDataToOptions(coursesData ?? []),
+        [coursesData],
     );
 
-    const mountainOptions: Option[] = refactorMountainDataToOptions(
-        mountainsData ?? [],
-    );
-    const courseOptions: Option[] = refactorCoursesDataToOptions(
-        coursesData ?? [],
-    );
+    useEffect(() => {
+        if (courseId !== 0) return;
+        const newCourseId =
+            selectedCourseId !== 0
+                ? selectedCourseId
+                : (coursesData?.[0].courseId ?? 0);
+        setSelectedCourseId(newCourseId);
+        const next = new URLSearchParams(searchParams);
+        next.set('courseid', String(newCourseId));
+        setSearchParams(next);
+    }, [coursesData]);
+    useEffect(() => {
+        if (weekdayId !== 0) return;
+        setSelectedWeekdayId(weekdayData[0].id);
+        const next = new URLSearchParams(searchParams);
+        next.set('weekdayid', String(weekdayData[0].id));
+        setSearchParams(next);
+    }, []);
 
     return (
         <SearchBar
@@ -94,5 +113,5 @@ export default function ForecastSearchSection() {
 const weekdayData = [
     { id: 1, name: '오늘' },
     { id: 2, name: '내일' },
-    { id: 3, name: '글피' },
+    { id: 3, name: '모레' },
 ];
