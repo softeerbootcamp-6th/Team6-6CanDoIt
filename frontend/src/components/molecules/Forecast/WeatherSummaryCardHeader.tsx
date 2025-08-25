@@ -13,7 +13,7 @@ export default function WeatherSummaryCardHeader() {
                 fontWeight='medium'
                 color='greyOpacityWhite-50'
             >
-                이미지를 저장 또는 공유하여 등산시 참고해주세요
+                저장 버튼을 통해 최근 본 등산목록에 추가하세요!
             </CommonText>
         </>
     );

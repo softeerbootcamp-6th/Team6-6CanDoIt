@@ -12,7 +12,12 @@ interface PropsState {
     type: string;
     courseAltitude?: number;
     onClose: () => void;
-    card: CardData;
+    card: {
+        data: CardData;
+        backgroundType?: Background;
+        title?: string;
+        courseAltitude?: number;
+    } | null;
 }
 
 interface CardData {
@@ -46,6 +51,7 @@ export default function WeatherDetailSideBar({
     onClose,
     card,
 }: PropsState) {
+    if (!card) return <div>loading...</div>;
     const {
         apparentTemperature,
         temperatureDescription,
@@ -60,7 +66,7 @@ export default function WeatherDetailSideBar({
         hikingActivity,
         temperature,
         precipitationType,
-    } = card;
+    } = card.data;
 
     const weatherDetailContentData = {
         apparentTemperature,
@@ -112,6 +118,16 @@ const wrapperStyles = (background: Background) => css`
     padding: 3rem;
     box-sizing: border-box;
     background-color: ${colors.accentWeather[background]};
+    animation: slideIn 0.3s ease-out forwards;
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
 `;
 
 const topSectionStyles = css`
