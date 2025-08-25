@@ -26,7 +26,7 @@ public class CardHistoryAdapterImpl implements CardHistoryAdapter {
     @Override
     @Transactional
     public void touchOrCreate(long userId, long courseId, LocalDateTime forecastDate) {
-        cardHistoryJpaRepository.findByUserIdAndCourseId(userId, courseId)
+        cardHistoryJpaRepository.findByUserIdAndCourseIdAndForecastDate(userId, courseId, forecastDate)
                 .ifPresentOrElse(
                         CardHistoryEntity::touch,
                         () -> cardHistoryJpaRepository.save(CardHistoryEntity.builder()

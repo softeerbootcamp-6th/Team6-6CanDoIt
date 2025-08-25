@@ -32,7 +32,7 @@ public class UltraForecastJobScheduler {
         this.scheduledJob = scheduledJob;
     }
 
-    @Scheduled(cron = "15 5,15,25,35,45,55 * * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 5,15,25,35,45,55 * * * *", zone = "Asia/Seoul")
     public void runForecastJob() throws Exception {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTime = ApiTimeUtil.getBatchAlignedUltraBaseTime(now);
