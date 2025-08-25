@@ -22,8 +22,11 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*");
+                .allowedOrigins("http://localhost:3000", "https://climbingtoday.site")
+                .allowedMethods("GET","POST","PUT","PATCH","DELETE","OPTIONS","HEAD")
+                .allowedHeaders("*")
+                .exposedHeaders("Location","Content-Disposition")
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }
