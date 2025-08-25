@@ -37,26 +37,23 @@
 </table>
 
 # 기술 스택
+| FE | BE | 배포환경 |
+| --- | --- | --- |
+| <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" /> <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=zustand&logoColor=white" /> | <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" /> <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" /> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-1F6FEB?logo=testcontainers&logoColor=white) ![Bucket4j](https://img.shields.io/badge/Bucket4j-0F6EDE?logo=java&logoColor=white)| <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white" /> <img src="https://img.shields.io/badge/Amazon_S3-569A31?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/CloudFront-FF4F8B?style=flat&logo=amazoncloudwatch&logoColor=white" /> <img src="https://img.shields.io/badge/Route_53-8C4FFF?style=flat&logo=amazonroute53&logoColor=white" /> <img src="https://img.shields.io/badge/CodeDeploy-6DB33F?style=flat&logo=amazonaws&logoColor=white" /> |
+</br>
 
-<table align="center">
-  <tr>
-    <td><strong>FE</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" />
-      <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" />
-      <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" />
-      <img src="https://img.shields.io/badge/Zustand-000000?style=flat&logo=zotero&logoColor=white" />
-    </td>
-  </tr>
-  <tr>
-    <td><strong>BE</strong></td>
-    <td>
-      <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" />
-      <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" />
-    </td>
-  </tr>
-</table>
+
+리드미 수정 방안
+
+- 서비스 소개는 엄청 간단하게만 넣기(주요 기능만? 페이지별 기능 소개?)
+- 목차?
+- 기술 스택에 대한 소개(간단하게, 이러한 기능을 위해 사용 정도만)
+- 개발기간? (설계 2주, ~작업 1주 이런식?) → 설계에 시간을 많이 쓴 것을 어필?
+- 여기에 회고 링크를?
+- 향후 개발 계획 및 현재 상태?
+- 라이선스??
 
 # 프로젝트 구조
+<img width="2689" height="1140" alt="6candoit_project_architecture" src="https://github.com/user-attachments/assets/75ce15cd-d6d3-47e0-9f32-a023951ceae8" />
 
 
