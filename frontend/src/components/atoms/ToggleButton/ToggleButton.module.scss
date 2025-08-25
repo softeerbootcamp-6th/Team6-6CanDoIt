@@ -1,0 +1,19 @@
+.toggleButtonWrapper {
+    display: flex;
+    align-items: center;
+
+    padding-left: 0.1rem;
+    width: 3.2rem;
+    height: 2rem;
+
+    background-color: var(--grey-80);
+    border-radius: 1rem;
+}
+
+.circle {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 100%;
+
+    background-color: var(--grey-40);
+}
