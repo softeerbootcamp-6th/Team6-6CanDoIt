@@ -108,7 +108,6 @@ export default function TimeSeletor({
             ? scrollStartTimeStr
             : startTimeStr;
         const startDate = new Date(seletedTime);
-        console.log(scrollStartTimeStr);
 
         const formatTime = (date: Date) => {
             const hours = date.getHours();
