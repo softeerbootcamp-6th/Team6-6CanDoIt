@@ -103,14 +103,14 @@ export default function ForecastSearchSection() {
     }, [courseId, coursesData, selectedCourseId]);
     useEffect(() => {
         if (weekdayId !== 0) return;
-        const id = weekdayData[0].id;
-        setSelectedWeekdayId(id);
+        const newWeekdayId = weekdayData[0].id;
+        setSelectedWeekdayId(newWeekdayId);
         setSearchParams((prev) => {
             const next = new URLSearchParams(prev);
-            next.set('weekdayid', String(id));
+            next.set('weekdayid', String(newWeekdayId));
             return next;
         });
-    }, [weekdayId]);
+    }, [weekdayId, courseId]);
     useEffect(() => {
         setIsLoading(true);
         const timer = setTimeout(() => {
