@@ -56,4 +56,15 @@
 # 프로젝트 구조
 <img width="2689" height="1140" alt="6candoit_project_architecture" src="https://github.com/user-attachments/assets/75ce15cd-d6d3-47e0-9f32-a023951ceae8" />
 
+# 프로젝트 ERD
+<img width="100%" height="auto" alt="erd (1)" src="https://github.com/user-attachments/assets/c46c79e8-235d-4b72-b401-83d8eb085a02" />
 
+## 프로젝트 핵심 도메인
+- 예보 도메인
+  - 날씨 예보 데이터와 관련된 도메인
+- 등산로 도메인
+  - 산, 등산 코스와 관련된 도메인
+- 사용자 도메인
+  - 사용자 정보와 관련된 도메인
+- 제보 도메인
+  - 등산 코스에 대해서 사용자가 생성, 제공하는 도메인
