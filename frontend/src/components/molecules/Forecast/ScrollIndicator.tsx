@@ -13,13 +13,7 @@ export default function ScrollIndicator() {
                 >
                     스크롤하여 초단기 날씨를
                 </span>
-                <span
-                    css={css`
-                        margin-bottom: 0.6rem;
-                    `}
-                >
-                    확인하세요
-                </span>
+                <span>확인하세요</span>
             </CommonText>
             <Icon
                 name='chevron-down-double'
@@ -35,7 +29,7 @@ const textProps = {
     TextTag: 'p',
     color: 'grey-100',
     fontWeight: 'medium',
-    fontSize: 'body',
+    fontSize: 'caption',
     flexColoumn: true,
 } as const;
 

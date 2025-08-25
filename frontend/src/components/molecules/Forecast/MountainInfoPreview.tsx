@@ -19,8 +19,8 @@ export default function MountainInfoPreview({
 }: PropsState) {
     return (
         <div css={wrapperStyles}>
-            <div css={dummySteyls}>
-                <img src={courseImageUrl} width={400} height={400} />
+            <div css={imgContainerStyles}>
+                <img src={courseImageUrl} css={imgStyles} />
             </div>
 
             <ClimbInfoText
@@ -42,9 +42,16 @@ const wrapperStyles = css`
     margin-top: 2%;
 `;
 
-const dummySteyls = css`
-    width: 100%;
+const imgContainerStyles = css`
+    width: 50%;
+    height: 55%;
     flex-grow: 1;
     display: flex;
     justify-content: center;
+`;
+
+const imgStyles = css`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 `;
