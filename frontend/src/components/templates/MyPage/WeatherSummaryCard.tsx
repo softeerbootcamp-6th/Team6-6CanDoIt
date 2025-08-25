@@ -20,7 +20,7 @@ export default function WeatherSummaryCardModal({
     const { frontCard, backCard } = useForecastCardData(courseId, forecastDate);
     const cardData = { frontCard, backCard };
 
-    if (!cardData) return <div>loading...</div>;
+    if (!cardData.backCard) return <div>loading...</div>;
 
     return (
         <div css={overlayStyles} onClick={onClose}>
