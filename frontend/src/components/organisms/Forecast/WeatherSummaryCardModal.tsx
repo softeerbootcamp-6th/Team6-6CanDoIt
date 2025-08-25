@@ -4,14 +4,35 @@ import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import { useState } from 'react';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
+import Icon from '../../atoms/Icon/Icons.tsx';
+import useApiMutation from '../../../hooks/useApiMutation.ts';
 
 interface Props {
     cardData: any;
     onClose: () => void;
+    scrollSelectedDate: string;
+    selectedCourseId: number;
 }
 
-export default function WeatherSummaryCardModal({ onClose, cardData }: Props) {
+export default function WeatherSummaryCardModal({
+    onClose,
+    cardData,
+    scrollSelectedDate,
+    selectedCourseId,
+}: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
+    const storeMountainCardMutation = useApiMutation<any>(
+        `/card/interaction/history/${selectedCourseId}`,
+        'PUT',
+        {
+            onSuccess: () => {
+                alert('최근 본 등산목록에 추가되었습니다.');
+            },
+            onError: (err) => alert(`${err.message}`),
+        },
+        { startDateTime: scrollSelectedDate },
+    );
+
     return (
         <div css={overlayStyles} onClick={onClose}>
             <WeatherSummaryCardHeader />
@@ -33,6 +54,17 @@ export default function WeatherSummaryCardModal({ onClose, cardData }: Props) {
                     <BackWeatherSummaryCard cardData={cardData.backCard} />
                 </div>
             </div>
+            <button
+                onClick={() => storeMountainCardMutation.mutate({})}
+                css={storeBtnStyles}
+            >
+                <Icon
+                    name='download-02'
+                    width={1.4}
+                    height={1.4}
+                    color='grey-100'
+                />
+            </button>
         </div>
     );
 }
@@ -93,4 +125,21 @@ const modalStyles = (isFront: boolean, mountainImageUrl?: string) => css`
         justify-content: space-between;
         padding: 1.5rem;
     }
+`;
+
+const storeBtnStyles = css`
+    all: unset;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 28%;
+    left: calc(50% + 14rem);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100%;
+    background-color: ${colors.grey[40]};
+    padding: 0 3px 5px 0;
+    box-sizing: border-box;
+    cursor: pointer;
 `;
