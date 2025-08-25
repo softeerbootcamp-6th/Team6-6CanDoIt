@@ -33,7 +33,7 @@ export default function WeatherSummaryCardModal({
                 alert('최근 본 등산목록에 추가되었습니다.');
                 onClose();
             },
-            onError: (err) => {
+            onError: () => {
                 if (
                     !(
                         localStorage.getItem('accessToken') ||
