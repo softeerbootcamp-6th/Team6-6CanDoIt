@@ -90,23 +90,27 @@ export default function ForecastSearchSection() {
     );
 
     useEffect(() => {
-        if (courseId !== 0) return;
-        const newCourseId =
-            selectedCourseId !== 0
-                ? selectedCourseId
-                : (coursesData?.[0].courseId ?? 0);
+        if (courseId !== 0 || !coursesData?.length) return;
+        const newCourseId = selectedCourseId || coursesData[0].courseId;
+        if (!newCourseId) return;
+
         setSelectedCourseId(newCourseId);
-        const next = new URLSearchParams(searchParams);
-        next.set('courseid', String(newCourseId));
-        setSearchParams(next);
-    }, [coursesData]);
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('courseid', String(newCourseId));
+            return next;
+        });
+    }, [courseId, coursesData, selectedCourseId]);
     useEffect(() => {
         if (weekdayId !== 0) return;
-        setSelectedWeekdayId(weekdayData[0].id);
-        const next = new URLSearchParams(searchParams);
-        next.set('weekdayid', String(weekdayData[0].id));
-        setSearchParams(next);
-    }, []);
+        const id = weekdayData[0].id;
+        setSelectedWeekdayId(id);
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            next.set('weekdayid', String(id));
+            return next;
+        });
+    }, [weekdayId]);
     useEffect(() => {
         setIsLoading(true);
         const timer = setTimeout(() => {
