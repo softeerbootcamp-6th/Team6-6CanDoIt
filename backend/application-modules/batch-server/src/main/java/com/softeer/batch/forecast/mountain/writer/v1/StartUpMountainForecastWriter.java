@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.mountain.writer;
+package com.softeer.batch.forecast.mountain.writer.v1;
 
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
 import com.softeer.batch.common.writersupporter.SunTimeJdbcWriter;
