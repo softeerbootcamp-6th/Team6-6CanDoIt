@@ -1,4 +1,4 @@
-package com.softeer.batch.forecast.shortterm.writer;
+package com.softeer.batch.forecast.shortterm.writer.v1;
 
 import com.softeer.batch.common.writersupporter.DailyTemperatureWriter;
 import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
