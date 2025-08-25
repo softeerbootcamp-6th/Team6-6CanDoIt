@@ -58,5 +58,6 @@
 </table>
 
 # 프로젝트 구조
+<img width="2689" height="1140" alt="6candoit_project_architecture" src="https://github.com/user-attachments/assets/75ce15cd-d6d3-47e0-9f32-a023951ceae8" />
 
 
