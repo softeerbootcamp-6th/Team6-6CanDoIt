@@ -4,22 +4,22 @@ import LogoWithNav from '../../molecules/Header/LogoWithNav';
 import IconNavList from '../../molecules/Header/IconNavList';
 import { LabelHeading } from '../../atoms/Heading/Heading';
 import Icon from '../../atoms/Icon/Icons';
+import { theme } from '../../../theme/theme';
 
 export default function Header() {
     const location = useLocation();
     const isForecastPage = location.pathname.includes('/forecast');
-
     const navigate = useNavigate();
 
     return (
-        <header css={headerStyles}>
+        <header css={headerStyles(isForecastPage)}>
             <nav css={navStyles}>
                 {isForecastPage ? (
                     <>
                         <button
                             css={css`
                                 all: unset;
-                                cursor: hover;
+                                cursor: pointer;
                             `}
                             onClick={() => navigate('/')}
                         >
@@ -45,7 +45,9 @@ export default function Header() {
     );
 }
 
-const headerStyles = css`
+const { colors } = theme;
+
+const headerStyles = (isForecastPage: boolean) => css`
     position: sticky;
     top: 0;
     z-index: 10000;
@@ -55,11 +57,13 @@ const headerStyles = css`
     height: 5rem;
     padding: 0 4rem;
     box-sizing: border-box;
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.5) 0%,
-        rgba(0, 0, 0, 0) 100%
-    );
+    background: ${isForecastPage
+        ? `linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.5) 0%,
+            rgba(0, 0, 0, 0) 100%
+        )`
+        : colors.grey[0]};
 `;
 
 const navStyles = css`
