@@ -53,7 +53,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateNickname(Long userId, MultipartFile imageFile) {
+    public ResponseEntity<Void> updateImage(Long userId, MultipartFile imageFile) {
         userService.updateImage(userId, imageFile);
 
         return ResponseEntity.ok().build();

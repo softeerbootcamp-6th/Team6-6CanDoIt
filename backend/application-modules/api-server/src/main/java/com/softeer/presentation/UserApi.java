@@ -167,7 +167,7 @@ public interface UserApi {
     """
     )
     @PatchMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<Void> updateNickname(@LoginUserId Long userId, @RequestParam MultipartFile imageFile);
+    ResponseEntity<Void> updateImage(@LoginUserId Long userId, @RequestParam MultipartFile imageFile);
 
     @Operation(
             summary = "사용자 프로필 조회",

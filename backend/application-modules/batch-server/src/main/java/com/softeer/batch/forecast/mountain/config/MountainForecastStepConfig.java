@@ -3,14 +3,19 @@ package com.softeer.batch.forecast.mountain.config;
 import com.softeer.batch.forecast.mountain.dto.MountainDailyForecast;
 import com.softeer.batch.forecast.mountain.dto.MountainIdentifier;
 import com.softeer.batch.forecast.mountain.listener.DailyTemperatureLoader;
-import com.softeer.batch.forecast.mountain.processor.MountainForecastProcessor;
+import com.softeer.batch.forecast.mountain.processor.MountainForecastV2Processor;
 import com.softeer.batch.forecast.mountain.reader.MountainIdentifierReader;
-import com.softeer.batch.forecast.mountain.writer.ScheduledMountainForecastWriter;
-import com.softeer.batch.forecast.mountain.writer.StartUpMountainForecastWriter;
+import com.softeer.batch.forecast.mountain.writer.v2.ScheduledMountainForecastV2Writer;
+import com.softeer.batch.forecast.mountain.writer.v2.StartUpMountainForecastV2Writer;
+import com.softeer.throttle.BackoffStrategy;
+import com.softeer.throttle.ThrottlingProperties;
+import com.softeer.throttle.manager.impl.LeakyTokenThrottlingManager;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
@@ -18,8 +23,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import static com.softeer.batch.common.support.BatchNames.Steps.SCHEDULED_MOUNTAIN_FORECAST_STEP;
-import static com.softeer.batch.common.support.BatchNames.Steps.STARTUP_MOUNTAIN_FORECAST_STEP;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static com.softeer.batch.common.support.BatchNames.Steps.*;
 
 @Slf4j
 @Configuration
@@ -31,12 +39,27 @@ public class MountainForecastStepConfig {
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final MountainIdentifierReader mountainIdentifierReader;
-    private final MountainForecastProcessor mountainForecastProcessor;
+    private final MountainForecastV2Processor mountainForecastProcessor;
 
-    private final ScheduledMountainForecastWriter scheduledWriter;
-    private final StartUpMountainForecastWriter startupWriter;
+    private final ScheduledMountainForecastV2Writer scheduledWriter;
+    private final StartUpMountainForecastV2Writer startupWriter;
+    private final ThrottlingProperties throttlingProperties;
+    private final ProxyManager<String> proxyManager;
 
     private final DailyTemperatureLoader dailyTemperatureLoader;
+
+    @Bean(name = MOUNTAIN_FORECAST_V2_EX_SERVICE)
+    public ExecutorService threadPoolV3() {
+        return Executors.newFixedThreadPool(CHUNK_SIZE);
+    }
+
+    @Bean(name = MOUNTAIN_LEAKY_MANAGER)
+    @StepScope
+    public LeakyTokenThrottlingManager leakyTokenThrottlingManager() {
+        BackoffStrategy backoffStrategy = new BackoffStrategy(100, 400);
+        return new LeakyTokenThrottlingManager(proxyManager, throttlingProperties, backoffStrategy);
+    }
+
 
     @Bean(name = STARTUP_MOUNTAIN_FORECAST_STEP)
     @JobScope
@@ -50,9 +73,9 @@ public class MountainForecastStepConfig {
         return createForecastStep(SCHEDULED_MOUNTAIN_FORECAST_STEP, scheduledWriter);
     }
 
-    private Step createForecastStep(String stepName, ItemWriter<MountainDailyForecast> writer) {
+    private Step createForecastStep(String stepName, ItemWriter<CompletableFuture<MountainDailyForecast>> writer) {
         return new StepBuilder(stepName, jobRepository)
-                .<MountainIdentifier, MountainDailyForecast>chunk(CHUNK_SIZE, transactionManager)
+                .<MountainIdentifier, CompletableFuture<MountainDailyForecast>>chunk(CHUNK_SIZE, transactionManager)
                 .reader(mountainIdentifierReader)
                 .processor(mountainForecastProcessor)
                 .writer(writer)
