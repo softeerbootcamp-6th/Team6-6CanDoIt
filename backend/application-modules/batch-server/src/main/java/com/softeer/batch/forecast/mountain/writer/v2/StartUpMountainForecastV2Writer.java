@@ -1,0 +1,37 @@
+package com.softeer.batch.forecast.mountain.writer.v2;
+
+import com.softeer.batch.common.writersupporter.ForecastJdbcWriter;
+import com.softeer.batch.common.writersupporter.SunTimeJdbcWriter;
+import com.softeer.batch.forecast.mountain.redis.MountainForecastRedisWriter;
+import com.softeer.domain.Forecast;
+import com.softeer.time.TimeUtil;
+import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+@StepScope
+public class StartUpMountainForecastV2Writer extends AbstractMountainForecastV2Writer {
+
+    public StartUpMountainForecastV2Writer(
+            ForecastJdbcWriter forecastJdbcWriter,
+            SunTimeJdbcWriter sunTimeJdbcWriter,
+            MountainForecastRedisWriter mountainForecastRedisWriter
+    ) {
+        super(forecastJdbcWriter, sunTimeJdbcWriter, mountainForecastRedisWriter);
+    }
+
+    @Override
+    protected List<Forecast> filterForecasts(List<Forecast> forecasts) {
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime rawThreeDaysLater = now.plusDays(3).withHour(0);
+        final LocalDateTime threeDaysLater = TimeUtil.getBaseTime(rawThreeDaysLater);
+
+        return forecasts.stream()
+                .filter(hourly -> !hourly.dateTime().isAfter(threeDaysLater))
+                .collect(Collectors.toList());
+    }
+}

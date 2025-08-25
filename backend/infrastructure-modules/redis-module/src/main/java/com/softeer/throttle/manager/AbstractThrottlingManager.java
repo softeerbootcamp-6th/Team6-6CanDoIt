@@ -34,7 +34,7 @@ public abstract class AbstractThrottlingManager {
     private final AtomicInteger lastUpdatedTps = new AtomicInteger();
 
     private volatile boolean shutdown = false;
-    private volatile Bucket bucket;
+    private Bucket bucket;
 
     public AbstractThrottlingManager(ProxyManager<String> proxyManager, ThrottlingProperties properties, BackoffStrategy backoffStrategy) {
         this.proxyManager = proxyManager;

@@ -25,6 +25,6 @@ public class ProfileCommandUseCaseImpl implements ProfileCommandUseCase {
     @Override
     @Transactional
     public void updateProfileImage(long userId, long imageId) {
-        userAdapter.updateImage(imageId, userId);
+        userAdapter.updateImage(userId, imageId);
     }
 }
