@@ -10,6 +10,7 @@ import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
 } from '../Main/utils.ts';
+import Loading from '../../organisms/Loading/Loading.tsx';
 
 interface Option {
     id: number;
@@ -18,6 +19,7 @@ interface Option {
 
 export default function ForecastSearchSection() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isLoading, setIsLoading] = useState(false);
     const mountainId = Number(searchParams.get('mountainid'));
     const courseId = Number(searchParams.get('courseid'));
     const weekdayId = Number(searchParams.get('weekdayid'));
@@ -44,6 +46,14 @@ export default function ForecastSearchSection() {
         },
     );
 
+    const selectedMountain = useMemo(() => {
+        return mountainsData?.find(
+            (mountain) => mountain.mountainId === selectedMountainId,
+        );
+    }, [mountainsData, selectedMountainId]);
+    const mountainTitle = selectedMountain?.mountainName ?? '';
+    const mountainDescription = selectedMountain?.mountainDescription ?? '';
+
     const mouuntainChangeHandler = (id: number) => {
         setSelectedMountainId(id);
         setSelectedCourseId(0);
@@ -56,6 +66,12 @@ export default function ForecastSearchSection() {
     };
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
+        if (
+            selectedMountainId === 0 ||
+            selectedCourseId === 0 ||
+            selectedWeekdayId === 0
+        )
+            return;
 
         const next = new URLSearchParams(searchParams);
         next.set('mountainid', String(selectedMountainId));
@@ -91,22 +107,38 @@ export default function ForecastSearchSection() {
         next.set('weekdayid', String(weekdayData[0].id));
         setSearchParams(next);
     }, []);
+    useEffect(() => {
+        setIsLoading(true);
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [mountainId]);
 
     return (
-        <SearchBar
-            searchBarMessage='를 오르는'
-            pageName='main'
-            mountainOptions={mountainOptions}
-            selectedMountainId={selectedMountainId ?? 0}
-            mountainChangeHandler={mouuntainChangeHandler}
-            courseOptions={courseOptions}
-            selectedCourseId={selectedCourseId ?? 0}
-            courseChangeHandler={courseChangeHandler}
-            weekdayOptions={weekdayData}
-            selectedWeekdayId={selectedWeekdayId ?? 0}
-            weekdayChangeHandler={weekdayChangeHandler}
-            onSubmit={submitHandler}
-        />
+        <>
+            <SearchBar
+                searchBarMessage='를 오르는'
+                pageName='main'
+                mountainOptions={mountainOptions}
+                selectedMountainId={selectedMountainId ?? 0}
+                mountainChangeHandler={mouuntainChangeHandler}
+                courseOptions={courseOptions}
+                selectedCourseId={selectedCourseId ?? 0}
+                courseChangeHandler={courseChangeHandler}
+                weekdayOptions={weekdayData}
+                selectedWeekdayId={selectedWeekdayId ?? 0}
+                weekdayChangeHandler={weekdayChangeHandler}
+                onSubmit={submitHandler}
+            />
+            {isLoading && (
+                <Loading
+                    mountainTitle={mountainTitle}
+                    mountainDescription={mountainDescription}
+                />
+            )}
+        </>
     );
 }
 
