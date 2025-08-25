@@ -74,7 +74,7 @@ public final class HikingActivityCalculator {
     private enum HikingActivityStatus {
 
         BAD("나쁨", Double.NEGATIVE_INFINITY, 2.3938),
-        SLIGHTLY_BAD("약간나쁨", 2.3939, 3.1240),
+        SLIGHTLY_BAD("약간 나쁨", 2.3939, 3.1240),
         GOOD("좋음", 3.1241, 3.6108),
         VERY_GOOD("매우 좋음", 3.6109, Double.POSITIVE_INFINITY);
 

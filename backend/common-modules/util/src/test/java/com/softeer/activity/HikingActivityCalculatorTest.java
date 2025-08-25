@@ -12,20 +12,20 @@ class HikingActivityCalculatorExtensiveTest {
             // All lowest → CI=1.0000 → 나쁨
             "-10.0, 20.0, '50.0mm 이상', 6.0, 5.0, 나쁨",
             // All 2 → CI=2.0000 → 나쁨
-            "0.0, 8.0, '1.3mm', 3.5, 20.0, 약간나쁨",
+            "0.0, 8.0, '1.3mm', 3.5, 20.0, 약간 나쁨",
             // All 3 → CI=3.0000 → 약간나쁨
-            "5.0, 8.0, '1.0mm', 4.0, 30.0, 약간나쁨",
+            "5.0, 8.0, '1.0mm', 4.0, 30.0, 약간 나쁨",
             // All highest → CI=4.0000 → 매우 좋음
             "25.0, 5.0, '강수없음', 2.0, 45.0, 매우 좋음",
 
             // Edge between BAD and SLIGHTLY_BAD: CI just below 2.3939 → 나쁨
             "-6.0, 7.0, '1.3mm', 3.4, 40.0, 나쁨",
             // Edge between SLIGHTLY_BAD and GOOD: CI just above 3.1241 → 좋음
-            "1.0, 16.2, '강수없음', 2.0, 50.0, 약간나쁨",
+            "1.0, 16.2, '강수없음', 2.0, 50.0, 약간 나쁨",
             // Mixed mid-range → SLIGHTLY_BAD
-            "20.0, 2.0, '1.3mm', 5.0, 10.0, 약간나쁨",
+            "20.0, 2.0, '1.3mm', 5.0, 10.0, 약간 나쁨",
             // One high, others low → GOOD
-            "25.0, 20.0, '50.0mm 이상', 2.0, 50.0, 약간나쁨",
+            "25.0, 20.0, '50.0mm 이상', 2.0, 50.0, 약간 나쁨",
             // One low, others high → SLIGHTLY_BAD
             "-10.0, 5.0, '강수없음', 2.0, 45.0, 좋음",
             // Random combination → BAD
