@@ -94,13 +94,13 @@
 <table align="center">
   <tr>
     <td>
-      <img width="200" height="auto" alt="박종성" src="https://github.com/user-attachments/assets/47aec288-4d43-41ee-9a43-01d706551a32" />
+      <img width="200" height="auto" alt="박종성" src="https://github.com/user-attachments/assets/abeade16-80f8-44c2-924b-d730a99b85f4" />
     </td>
     <td>
       <img width="200" height="auto" alt="시보성" src="https://github.com/user-attachments/assets/4c618167-3d66-41f4-bdf1-019d771b269d" />
     </td>
     <td>
-      <img width="200" height="auto" alt="김명규" src="https://github.com/user-attachments/assets/b20aa9c0-8d38-41fb-88ec-57c3c9a9dca3" />
+      <img width="200" height="auto" alt="김명규" src="https://github.com/user-attachments/assets/7bc760fb-f612-41fc-91b4-7b0b9ec75fc2" />
     </td>
     <td>
       <img width="200" height="auto" alt="백승진" src="https://github.com/user-attachments/assets/f51e727b-2279-4343-ab7d-6f2478d82e6b" />
