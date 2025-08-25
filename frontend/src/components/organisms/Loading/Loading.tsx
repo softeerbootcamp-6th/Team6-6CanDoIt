@@ -2,6 +2,7 @@ import { DisplayHeading } from '../../atoms/Heading/Heading.tsx';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css, keyframes } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
+import { useEffect } from 'react';
 
 interface PropsState {
     mountainTitle: string;
@@ -10,6 +11,13 @@ interface PropsState {
 
 export default function Loading(props: PropsState) {
     const { mountainTitle, mountainDescription } = props;
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
 
     return (
         <div css={fullScreenContainerStyle}>
@@ -35,6 +43,7 @@ const fullScreenContainerStyle = css`
     bottom: 0;
     background-color: ${colors.grey[0]};
     z-index: 10010;
+    overflow: hidden;
 `;
 
 const fillProgress = keyframes`
