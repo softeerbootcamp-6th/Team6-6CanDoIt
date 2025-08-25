@@ -119,8 +119,8 @@ const cardStyles = css`
     justify-content: space-between;
 
     box-sizing: border-box;
-    width: 15rem;
-    height: 10rem;
+    width: 14rem;
+    height: 9rem;
 
     padding: 0.75rem 0;
 
