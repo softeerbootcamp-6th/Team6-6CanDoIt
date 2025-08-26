@@ -15,6 +15,7 @@ import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.t
 
 import { detailInfoSectionData } from '../../../constants/placeholderData.ts';
 import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 interface CourseForcast {
     startCard: CardData;
@@ -76,18 +77,20 @@ export default function DetailInfoSection() {
         setScrollSelectedTime(getDayStartTime(selectedWeekdayId));
     }, [selectedWeekdayId]);
 
-    const { data: courseForecastData = detailInfoSectionData } =
-        useApiQuery<CourseForcast>(
-            `/card/course/${selectedCourseId}/forecast`,
-            { startDateTime: scrollSelectedTime },
-            {
-                placeholderData: keepPreviousData,
-                retry: 3,
-                enabled: true,
-            },
-        );
+    const {
+        data: courseForecastData = detailInfoSectionData,
+        isError: isCourseDataError,
+    } = useApiQuery<CourseForcast>(
+        `/card/course/${selectedCourseId}/forecast`,
+        { startDateTime: scrollSelectedTime },
+        {
+            placeholderData: keepPreviousData,
+            retry: 3,
+            enabled: true,
+        },
+    );
 
-    const { data: duration = 0 } = useApiQuery<any>(
+    const { data: duration = 0, isError: isDurationError } = useApiQuery<any>(
         `/card/mountain/course/${selectedCourseId}`,
         { dateTime: scrollSelectedTime },
         {
@@ -156,7 +159,7 @@ export default function DetailInfoSection() {
                     scrollSelectedTime={scrollSelectedTime}
                     onToggle={() => setIsToggleOn((prev) => !prev)}
                     isToggleOn={isToggleOn}
-                    time={Math.ceil(duration)}
+                    time={isDurationError ? Math.ceil(duration) : 3}
                     selectedMountainId={selectedMountainId}
                     onTimeSelect={(time) => setScrollSelectedTime(time)}
                 />
@@ -175,6 +178,12 @@ export default function DetailInfoSection() {
                     scrollSelectedTime={scrollSelectedTime}
                     selectedCourseId={selectedCourseId}
                 />
+            )}
+            {isCourseDataError && (
+                <Modal onClose={() => window.location.reload()}>
+                    couseData를 불러오는데 에러가 발생했습니다. 새로고침을 통해
+                    다시 시도해주세요.
+                </Modal>
             )}
         </>
     );
