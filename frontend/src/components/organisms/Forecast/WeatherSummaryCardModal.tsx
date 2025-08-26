@@ -1,7 +1,6 @@
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import useForecastCardData from '../../../hooks/useForecastCardData.ts';
@@ -36,7 +35,6 @@ export default function WeatherSummaryCardModal({
 
     const cardData = { frontCard, backCard };
 
-    const navigate = useNavigate();
     const storeMountainCardMutation = useApiMutation<any>(
         `/card/interaction/history/${selectedCourseId}`,
         'PUT',
