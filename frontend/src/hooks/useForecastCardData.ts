@@ -1,9 +1,9 @@
 import useApiQuery from './useApiQuery';
 
-export const useForecastCardData = (
+export default function useForecastCardData(
     selectedCourseId: number,
     seletedTime: string,
-) => {
+) {
     const {
         data: frontData,
         refetch: refetchFront,
@@ -42,4 +42,4 @@ export const useForecastCardData = (
         isError,
         error,
     };
-};
+}

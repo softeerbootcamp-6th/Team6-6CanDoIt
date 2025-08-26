@@ -3,7 +3,7 @@ import { theme } from '../../../theme/theme.ts';
 import { useState } from 'react';
 import FrontWeatherSummaryCard from '../../organisms/Forecast/FrontWeatherSummaryCard';
 import BackWeatherSummaryCard from '../../organisms/Forecast/BackWeatherSummaryCard.tsx';
-import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
+import useForecastCardData from '../../../hooks/useForecastCardData.ts';
 
 interface Props {
     courseId: number;
