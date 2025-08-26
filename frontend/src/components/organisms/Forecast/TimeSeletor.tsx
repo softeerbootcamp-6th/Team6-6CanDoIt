@@ -5,7 +5,7 @@ import { theme } from '../../../theme/theme.ts';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import { convertToIconName } from '../../../utils/utils.ts';
 
@@ -13,10 +13,9 @@ interface PropsState {
     onToggle: () => void;
     isToggleOn: boolean;
     time: number;
-    selectedTime: string;
     selectedMountainId: number;
     onTimeSelect?: (time: string) => void;
-    scrollSelectedTime?: string;
+    scrollSelectedTime: string;
 }
 
 const { colors, typography } = theme;
@@ -25,7 +24,6 @@ export default function TimeSeletor({
     onToggle,
     isToggleOn,
     time,
-    selectedTime,
     selectedMountainId,
     onTimeSelect,
     scrollSelectedTime,
@@ -72,24 +70,16 @@ export default function TimeSeletor({
     };
 
     const now = new Date();
-    const selectedDate = new Date(selectedTime);
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
 
-    let startTime: string;
-
-    if (selectedDate < now) {
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const date = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-
-        startTime = `${year}-${month}-${date}T${hours}:00:00`;
-    } else {
-        startTime = selectedTime;
-    }
+    const currentTimeStr = `${year}-${month}-${day}T${hour}:00:00`;
 
     const { data } = useApiQuery<any[]>(
         `/card/mountain/${selectedMountainId}/forecast`,
-        { startDateTime: startTime },
+        { startDateTime: currentTimeStr },
         {
             retry: false,
         },
@@ -100,13 +90,10 @@ export default function TimeSeletor({
     `;
 
     function getStartAndEndTimeHoursOnly(
-        scrollStartTimeStr: string | undefined,
+        scrollStartTimeStr: string,
         duration: number,
-        startTimeStr: string,
     ): [string, string] {
-        const seletedTime = scrollStartTimeStr
-            ? scrollStartTimeStr
-            : startTimeStr;
+        const seletedTime = scrollStartTimeStr;
         const startDate = new Date(seletedTime);
 
         const formatTime = (date: Date) => {
@@ -128,9 +115,28 @@ export default function TimeSeletor({
     }
 
     const [startHourTime, endHourTime] = useMemo(
-        () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time, startTime),
+        () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time),
         [scrollSelectedTime, time],
     );
+
+    useEffect(() => {
+        if (!scrollRef.current || !data) return;
+
+        const container = scrollRef.current;
+        const gap = 8; // cell 간 간격
+        const cellWidth = container.children[0]?.clientWidth ?? 1;
+
+        // scrollSelectedTime에 맞는 인덱스 찾기
+        const index = data.findIndex(
+            (item) => item.dateTime === scrollSelectedTime,
+        );
+        if (index === -1) return;
+
+        container.scrollTo({
+            left: index * (cellWidth + gap),
+            behavior: 'smooth',
+        });
+    }, [scrollSelectedTime, data]);
 
     return (
         <div css={timeSeletorStyles}>
