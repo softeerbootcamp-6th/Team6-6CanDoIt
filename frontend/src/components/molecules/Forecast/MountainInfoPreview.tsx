@@ -44,7 +44,7 @@ const wrapperStyles = css`
 
 const imgContainerStyles = css`
     width: 50%;
-    height: 55%;
+    height: 60%;
     flex-grow: 1;
     display: flex;
     justify-content: center;
@@ -53,5 +53,5 @@ const imgContainerStyles = css`
 const imgStyles = css`
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 `;
