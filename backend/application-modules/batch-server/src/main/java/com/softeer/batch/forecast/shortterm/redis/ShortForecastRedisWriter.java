@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,10 @@ public class ShortForecastRedisWriter {
         items.forEach(item ->
             item.forecasts().forEach(forecast -> {
                 try {
-                    byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.SHORT, forecast.dateTime());
+                    LocalDate date = forecast.dateTime().toLocalDate();
+                    if (date.isAfter(LocalDate.now().plusDays(2))) return;
+
+                    byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.SHORT, date);
                     Map<byte[], byte[]> value = recordMapper.toByteMap(new ForecastRedisEntity(forecast, item.gridId()));
                     Duration ttl = TimeUtil.getRedisTtl(forecast.dateTime().plusHours(1));
 

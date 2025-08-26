@@ -18,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +65,11 @@ public class MountainForecastRedisWriter {
         items.forEach(item ->
             item.hourlyForecasts().forEach(forecast -> {
                 try {
+                    LocalDate date = forecast.dateTime().toLocalDate();
+                    if (date.isAfter(LocalDate.now().plusDays(2))) return;
 
                     byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.MOUNTAIN, forecast.dateTime());
-                    DailyTemperatureValue dailyTemperatureValue = dailyTempMap.get(new DailyTemperatureKey(item.gridId(), forecast.dateTime().toLocalDate()));
+                    DailyTemperatureValue dailyTemperatureValue = dailyTempMap.get(new DailyTemperatureKey(item.gridId(), date));
 
                     if (dailyTemperatureValue == null) return;
 
