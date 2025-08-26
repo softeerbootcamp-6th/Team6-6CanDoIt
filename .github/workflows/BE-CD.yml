@@ -1,26 +1,95 @@
-name: Backend CD
+name: Backend CD (Optimized)
 
 on:
   push:
     branches:
       - dev
+      - be/feature/CD-update
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
+  # 변경된 서비스를 결정하는 Job
+  determine-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.filter.outputs.services }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # 모든 브랜치와 태그의 전체 히스토리를 가져옴
+          fetch-depth: 0
+
+      - name: Find changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          # 'dev' 브랜치의 마지막 성공적인 커밋 이후의 변경 사항을 가져옴
+          since_last_remote_commit: 'true'
+
+      - name: List all changed files
+        run: |
+          echo "Changed files:"
+          echo "${{ steps.changed-files.outputs.all_changed_files }}"
+
+      - name: Determine which services to build based on changes
+        id: filter
+        run: |
+          # 각 서비스의 의존성을 정의.
+          # 모듈 의존성이 변경되면 이 부분을 반드시 업데이트해야 함.
+          # 형식: '서비스이름:경로1,경로2,경로3...'
+          # 서비스 자신의 경로도 반드시 포함.
+          declare -A deps
+          deps["api-server"]="application-modules/api-server,core-modules/core,domain-modules/domain-a"
+          deps["batch-server"]="application-modules/batch-server,core-modules/core,domain-modules/domain-b"
+
+          changed_services=()
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+
+            for svc in "${!deps[@]}"; do
+              IFS=',' read -ra dep_paths <<< "${deps[$svc]}"
+
+              for path in "${dep_paths[@]}"; do
+                if [[ "$file" == "backend/$path"* ]]; then
+                  if [[ ! " ${changed_services[@]} " =~ " ${svc} " ]]; then
+                    changed_services+=("$svc")
+                  fi
+                  break 
+                fi
+              done
+
+            done
+
+          done
+
+          if [ ${#changed_services[@]} -eq 0 ]; then
+            echo "No changes detected in backend services or their dependencies."
+            echo "services=[]" >> $GITHUB_OUTPUT
+
+          else
+            json_array=$(printf '"%s",' "${changed_services[@]}")
+            json_array="[${json_array%,}]"
+            echo "Services to build: $json_array"
+            echo "services=$json_array" >> $GITHUB_OUTPUT
+
+          fi
+
+  # 빌드 Job, 변경된 서비스가 있을 경우에만 실행
   build:
+    needs: determine-changes
+    if: fromJson(needs.determine-changes.outputs.services)[0] != null
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        svc: [api-server, batch-server]
+        svc: ${{ fromJson(needs.determine-changes.outputs.services) }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. JDK 설정
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -43,18 +112,15 @@ jobs:
 
       - name: Upload JAR to S3
         run: |
-          # build/libs/ 경로에서 *-plain.jar가 아닌 실행 가능한 JAR 파일 찾기
           JAR_FILE=$(find ./backend/application-modules/${{ matrix.svc }}/build/libs -name "*.jar" ! -name "*-plain.jar")
-          
-          # S3에 업로드 (서비스 이름.jar 로 통일하여 업로드)
           aws s3 cp $JAR_FILE \
             s3://${{ secrets.AWS_BE_BUCKET_NAME }}/artifacts/${{ github.sha }}/${{ matrix.svc }}.jar \
             --storage-class STANDARD_IA
 
+  # 배포 Job, 빌드 Job이 성공했을 경우에만 실행
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -96,10 +162,7 @@ jobs:
           export KMA_API_KEY_ULTRA=${{ secrets.KMA_API_KEY_ULTRA }}
           EOF
 
-          # 실행 권한 부여
           chmod 755 deploy/*.sh
-
-          # 패키징
           cd deploy && zip -r ../deploy.zip .
 
       - name: Upload deployment package to S3
