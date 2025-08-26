@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import { useState } from 'react';
 
@@ -10,6 +10,7 @@ import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCar
 import LoginRequiredModal from '../../molecules/Button/LoginRequiredModal.tsx';
 import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 interface Props {
     onClose: () => void;
@@ -25,13 +26,10 @@ export default function WeatherSummaryCardModal({
     const [isFront, setIsFront] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
-    const {
-        frontCard,
-        backCard,
-        isLoading,
-        isError,
-        error: cardError,
-    } = useForecastCardData(selectedCourseId, scrollSelectedTime);
+    const { frontCard, backCard, isLoading, isError } = useForecastCardData(
+        selectedCourseId,
+        scrollSelectedTime,
+    );
 
     const cardData = { frontCard, backCard };
 
@@ -59,47 +57,75 @@ export default function WeatherSummaryCardModal({
         { startDateTime: scrollSelectedTime },
     );
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError) return <div>{cardError?.message}</div>;
-
     return (
         <div css={overlayStyles}>
-            <WeatherSummaryCardHeader />
-
-            <div
-                css={modalStyles(isFront, cardData.frontCard.mountainImageUrl)}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setIsFront((prev) => !prev);
-                }}
-            >
-                <div className='front'>
-                    <FrontWeatherSummaryCard
-                        cardData={cardData.frontCard}
-                        onClose={onClose}
+            {isLoading ? (
+                <div css={loadingStyles} role='dialog' aria-modal='true'>
+                    <Icon
+                        name='clear-day'
+                        width={2}
+                        height={2}
+                        color='grey-100'
+                    />
+                    <Icon name='rain' width={2} height={2} color='grey-100' />
+                    <Icon name='snow' width={2} height={2} color='grey-100' />
+                    <Icon
+                        name='thunderstorm'
+                        width={2}
+                        height={2}
+                        color='grey-100'
                     />
                 </div>
-                <div className='back'>
-                    <BackWeatherSummaryCard cardData={cardData.backCard} />
-                </div>
-            </div>
+            ) : (
+                <>
+                    <WeatherSummaryCardHeader />
+                    <div
+                        css={modalStyles(
+                            isFront,
+                            cardData.frontCard.mountainImageUrl,
+                        )}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsFront((prev) => !prev);
+                        }}
+                    >
+                        <div className='front'>
+                            <FrontWeatherSummaryCard
+                                cardData={cardData.frontCard}
+                                onClose={onClose}
+                            />
+                        </div>
+                        <div className='back'>
+                            <BackWeatherSummaryCard
+                                cardData={cardData.backCard}
+                            />
+                        </div>
+                    </div>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            storeMountainCardMutation.mutate({});
+                        }}
+                        css={storeBtnStyles}
+                    >
+                        <Icon
+                            name='download-02'
+                            width={1.4}
+                            height={1.4}
+                            color='grey-100'
+                        />
+                    </button>
+                </>
+            )}
 
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    storeMountainCardMutation.mutate({});
-                }}
-                css={storeBtnStyles}
-            >
-                <Icon
-                    name='download-02'
-                    width={1.4}
-                    height={1.4}
-                    color='grey-100'
-                />
-            </button>
             {errorMessage && (
                 <LoginRequiredModal onClose={() => setErrorMessage('')} />
+            )}
+            {isError && (
+                <Modal onClose={() => window.location.reload()}>
+                    데이터 페칭중 오류가 발생했습니다. 새로고침을 통해 다시
+                    시도해주세요.
+                </Modal>
             )}
         </div>
     );
@@ -179,5 +205,44 @@ const storeBtnStyles = css`
     cursor: pointer;
     &:hover {
         opacity: 0.8;
+    }
+`;
+
+const show2 = keyframes`
+  0%, 24.99% { opacity: 0; }
+  25%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const show3 = keyframes`
+  0%, 49.99% { opacity: 0; }
+  50%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const show4 = keyframes`
+  0%, 74.99% { opacity: 0; }
+  75%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const loadingStyles = css`
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 50;
+
+    & > :nth-of-type(2) {
+        animation: ${show2} 2s linear infinite;
+    }
+    & > :nth-of-type(3) {
+        animation: ${show3} 2s linear infinite;
+    }
+    & > :nth-of-type(4) {
+        animation: ${show4} 2s linear infinite;
     }
 `;
