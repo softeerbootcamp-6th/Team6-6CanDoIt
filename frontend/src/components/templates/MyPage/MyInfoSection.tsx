@@ -6,7 +6,6 @@ import useApiQuery from '../../../hooks/useApiQuery';
 import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation';
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UserData {
@@ -19,7 +18,6 @@ export default function MyInfoSection() {
     const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
     const inputNickNameRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
