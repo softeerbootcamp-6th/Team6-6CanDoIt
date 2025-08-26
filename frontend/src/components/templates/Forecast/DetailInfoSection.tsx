@@ -73,6 +73,10 @@ export default function DetailInfoSection() {
         getDayStartTime(selectedWeekdayId),
     );
 
+    useEffect(() => {
+        setScrollSelectedTime(getDayStartTime(selectedWeekdayId));
+    }, [selectedWeekdayId]);
+
     const { frontCard, backCard, refetch } = useForecastCardData(
         selectedCourseId,
         scrollSelectedTime,
