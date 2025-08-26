@@ -8,22 +8,32 @@ import Icon from '../../atoms/Icon/Icons.tsx';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { useNavigate } from 'react-router-dom';
+import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
 
 interface Props {
-    cardData: any;
     onClose: () => void;
-    scrollSelectedDate: string;
+    scrollSelectedTime: string;
     selectedCourseId: number;
 }
 
 export default function WeatherSummaryCardModal({
     onClose,
-    cardData,
-    scrollSelectedDate,
+    scrollSelectedTime,
     selectedCourseId,
 }: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>('');
+
+    const {
+        frontCard,
+        backCard,
+        isLoading,
+        isError,
+        error: cardError,
+    } = useForecastCardData(selectedCourseId, scrollSelectedTime);
+
+    const cardData = { frontCard, backCard };
+
     const navigate = useNavigate();
     const storeMountainCardMutation = useApiMutation<any>(
         `/card/interaction/history/${selectedCourseId}`,
@@ -46,8 +56,11 @@ export default function WeatherSummaryCardModal({
                 }
             },
         },
-        { startDateTime: scrollSelectedDate },
+        { startDateTime: scrollSelectedTime },
     );
+
+    if (isLoading) return <div>Loading...</div>;
+    if (isError) return <div>{cardError?.message}</div>;
 
     return (
         <div css={overlayStyles}>
