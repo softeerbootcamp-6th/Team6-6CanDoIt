@@ -103,7 +103,7 @@
       <img width="200" height="auto" alt="김명규" src="https://github.com/user-attachments/assets/7bc760fb-f612-41fc-91b4-7b0b9ec75fc2" />
     </td>
     <td>
-      <img width="200" height="auto" alt="백승진" src="https://github.com/user-attachments/assets/f51e727b-2279-4343-ab7d-6f2478d82e6b" />
+      <img width="200" height="auto" alt="image" src="https://github.com/user-attachments/assets/659cd341-b5ad-4323-9d92-d809cab81697" />
     </td>
   </tr>
   <tr>
