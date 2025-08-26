@@ -7,7 +7,7 @@ import com.softeer.entity.enums.WindDirection;
 
 public record UltraForecastRedisEntity(double temperature, String precipitation,
                                        Sky sky, double humidity, PrecipitationType precipitationType,
-                                       WindDirection windDirection, double windSpeed) {
+                                       WindDirection windDir, double windSpeed) {
 
     public UltraForecastRedisEntity(UltraForecastResponse response) {
         this(
