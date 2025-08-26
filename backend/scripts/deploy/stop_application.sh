@@ -6,23 +6,39 @@ set -e
 
 echo "=== ApplicationStop: Stopping application ==="
 
-# List of application JARs to stop
 JARS=("api-server.jar" "batch-server.jar")
+TIMEOUT=30
 
 for jar in "${JARS[@]}"; do
-    # Find the process ID (PID) of the running Java application
-    PID=$(pgrep -f "java -jar.*${jar}")
+    PIDS=$(pgrep -f "java -jar.*${jar}")
 
-    if [ -n "$PID" ]; then
-        echo "Found running process for $jar with PID: $PID. Stopping it..."
-        # Send SIGTERM (15) for a graceful shutdown
-        kill -15 "$PID"
-        # Wait for the process to terminate
-        wait "$PID" 2>/dev/null
-        echo "$jar stopped successfully."
-    else
+    if [ -z "$PIDS" ]; then
         echo "No running process found for $jar. Nothing to stop."
+        continue
     fi
+
+    for PID in $PIDS; do
+        echo "Found running process for $jar with PID: $PID. Sending SIGTERM..."
+        kill -15 "$PID"
+
+        counter=0
+        while ps -p "$PID" > /dev/null; do
+            if [ $counter -ge $TIMEOUT ]; then
+                echo "Process $PID for $jar did not stop after $TIMEOUT seconds. Forcing shutdown with SIGKILL..."
+                kill -9 "$PID"
+                break
+            fi
+            echo "Waiting for $jar (PID: $PID) to stop... ($counter/$TIMEOUT)"
+            sleep 1
+            ((counter++))
+        done
+
+        if ! ps -p "$PID" > /dev/null; then
+            echo "$jar (PID: $PID) stopped successfully."
+        else
+            echo "Failed to stop $jar (PID: $PID)."
+        fi
+    done
 done
 
 echo "=== ApplicationStop completed successfully ==="
