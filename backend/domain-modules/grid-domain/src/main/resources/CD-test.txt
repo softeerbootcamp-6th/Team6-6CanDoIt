@@ -1,0 +1,4 @@
+CD test file.
+
+grid-domain 수정 시 빌드 진행 테스트
+- 예상 결과: api-server 모듈이 빌드됨. batch-server 모듈이 빌드됨.
