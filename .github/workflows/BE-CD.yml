@@ -38,15 +38,24 @@ jobs:
       - name: Determine which services to build based on changes
         id: filter
         run: |
-          # 각 서비스의 의존성을 정의.
-          # 모듈 의존성이 변경되면 이 부분을 반드시 업데이트해야 함.
-          # 형식: '서비스이름:경로1,경로2,경로3...'
-          # 서비스 자신의 경로도 반드시 포함.
-          declare -A deps
-          deps["api-server"]="application-modules/api-server,core-modules/core,domain-modules/domain-a"
-          deps["batch-server"]="application-modules/batch-server,core-modules/core,domain-modules/domain-b"
-
           changed_services=()
+
+          # dependencies.json 파일을 통해서 각 모듈의 의존성을 조회함.
+          services=$(jq -r 'keys | .[]' .github/dependencies.json)
+
+          for svc in $services; do\
+            dep_paths=$(jq -r --arg SVC "$svc" '.[$SVC] | .[]' .github/dependencies.json)
+            
+            for path in $dep_paths; do
+              if grep -q "backend/$path" <<< "${{ steps.changed-files.outputs.all_changed_files }}"; then
+                if [[ ! " ${changed_services[@]} " =~ " ${svc} " ]]; then
+                  changed_services+=("$svc")
+                fi
+                break
+              fi
+            done
+          done
+
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
 
             for svc in "${!deps[@]}"; do
