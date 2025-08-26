@@ -5,11 +5,11 @@ import { useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import useForecastCardData from '../../../hooks/useForecastCardData.ts';
 
+import Icon from '../../atoms/Icon/Icons.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
 import LoginRequiredModal from '../../molecules/Button/LoginRequiredModal.tsx';
 import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
-import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
 
 interface Props {
     onClose: () => void;
@@ -83,9 +83,21 @@ export default function WeatherSummaryCardModal({
                     <BackWeatherSummaryCard cardData={cardData.backCard} />
                 </div>
             </div>
-            <DownloadButton
-                onClick={() => storeMountainCardMutation.mutate({})}
-            />
+
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    storeMountainCardMutation.mutate({});
+                }}
+                css={storeBtnStyles}
+            >
+                <Icon
+                    name='download-02'
+                    width={1.4}
+                    height={1.4}
+                    color='grey-100'
+                />
+            </button>
             {errorMessage && (
                 <LoginRequiredModal onClose={() => setErrorMessage('')} />
             )}
@@ -118,7 +130,6 @@ const modalStyles = (isFront: boolean, mountainImageUrl?: string) => css`
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
     transform: ${isFront ? 'rotateY(0deg)' : 'rotateY(180deg)'};
-
     .front,
     .back {
         position: absolute;
@@ -158,7 +169,7 @@ const storeBtnStyles = css`
     justify-content: center;
     align-items: center;
     top: 28%;
-    left: calc(50% + 14rem);
+    left: calc(50% + 13rem);
     width: 3rem;
     height: 3rem;
     border-radius: 100%;
@@ -166,4 +177,7 @@ const storeBtnStyles = css`
     padding: 0 3px 5px 0;
     box-sizing: border-box;
     cursor: pointer;
+    &:hover {
+        opacity: 0.8;
+    }
 `;
