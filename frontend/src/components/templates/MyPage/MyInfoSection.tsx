@@ -6,6 +6,7 @@ import useApiQuery from '../../../hooks/useApiQuery';
 import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UserData {
@@ -18,6 +19,7 @@ export default function MyInfoSection() {
     const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
     const inputNickNameRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -108,6 +110,13 @@ export default function MyInfoSection() {
         updateProfileImageMutation.mutate(formData);
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+
+        window.location.reload();
+    };
+
     if (!myInfoData) return <div>loading!!</div>;
 
     const { nickname, loginId, imageUrl = dummyImg } = myInfoData;
@@ -115,7 +124,7 @@ export default function MyInfoSection() {
     return (
         <div css={wrapperStyles}>
             <div css={profileWrapper}>
-                <div css={imgWrappStyles}>
+                <div css={imgWrappStyles} onClick={handleFileClick}>
                     <img src={imageUrl} css={imgStyles}></img>
                 </div>
                 <div css={profileTextWrapper}>
@@ -168,8 +177,8 @@ export default function MyInfoSection() {
                     </CommonText>
                 </div>
             </div>
-            <button css={buttonStyles} onClick={handleFileClick}>
-                사진 변경
+            <button css={buttonStyles} onClick={handleLogout}>
+                로그아웃
             </button>
             <input
                 type='file'
@@ -235,6 +244,10 @@ const buttonStyles = css`
     height: 3.5rem;
     width: 10rem;
     line-height: 150%;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
+    }
     color: ${colors.grey[20]};
 `;
 
@@ -247,6 +260,10 @@ const imgWrappStyles = css`
     align-items: center;
     justify-content: center;
     margin-right: 1rem;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
+    }
 `;
 
 const imgStyles = css`
