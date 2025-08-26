@@ -9,7 +9,13 @@ interface PropsState {
 
 export default function DownloadButton({ onClick }: PropsState) {
     return (
-        <button css={storeBtnStyles} onClick={onClick}>
+        <button
+            css={storeBtnStyles}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+            }}
+        >
             <Icon {...downloadIconProps} />
         </button>
     );

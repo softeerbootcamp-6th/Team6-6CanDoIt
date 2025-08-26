@@ -5,11 +5,11 @@ import { useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import useForecastCardData from '../../../hooks/useForecastCardData.ts';
 
-import Icon from '../../atoms/Icon/Icons.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
 import LoginRequiredModal from '../../molecules/Button/LoginRequiredModal.tsx';
 import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
+import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
 
 interface Props {
     onClose: () => void;
@@ -83,20 +83,9 @@ export default function WeatherSummaryCardModal({
                     <BackWeatherSummaryCard cardData={cardData.backCard} />
                 </div>
             </div>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    storeMountainCardMutation.mutate({});
-                }}
-                css={storeBtnStyles}
-            >
-                <Icon
-                    name='download-02'
-                    width={1.4}
-                    height={1.4}
-                    color='grey-100'
-                />
-            </button>
+            <DownloadButton
+                onClick={() => storeMountainCardMutation.mutate({})}
+            />
             {errorMessage && (
                 <LoginRequiredModal onClose={() => setErrorMessage('')} />
             )}
