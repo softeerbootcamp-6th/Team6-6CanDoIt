@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
 
 import Icon from '../../atoms/Icon/Icons.tsx';
 import DetailTitle from '../../../components/molecules/Forecast/DetailTitle.tsx';
@@ -51,6 +50,13 @@ interface CardData {
     title?: string;
 }
 
+interface SideBarProps {
+    backgroundType: Background;
+    title: string;
+    courseAltitude?: number;
+    data: CardData;
+}
+
 type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나쁨';
 type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
 
@@ -60,15 +66,12 @@ export default function DetailInfoSection() {
     const selectedMountainId = Number(searchParams.get('mountainid'));
     const selectedWeekdayId = Number(searchParams.get('weekdayid'));
 
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [isCard, setIsCard] = useState<boolean>(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+    const [isOpenCard, setIsOpenCard] = useState<boolean>(false);
     const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
-    const [sidebarData, setSidebarData] = useState<{
-        backgroundType: Background;
-        title: string;
-        courseAltitude?: number;
-        data: CardData;
-    } | null>(null);
+
+    const [sidebarData, setSidebarData] = useState<SideBarProps | null>(null);
+
     const [scrollSelectedTime, setScrollSelectedTime] = useState<string>(
         getDayStartTime(selectedWeekdayId),
     );
@@ -76,13 +79,6 @@ export default function DetailInfoSection() {
     useEffect(() => {
         setScrollSelectedTime(getDayStartTime(selectedWeekdayId));
     }, [selectedWeekdayId]);
-
-    const { frontCard, backCard, refetch } = useForecastCardData(
-        selectedCourseId,
-        scrollSelectedTime,
-    );
-
-    const cardData = { frontCard, backCard };
 
     const { data: courseForecastData = detailInfoSectionData } =
         useApiQuery<CourseForcast>(
@@ -116,7 +112,7 @@ export default function DetailInfoSection() {
     } = courseForecastData;
 
     useEffect(() => {
-        setIsOpen(false);
+        setIsSidebarOpen(false);
     }, [scrollSelectedTime, isToggleOn]);
 
     const openSidebar = (
@@ -126,16 +122,15 @@ export default function DetailInfoSection() {
         data: CardData,
     ) => {
         setSidebarData({ backgroundType, title, courseAltitude, data });
-        setIsOpen(true);
+        setIsSidebarOpen(true);
     };
 
     const closeSidebar = () => {
-        setIsOpen(false);
+        setIsSidebarOpen(false);
     };
 
     const handleDownloadBtnClick = async () => {
-        await refetch();
-        setIsCard(true);
+        setIsOpenCard(true);
     };
 
     return (
@@ -179,7 +174,7 @@ export default function DetailInfoSection() {
                     onTimeSelect={(time) => setScrollSelectedTime(time)}
                 />
             </div>
-            {isOpen && (
+            {isSidebarOpen && (
                 <WeatherDetailSideBar
                     courseAltitude={sidebarData?.courseAltitude}
                     type={sidebarData?.title!}
@@ -187,11 +182,10 @@ export default function DetailInfoSection() {
                     card={sidebarData}
                 />
             )}
-            {isCard && (
+            {isOpenCard && (
                 <WeatherCardModal
-                    cardData={cardData}
-                    onClose={() => setIsCard(false)}
-                    scrollSelectedDate={scrollSelectedTime}
+                    onClose={() => setIsOpenCard(false)}
+                    scrollSelectedTime={scrollSelectedTime}
                     selectedCourseId={selectedCourseId}
                 />
             )}
