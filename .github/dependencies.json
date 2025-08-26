@@ -1,0 +1,28 @@
+{
+  "api-server": [
+    "application-modules/api-server",
+
+    "domain-modules/grid-domain",
+    "domain-modules/user-domain",
+    "domain-modules/forecast-domain",
+    "domain-modules/mountain-domain",
+    "domain-modules/interaction-domain",
+    "domain-modules/image-domain",
+    
+    "infrastructure-modules/s3-client-module",
+    
+    "common-modules/exception"
+  ],
+  "batch-server": [
+    "application-modules/batch-server",
+
+    "domain-modules/forecast-domain",
+    "domain-modules/mountain-domain",
+    "domain-modules/grid-domain",
+    
+    "common-modules/util",
+    
+    "infrastructure-modules/kma-adapter-module",
+    "infrastructure-modules/redis-module"
+  ]
+}
