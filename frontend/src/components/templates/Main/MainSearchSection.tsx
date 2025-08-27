@@ -10,15 +10,12 @@ import {
 } from './utils.ts';
 import { useNavigate } from 'react-router-dom';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import type { Option } from '../../../types/searchBarTypes';
 
 interface PropsState {
     onFormValidChange: (isValid: boolean) => void;
-}
-
-interface Option {
-    id: number;
-    name: string;
 }
 
 export default function MainSearchSection(props: PropsState) {
@@ -27,6 +24,7 @@ export default function MainSearchSection(props: PropsState) {
     const [selectedMountainId, setSelectedMountainId] = useState<number>(0);
     const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
     const [selectedWeekdayId, setSelectedWeekdayId] = useState<number>(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const mouuntainChangeHandler = (id: number) => {
         setSelectedMountainId(id);
@@ -52,30 +50,43 @@ export default function MainSearchSection(props: PropsState) {
             onFormValidChange(false);
             return;
         }
-
         onFormValidChange(true);
         navigate(
             `/forecast?mountainid=${selectedMountainId}&courseid=${selectedCourseId}&weekdayid=${selectedWeekdayId}`,
         );
     };
 
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
+    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
+        MountainData[]
+    >(
         '/card/mountain',
         {},
         {
-            //placeholderData: MountainsData,
             retry: false,
+            networkMode: 'always',
+            staleTime: 5 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
-    const { data: coursesData } = useApiQuery<MountainCourse[]>(
+    const { data: coursesData, isError: isCoursesError } = useApiQuery<
+        MountainCourse[]
+    >(
         `/card/mountain/${selectedMountainId}/course`,
         {},
         {
-            //placeholderData: initCoursesData,
             enabled: !!selectedMountainId,
             retry: false,
+            networkMode: 'always',
+            staleTime: 1000 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
+
+    useEffect(() => {
+        if (isMountainsError || isCoursesError) {
+            setIsModalOpen(true);
+        }
+    }, [isMountainsError, isCoursesError]);
 
     const mountainOptions: Option[] = refactorMountainDataToOptions(
         mountainsData ?? [],
@@ -85,26 +96,35 @@ export default function MainSearchSection(props: PropsState) {
     );
 
     return (
-        <SearchBar
-            searchBarTitle='어디 날씨를 확인해볼까요?'
-            searchBarMessage='를 오르는'
-            pageName='main'
-            mountainOptions={mountainOptions}
-            selectedMountainId={selectedMountainId ?? 0}
-            mountainChangeHandler={mouuntainChangeHandler}
-            courseOptions={courseOptions}
-            selectedCourseId={selectedCourseId ?? 0}
-            courseChangeHandler={courseChangeHandler}
-            weekdayOptions={weekdayData}
-            selectedWeekdayId={selectedWeekdayId ?? 0}
-            weekdayChangeHandler={weekdayChangeHandler}
-            onSubmit={submitHandler}
-        />
+        <>
+            <SearchBar
+                searchBarTitle='어디 날씨를 확인해볼까요?'
+                searchBarMessage='를 오르는'
+                pageName='main'
+                mountainOptions={mountainOptions}
+                selectedMountainId={selectedMountainId ?? 0}
+                mountainChangeHandler={mouuntainChangeHandler}
+                courseOptions={courseOptions}
+                selectedCourseId={selectedCourseId ?? 0}
+                courseChangeHandler={courseChangeHandler}
+                weekdayOptions={weekdayData}
+                selectedWeekdayId={selectedWeekdayId ?? 0}
+                weekdayChangeHandler={weekdayChangeHandler}
+                onSubmit={submitHandler}
+            />
+            {isModalOpen && (
+                <Modal onClose={() => setIsModalOpen(false)}>
+                    {isMountainsError
+                        ? '산 정보를 불러오는데 실패했습니다.'
+                        : '코스 정보를 불러오는데 실패했습니다.'}
+                </Modal>
+            )}
+        </>
     );
 }
 
 const weekdayData = [
     { id: 1, name: '오늘' },
     { id: 2, name: '내일' },
-    { id: 3, name: '글피' },
+    { id: 3, name: '모레' },
 ];
