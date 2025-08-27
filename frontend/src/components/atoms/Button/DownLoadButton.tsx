@@ -45,4 +45,8 @@ const storeBtnStyles = css`
     padding: 0 3px 5px 0;
     box-sizing: border-box;
     cursor: pointer;
+
+    &:hover {
+        opacity: 0.7;
+    }
 `;
