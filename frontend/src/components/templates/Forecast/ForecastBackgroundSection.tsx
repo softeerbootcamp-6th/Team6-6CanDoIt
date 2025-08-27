@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 export default function ForecastBackgroundSection() {
     const [searchParams] = useSearchParams();
     const courseId = Number(searchParams.get('courseid'));
-    const backgroundImageIndex = (courseId % 2) + 1;
+    const backgroundImageIndex = (courseId % 3) + 1;
 
     const layer1Ref = useRef<HTMLDivElement>(null);
     const layer2Ref = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ const topLayerStyles = (index: number) => css`
     left: 0;
     right: 0;
     height: 100%;
-    background-image: url('/images/mountain${index}_layer3.png');
+    background-image: url('/images/mountain${index}_layer3.webp');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -74,7 +74,7 @@ const middleLayerStyles = (index: number) => css`
     left: 0;
     right: 0;
     height: 110%;
-    background-image: url('/images/mountain${index}_layer2.png');
+    background-image: url('/images/mountain${index}_layer2.webp');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -88,7 +88,7 @@ const bottomLayerStyles = (index: number) => css`
     left: 0;
     right: 0;
     height: 120%;
-    background-image: url('/images/mountain${index}_layer1.png');
+    background-image: url('/images/mountain${index}_layer1.webp');
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
