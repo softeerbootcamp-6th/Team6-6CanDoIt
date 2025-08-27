@@ -3,7 +3,7 @@ import { theme } from '../../../theme/theme.ts';
 
 import { useNavigate } from 'react-router-dom';
 
-import Modal from '../Modal/RegisterModal.tsx';
+import Modal from './RegisterModal.tsx';
 
 interface LoginRequiredModalProps {
     onClose: () => void;
