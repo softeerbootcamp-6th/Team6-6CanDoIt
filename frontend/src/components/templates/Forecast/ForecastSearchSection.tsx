@@ -11,6 +11,7 @@ import {
     refactorMountainDataToOptions,
 } from '../Main/utils.ts';
 import Loading from '../../organisms/Loading/Loading.tsx';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 interface Option {
     id: number;
@@ -20,6 +21,7 @@ interface Option {
 export default function ForecastSearchSection() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const mountainId = Number(searchParams.get('mountainid'));
     const courseId = Number(searchParams.get('courseid'));
     const weekdayId = Number(searchParams.get('weekdayid'));
@@ -30,21 +32,39 @@ export default function ForecastSearchSection() {
     const [selectedWeekdayId, setSelectedWeekdayId] =
         useState<number>(weekdayId);
 
-    const { data: coursesData } = useApiQuery<MountainCourse[]>(
+    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
+        MountainData[]
+    >(
+        '/card/mountain',
+        {},
+        {
+            retry: false,
+            networkMode: 'always',
+            staleTime: 5 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
+        },
+    );
+    const { data: coursesData, isError: isCoursesError } = useApiQuery<
+        MountainCourse[]
+    >(
         `/card/mountain/${selectedMountainId}/course`,
         {},
         {
             enabled: selectedMountainId !== 0,
             retry: false,
+            networkMode: 'always',
+            staleTime: 1000 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-        },
-    );
+    useEffect(() => {
+        const errorMessage = isMountainsError
+            ? '산 정보를 불러오지 못했습니다.'
+            : isCoursesError
+              ? '코스 정보를 불러오지 못했습니다.'
+              : '';
+        setErrorMessage(errorMessage);
+    }, [isMountainsError, isCoursesError]);
 
     const selectedMountain = useMemo(() => {
         return mountainsData?.find(
@@ -141,6 +161,15 @@ export default function ForecastSearchSection() {
                     mountainTitle={mountainTitle}
                     mountainDescription={mountainDescription}
                 />
+            )}
+            {errorMessage && (
+                <Modal
+                    onClose={() => {
+                        setErrorMessage('');
+                    }}
+                >
+                    {errorMessage}
+                </Modal>
             )}
         </>
     );

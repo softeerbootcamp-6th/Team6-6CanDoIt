@@ -52,7 +52,10 @@ export default function WeatherCard({
     const weatherInfo = { convertedIconName, weatherIconText, windSpeed };
 
     return (
-        <div css={[cardStyles, dynamicBackgoundStyle]}>
+        <div
+            css={[cardStyles, dynamicBackgoundStyle]}
+            onClick={() => onClick(backgroundType, title, courseAltitude)}
+        >
             <div css={headerStyles}>
                 <div css={titleStyles}>
                     <CommonText {...titleTextProps}>{title}</CommonText>
@@ -62,14 +65,9 @@ export default function WeatherCard({
                         </CommonText>
                     )}
                 </div>
-                <button
-                    css={buttonStyles}
-                    onClick={() =>
-                        onClick(backgroundType, title, courseAltitude)
-                    }
-                >
+                <div css={iconWrapperStyles}>
                     <Icon {...iconProps} />
-                </button>
+                </div>
             </div>
             <div css={footerStyles}>
                 <WeatherInfoColumn {...weatherInfo} />
@@ -128,8 +126,7 @@ const cardStyles = css`
     border: 2px solid ${colors.greyOpacityWhite[80]};
 `;
 
-const buttonStyles = css`
-    all: unset;
+const iconWrapperStyles = css`
     display: flex;
     justify-content: center;
     align-items: center;

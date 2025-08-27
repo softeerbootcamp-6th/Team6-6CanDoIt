@@ -110,14 +110,29 @@ const weatherCardWrapperStyles = css`
 
     & > :nth-of-type(1) {
         transform: translateY(4rem);
+        cursor: pointer;
+
+        &:hover {
+            transform: translateY(4rem) scale(1.15);
+        }
     }
 
     & > :nth-of-type(2) {
         transform: translateY(-3rem);
+        cursor: pointer;
+
+        &:hover {
+            transform: translateY(-3rem) scale(1.15);
+        }
     }
 
     & > :nth-of-type(3) {
         transform: translateY(4rem);
+        cursor: pointer;
+
+        &:hover {
+            transform: translateY(4rem) scale(1.15);
+        }
     }
 `;
 

@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import ToggleButton from '../../atoms/Button/ToggleButton.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
-import { type FormEvent, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportModal from '../../organisms/Report/ReportModal.tsx';
@@ -12,6 +12,7 @@ import {
     formatTimeDifference,
     getCurrentTime,
     filterGatherer,
+    reportFormValidation,
 } from './utils.ts';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
@@ -19,26 +20,17 @@ import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { theme } from '../../../theme/theme.ts';
 import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { validateAccessToken } from '../../../utils/utils.ts';
+import {
+    parseFilterFromUrl,
+    validateAccessToken,
+} from '../../../utils/utils.ts';
 import ReportPendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
+import type { CardData } from '../../../types/reportCardTypes';
+import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 
 type ReportType = 'WEATHER' | 'SAFE';
 type ReportPages = InfiniteData<CardData[]>;
 
-interface CardData {
-    reportId: number;
-    reportType: string;
-    createdAt: string;
-    nickname: string;
-    userImageUrl: string;
-    imageUrl: string;
-    content: string;
-    likeCount?: number;
-    isLiked?: boolean;
-    weatherKeywords?: string[];
-    rainKeywords?: string[];
-    etceteraKeywords?: string[];
-}
 interface ReportFormData {
     courseId: number;
     type: ReportType;
@@ -58,25 +50,6 @@ export default function ReportCardSection() {
     const courseId = Number(searchParams.get('courseid'));
     const pageSize = 10;
 
-    const parseFilterFromUrl = (
-        searchParams: URLSearchParams,
-        key: string,
-    ): number[] => {
-        const paramValue = searchParams.get(key);
-        if (!paramValue) return [];
-
-        try {
-            return paramValue
-                .replace(/[\[\]]/g, '')
-                .split(',')
-                .filter((id) => id !== '')
-                .map((id) => Number(id));
-        } catch (e) {
-            console.error(`Failed to parse filter ${key}:`, e);
-            return [];
-        }
-    };
-
     const weatherKeywords = parseFilterFromUrl(searchParams, 'weatherKeywords');
     const rainKeywords = parseFilterFromUrl(searchParams, 'rainKeywords');
     const etceteraKeywords = parseFilterFromUrl(
@@ -88,11 +61,14 @@ export default function ReportCardSection() {
         reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
     const currentTime = getCurrentTime();
 
-    const { data: filterColumn } = useApiQuery(
+    const { data: filterColumn, isError: isFilterColumnError } = useApiQuery(
         '/card/interaction/keyword',
         {},
         {
             retry: false,
+            networkMode: 'always',
+            staleTime: 1000 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
 
@@ -101,6 +77,7 @@ export default function ReportCardSection() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
+        isError: isCardsError,
     } = useApiInfiniteQuery<CardData>(
         `/card/interaction/report/${courseId}`,
         {
@@ -115,8 +92,15 @@ export default function ReportCardSection() {
         },
         {
             retry: false,
+            networkMode: 'always',
         },
     );
+    useEffect(() => {
+        const errorMessage = isFilterColumnError ? '키워드' : '제보 카드';
+        if (isFilterColumnError || isCardsError) {
+            setValidationError(`${errorMessage} 불러오기에 실패했습니다.`);
+        }
+    }, [isFilterColumnError, isCardsError]);
     const flattenedData = cardsData?.pages.flat();
 
     const reportMutation = useApiMutation<FormData, any>(
@@ -142,10 +126,8 @@ export default function ReportCardSection() {
             onError: (error: any) => {
                 setIsReportModalOpen(false);
                 error instanceof TypeError
-                    ? setValidationError(
-                          '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
-                      )
-                    : setValidationError(error.message);
+                    ? setValidationError('네트워크 오류가 발생했습니다.')
+                    : setValidationError('제보에 실패했습니다.');
             },
         },
     );
@@ -193,42 +175,18 @@ export default function ReportCardSection() {
                     return { ...oldData, pages: newPages };
                 });
             },
-            onSuccess: () => {
-                console.log('Like action successful');
-            },
-            onError: (e) => {
-                console.error('Report submission failed:', e);
+            onError: (e: any) => {
                 if (previousDataRef.current) {
                     queryClient.setQueryData(key, previousDataRef.current);
                 }
+                if (e instanceof TypeError) {
+                    setValidationError('네트워크 연결을 확인해주세요.');
+                    return;
+                }
+                setValidationError('좋아요 요청에 실패했습니다.');
             },
         },
     );
-
-    const formValidation = (formData: FormData) => {
-        const imageFile = formData.get('image') as File;
-        if (!imageFile || !imageFile.type.startsWith('image/')) {
-            return '이미지 파일을 업로드해주세요';
-        }
-
-        const content = formData.get('content') as string;
-        if (!content || content.trim() === '') {
-            return '제보 내용을 입력해주세요';
-        }
-
-        const weatherKeywords = formData.getAll('weatherKeywords');
-        const rainKeywords = formData.getAll('rainKeywords');
-        const etceteraKeywords = formData.getAll('etceteraKeywords');
-        if (
-            weatherKeywords.length === 0 &&
-            rainKeywords.length === 0 &&
-            etceteraKeywords.length === 0
-        ) {
-            return '키워드를 선택해주세요';
-        }
-
-        return '';
-    };
 
     const reportModalSubmitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -236,7 +194,7 @@ export default function ReportCardSection() {
         const form = e.currentTarget;
         const formData = new FormData(form);
 
-        const validationErr = formValidation(formData);
+        const validationErr = reportFormValidation(formData);
         setValidationError(validationErr);
         if (validationErr) return;
 
@@ -277,8 +235,91 @@ export default function ReportCardSection() {
         event.currentTarget.scrollLeft += Number(event.deltaY);
     };
 
+    const chipButtonClickHandler = () => {
+        if (!validateAccessToken()) {
+            setValidationError('로그인이 필요합니다.');
+            return;
+        }
+        setIsReportModalOpen(true);
+    };
+
+    const heartClickHandler = () => {
+        if (!validateAccessToken()) {
+            setValidationError('로그인이 필요합니다.');
+            return;
+        }
+        cardLikeMutation.mutate({});
+    };
+
     if (!mountainId || !courseId || mountainId === 0 || courseId === 0)
         return null;
+
+    const renderReportCards = () =>
+        flattenedData?.map((card) => {
+            const isFlipped = flippedCardId === card.reportId;
+            const filterLabels = filterGatherer({
+                weatherKeywords: card.weatherKeywords,
+                rainKeywords: card.rainKeywords,
+                etceteraKeywords: card.etceteraKeywords,
+            });
+            const timeAgo = formatTimeDifference({
+                pastISO: card.createdAt,
+                nowDate: currentTime,
+            });
+
+            return (
+                <div
+                    key={card.reportId}
+                    css={[card3DStyle, isFlipped && card3DFlippedStyle]}
+                >
+                    <div css={cardFaceFrontStyle}>
+                        <FrontReportCard
+                            comment={card.content}
+                            timeAgo={timeAgo}
+                            filterLabels={filterLabels}
+                            onClick={() => setFlippedCardId(card.reportId)}
+                            imgSrc={card.imageUrl}
+                            userImageUrl={card.userImageUrl}
+                        />
+                    </div>
+                    <div css={cardFaceBackStyle}>
+                        <BackReportCard
+                            comment={card.content}
+                            timeAgo={timeAgo}
+                            userImageUrl={card.userImageUrl}
+                            likeCount={card.likeCount}
+                            filterLabels={filterLabels}
+                            onClick={() => setFlippedCardId(null)}
+                            isLiked={card.isLiked}
+                            onHeartClick={heartClickHandler}
+                        />
+                    </div>
+                </div>
+            );
+        });
+
+    const renderModals = () => (
+        <>
+            <ReportModal
+                title='실시간 제보하기'
+                description='사진, 내용, 키워드를 선택하여 제보해주세요.'
+                filterColumn={filterColumn ?? []}
+                isOpen={isReportModalOpen}
+                onClose={() => setIsReportModalOpen(false)}
+                onSubmit={reportModalSubmitHandler}
+            />
+            {validationError === '로그인이 필요합니다.' ? (
+                <LoginRequiredModal onClose={() => setValidationError('')} />
+            ) : (
+                validationError && (
+                    <Modal onClose={() => setValidationError('')}>
+                        {validationError}
+                    </Modal>
+                )
+            )}
+            {reportMutation.isPending && <ReportPendingModal />}
+        </>
+    );
 
     return (
         <>
@@ -286,90 +327,21 @@ export default function ReportCardSection() {
                 <HeadlineHeading HeadingTag='h2'>{title}</HeadlineHeading>
                 <ToggleButton
                     isOn={reportType === 'SAFE'}
-                    onClick={() => reportCardSectionToggleButtonHandler()}
-                    offBgColor={colors.grey[100]}
+                    onClick={reportCardSectionToggleButtonHandler}
+                    offBgColor={colors.grey[30]}
+                    onBgColor={colors.grey[30]}
                     onCircleColor={colors.status.normal.good}
                     offCircleColor={colors.status.normal.bad}
                 />
                 <ChipButton
-                    onClick={() => {
-                        if (!validateAccessToken()) {
-                            setValidationError('로그인이 필요합니다.');
-                            return;
-                        }
-                        setIsReportModalOpen(true);
-                    }}
+                    onClick={chipButtonClickHandler}
                     text='제보하기'
                     iconName='edit-03'
                 />
-                <ReportModal
-                    title='실시간 날씨 제보하기'
-                    description='실시간 날씨를 제보하려면 코스 근처에 있어야 해요. 사진은 6시간 이내에 촬영된 사진만 업로드 가능해요.'
-                    filterColumn={filterColumn ?? []}
-                    isOpen={isReportModalOpen}
-                    onClose={() => setIsReportModalOpen(false)}
-                    onSubmit={reportModalSubmitHandler}
-                />
-                {validationError && (
-                    <Modal onClose={() => setValidationError('')}>
-                        {validationError}
-                    </Modal>
-                )}
-                {reportMutation.isPending && <ReportPendingModal />}
+                {renderModals()}
             </div>
             <div css={reportCardContainerStyle} onWheel={wheelHandler}>
-                {flattenedData?.map((card) => {
-                    const isFlipped = flippedCardId === card.reportId;
-                    const filterLabels = filterGatherer({
-                        weatherKeywords: card.weatherKeywords,
-                        rainKeywords: card.rainKeywords,
-                        etceteraKeywords: card.etceteraKeywords,
-                    });
-                    const timeAgo = formatTimeDifference({
-                        pastISO: card.createdAt,
-                        nowDate: currentTime,
-                    });
-
-                    return (
-                        <div
-                            key={card.reportId}
-                            css={[card3DStyle, isFlipped && card3DFlippedStyle]}
-                        >
-                            <div css={cardFaceFrontStyle}>
-                                <FrontReportCard
-                                    comment={card.content}
-                                    timeAgo={timeAgo}
-                                    filterLabels={filterLabels}
-                                    onClick={() =>
-                                        setFlippedCardId(card.reportId)
-                                    }
-                                    imgSrc={card.imageUrl}
-                                    userImageUrl={card.userImageUrl}
-                                />
-                            </div>
-                            <div css={cardFaceBackStyle}>
-                                <BackReportCard
-                                    comment={card.content}
-                                    timeAgo={timeAgo}
-                                    userImageUrl={card.userImageUrl}
-                                    likeCount={card.likeCount}
-                                    filterLabels={filterLabels}
-                                    onClick={() => setFlippedCardId(null)}
-                                    isLiked={card.isLiked}
-                                    onHeartClick={() => {
-                                        if (!validateAccessToken()) {
-                                            setValidationError(
-                                                '로그인이 필요합니다.',
-                                            );
-                                            return;
-                                        }
-                                        cardLikeMutation.mutate({});
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    );
-                })}
+                {renderReportCards()}
                 <div css={loadMoreContainerStyle}>
                     {hasNextPage && (
                         <button

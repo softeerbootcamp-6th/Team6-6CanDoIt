@@ -1,19 +1,40 @@
 import ReportCardSection from '../../components/templates/Report/ReportCardSection.tsx';
 import ReportSearchSection from '../../components/templates/Report/ReportSearchSection.tsx';
 import { css } from '@emotion/react';
+import bg from '../../assets/bg.png';
 
 export default function ReportPage() {
     return (
-        <div css={pageContainerStyle}>
-            <div className='search-section' css={searchSectionStyle}>
-                <ReportSearchSection />
-            </div>
-            <div className='card-wrap' css={cardSectionStyle}>
-                <ReportCardSection />
+        <div css={outerContainerStyle}>
+            <img src={bg} alt='' css={backgroundImgStyle} />
+            <div css={pageContainerStyle}>
+                <div css={searchSectionStyle}>
+                    <ReportSearchSection />
+                </div>
+                <div css={cardSectionStyle}>
+                    <ReportCardSection />
+                </div>
             </div>
         </div>
     );
 }
+const outerContainerStyle = css`
+    position: relative;
+    width: 100vw;
+    height: calc(100dvh - 5rem);
+    overflow: hidden;
+`;
+
+const backgroundImgStyle = css`
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+`;
 
 const pageContainerStyle = css`
     position: relative;
@@ -24,8 +45,8 @@ const pageContainerStyle = css`
     overflow-x: hidden;
     padding-top: 1rem;
     box-sizing: border-box;
-
-    height: calc(100dvh - 5rem);
+    height: 100%;
+    z-index: 1;
 
     @keyframes cardRise {
         from {
@@ -38,34 +59,18 @@ const pageContainerStyle = css`
         }
     }
 
-    .search-section {
-        position: relative;
-        z-index: 20;
-        transform: translateY(0);
-        transition: transform 300ms ease;
+    &:not(:has(> :nth-child(2) > *)) > :first-child {
+        transform: translateY(11rem);
     }
 
-    &:not(:has(.card-wrap > *)) .search-section {
-        transform: translateY(3rem);
-    }
-
-    .card-wrap > * {
+    > :nth-child(2) > * {
         position: relative;
         opacity: 0;
-        transform: translateY(3rem);
-        z-index: 10;
+        transform: translateY(4rem);
     }
 
-    &:has(.card-wrap > *) .card-wrap > * {
-        animation: cardRise 300ms ease forwards;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        &:has(.card-wrap > *) .card-wrap > * {
-            animation: none;
-            opacity: 1;
-            transform: none;
-        }
+    &:has(> :nth-child(2) > *) > :nth-child(2) > * {
+        animation: cardRise 300ms forwards;
     }
 `;
 
@@ -73,6 +78,9 @@ const searchSectionStyle = css`
     width: 100dvw;
     margin: 0;
     height: max-content;
+    transform: translateY(0);
+    transition: transform 200ms;
+    z-index: 10;
 `;
 
 const cardSectionStyle = css`

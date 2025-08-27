@@ -17,7 +17,7 @@ export default function ForecastBackgroundSection() {
         const handleScroll = () => {
             const scrollY = window.scrollY;
             const pageHeight = window.innerHeight;
-            const limit = pageHeight * 0.4;
+            const limit = pageHeight * 0.05;
             const effectiveScroll = Math.min(scrollY, limit);
 
             if (!ticking) {

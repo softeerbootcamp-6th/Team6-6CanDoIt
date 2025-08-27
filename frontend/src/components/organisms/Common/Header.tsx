@@ -9,10 +9,13 @@ import { theme } from '../../../theme/theme';
 export default function Header() {
     const location = useLocation();
     const isForecastPage = location.pathname.includes('/forecast');
+    const isBackgroundPage = ['/alert', '/login'].some((path) =>
+        location.pathname.includes(path),
+    );
     const navigate = useNavigate();
 
     return (
-        <header css={headerStyles(isForecastPage)}>
+        <header css={headerStyles(isForecastPage, !isBackgroundPage)}>
             <nav css={navStyles}>
                 {isForecastPage ? (
                     <>
@@ -47,7 +50,7 @@ export default function Header() {
 
 const { colors } = theme;
 
-const headerStyles = (isForecastPage: boolean) => css`
+const headerStyles = (isForecastPage: boolean, isTransparent: boolean) => css`
     position: sticky;
     top: 0;
     z-index: 10000;
@@ -57,13 +60,16 @@ const headerStyles = (isForecastPage: boolean) => css`
     height: 5rem;
     padding: 0 4rem;
     box-sizing: border-box;
+
     background: ${isForecastPage
         ? `linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 0.5) 0%,
-            rgba(0, 0, 0, 0) 100%
-        )`
-        : colors.grey[0]};
+                to bottom,
+                rgba(0, 0, 0, 0.5) 0%,
+                rgba(0, 0, 0, 0) 100%
+            )`
+        : isTransparent
+          ? 'transparent'
+          : colors.grey[0]};
 `;
 
 const navStyles = css`

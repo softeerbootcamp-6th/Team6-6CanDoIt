@@ -30,13 +30,19 @@ export default function MountainCard(props: PropsState) {
     return (
         <div
             css={[
-                cardStyle(mountainImageUrl),
+                cardStyle,
                 isHovered && hoveredCardStyle,
                 isDimmed && dimmedCardStyle,
             ]}
             onClick={onClick}
             onMouseEnter={onMouseEnter}
         >
+            <img
+                src={mountainImageUrl}
+                loading='lazy'
+                alt={mountainName}
+                css={bgImageStyle}
+            />
             <MountainCardHeader
                 weatherIconName={weatherIconName}
                 surfaceTemperature={surfaceTemperature}
@@ -52,7 +58,9 @@ const easingFunctions = {
     outBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
 };
 
-const cardStyle = (mountainImageUrl: string) => css`
+const cardStyle = css`
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -62,25 +70,48 @@ const cardStyle = (mountainImageUrl: string) => css`
     box-sizing: border-box;
     border-radius: 1.5rem;
     padding: 1.25rem;
-    background-image:
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 30%),
-        url(${mountainImageUrl});
-    background-size: cover;
-
+    background: #000;
     transition:
         transform 0.5s ${easingFunctions.outBack},
         box-shadow 0.5s ${easingFunctions.outQuart},
         opacity 0.4s ${easingFunctions.outQuart};
-    position: relative;
     opacity: 1;
     cursor: pointer;
     will-change: transform, opacity;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.6) 0%,
+            rgba(0, 0, 0, 0) 30%,
+            rgba(0, 0, 0, 0) 70%,
+            rgba(0, 0, 0, 0.6) 100%
+        );
+        z-index: -5;
+        pointer-events: none;
+    }
+`;
+
+const bgImageStyle = css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -10;
 `;
 
 const hoveredCardStyle = css`
-    transform: translateY(-30px) scale(1.05);
+    transform: translateY(-1.5rem) scale(1.05);
     box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
-    z-index: 2;
+    z-index: 10;
     transition-delay: 0.05s;
 `;
 
