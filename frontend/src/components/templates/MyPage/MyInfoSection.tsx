@@ -145,6 +145,13 @@ export default function MyInfoSection() {
                                 >
                                     변경
                                 </button>
+
+                                <button
+                                    css={changeButtonStyles}
+                                    onClick={() => setIsEditingNickName(false)}
+                                >
+                                    취소
+                                </button>
                             </form>
                         ) : (
                             <CommonText
@@ -220,14 +227,18 @@ const linkStyles = css`
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.medium};
     margin-left: 0.5rem;
-    font-style: normal;
     line-height: normal;
     text-decoration-line: underline;
     text-decoration-style: solid;
     text-decoration-skip-ink: auto;
     text-decoration-thickness: auto;
-    text-underline-offset: auto;
-    text-underline-position: from-font;
+    text-underline-offset: 4px;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.7;
+        color: ${colors.grey[100]};
+    }
 `;
 
 const buttonStyles = css`
@@ -280,10 +291,15 @@ const inputStyles = css`
 
 const changeButtonStyles = css`
     all: unset;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.bold};
     color: ${colors.grey[60]};
     border-radius: 0.5rem;
     cursor: pointer;
+
+    &:hover {
+        opacity: 0.7;
+        color: ${colors.grey[100]};
+    }
 `;

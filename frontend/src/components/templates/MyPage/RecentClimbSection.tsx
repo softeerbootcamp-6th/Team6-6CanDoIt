@@ -115,6 +115,7 @@ const wrapperStyles = css`
 
     &:hover {
         transform: translateY(-10px) scale(1.1);
+        background-color: ${colors.grey[40]};
     }
 `;
 
