@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,8 @@ public class ShortForecastRedisWriter {
         items.forEach(item ->
             item.forecasts().forEach(forecast -> {
                 try {
-                    LocalDate date = forecast.dateTime().toLocalDate();
-                    if (date.isAfter(LocalDate.now().plusDays(2))) return;
+                    LocalDateTime date = forecast.dateTime();
+                    if (date.isAfter(LocalDate.now().plusDays(3).atStartOfDay())) return;
 
                     byte[] key = redisKeyGenerator.serializeKey(PREFIX, item.gridId(), ForecastType.SHORT, date);
                     Map<byte[], byte[]> value = recordMapper.toByteMap(new ForecastRedisEntity(forecast, item.gridId()));

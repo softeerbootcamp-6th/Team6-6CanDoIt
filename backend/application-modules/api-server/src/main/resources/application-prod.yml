@@ -10,6 +10,10 @@ spring:
     username: ${REDIS_USERNAME}
     password: ${REDIS_PASSWORD}
     ssl: false
+  servlet:
+    multipart:
+      max-request-size: 128MB
+      max-file-size: 128MB
 jwt:
   access-token-expiration-ms: ${JWT_EXPIRATION_MS}
   secret-key: ${JWT_SECRET_KEY}
