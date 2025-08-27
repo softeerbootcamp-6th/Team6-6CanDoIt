@@ -126,77 +126,66 @@ jobs:
             s3://${{ secrets.AWS_BE_BUCKET_NAME }}/artifacts/${{ github.sha }}/${{ matrix.svc }}.jar \
             --storage-class STANDARD_IA
 
-  summarize-build:
+  deploy:
     needs: [determine-changes, build]
+    if: fromJson(needs.determine-changes.outputs.services)[0] != null
     runs-on: ubuntu-latest
-    # build 작업이 성공적으로 완료되었을 때만 실행
-    if: success()
+    strategy:
+      matrix:
+        svc: ${{ fromJson(needs.determine-changes.outputs.services) }}
+
     steps:
-      - name: Print list of built modules
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS 자격 증명 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_BUCKET_REGION }}
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+
+      - name: ${{ matrix.svc }} 배포 패키지 생성
+        working-directory: ./backend
         run: |
-          echo "✅ Successfully built modules:"
-          echo "${{ needs.determine-changes.outputs.services }}"
+          mkdir -p deploy/${{ matrix.svc }}
+          cp -r scripts/deploy/* deploy/${{ matrix.svc }}/
+          cp appspec.yml deploy/${{ matrix.svc }}/
 
-  # 배포 Job, 빌드 Job이 성공했을 경우에만 실행
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+          cat > deploy/${{ matrix.svc }}/.env <<EOF
+          export ARTIFACT_VERSION=${GITHUB_SHA}
+          export S3_DEPLOY_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
+          export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+          EOF
 
-  #     - name: Configure AWS Credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-region: ${{ secrets.AWS_BUCKET_REGION }}
-  #         role-to-assume: ${{ secrets.OIDC_ROLE }}
+          chmod 755 deploy/${{ matrix.svc }}/*.sh
+          cd deploy/${{ matrix.svc }} && zip -r ../../deploy-${{ matrix.svc }}.zip .
 
-  #     - name: Create deployment package
-  #       working-directory: ./backend
-  #       run: |
-  #         mkdir -p deploy/scripts
-  #         cp -r scripts/deploy/* deploy/
-  #         cp appspec.yml deploy/
+      - name: ${{ matrix.svc }} 배포 패키지를 S3에 업로드
+        working-directory: ./backend
+        run: |
+          aws s3 cp deploy-${{ matrix.svc }}.zip \
+            s3://${{ secrets.AWS_BE_BUCKET_NAME }}/deployments/backend-${{ matrix.svc }}-${{ github.sha }}.zip
 
-  #         cat > deploy/.env <<EOF
-  #         export ARTIFACT_VERSION=${GITHUB_SHA}
-  #         export S3_DEPLOY_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
-  #         export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+      - name: ${{ matrix.svc }}에 대한 CodeDeploy 배포 생성
+        run: |
+          # 서비스를 기반으로 애플리케이션 및 그룹 이름을 동적으로 설정
+          # 참고: CODEDEPLOY_APPLICATION_API_SERVER 와 같은 시크릿이 필요합니다.
+          APP_NAME_VAR="CODEDEPLOY_APPLICATION_${{ matrix.svc }}"
+          GROUP_NAME_VAR="CODEDEPLOY_GROUP_${{ matrix.svc }}"
+          
+          APP_NAME_SECRET_KEY=$(echo "$APP_NAME_VAR" | tr '[:lower:]-' '[:upper:]_')
+          GROUP_NAME_SECRET_KEY=$(echo "$GROUP_NAME_VAR" | tr '[:lower:]-' '[:upper:]_')
 
-  #         export DB_HOST=${{ secrets.DB_HOST }}
-  #         export DB_PORT=3306
-  #         export DB_NAME=${{ secrets.DB_NAME }}
-  #         export DB_USER=${{ secrets.DB_USER }}
-  #         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          aws deploy create-deployment \
+            --application-name "${!APP_NAME_SECRET_KEY}" \
+            --deployment-group-name "${!GROUP_NAME_SECRET_KEY}" \
+            --deployment-config-name CodeDeployDefault.AllAtOnce \
+            --s3-location bucket=${{ secrets.AWS_BE_BUCKET_NAME }},key=deployments/backend-${{ matrix.svc }}-${{ github.sha }}.zip,bundleType=zip \
+            --description "${{ matrix.svc }} 서비스 배포 (커밋: ${{ github.sha }})" \
+            --ignore-application-stop-failures
 
-  #         export REDIS_HOST=${{ secrets.REDIS_HOST }}
-  #         export REDIS_PORT=${{ secrets.REDIS_PORT }}
-  #         export REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
-  #         export REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-
-  #         export JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
-  #         export JWT_EXPIRATION_MS=${{ secrets.JWT_EXPIRATION_MS }}
-
-  #         export KMA_API_KEY_MOUNTAIN=${{ secrets.KMA_API_KEY_MOUNTAIN }}
-  #         export KMA_API_KEY_SHORT=${{ secrets.KMA_API_KEY_SHORT }}
-  #         export KMA_API_KEY_ULTRA=${{ secrets.KMA_API_KEY_ULTRA }}
-  #         EOF
-
-  #         chmod 755 deploy/*.sh
-  #         cd deploy && zip -r ../deploy.zip .
-
-  #     - name: Upload deployment package to S3
-  #       working-directory: ./backend
-  #       run: |
-  #         aws s3 cp deploy.zip \
-  #           s3://${{ secrets.AWS_BE_BUCKET_NAME }}/deployments/backend-${GITHUB_SHA}.zip
-
-  #     - name: Create CodeDeploy deployment
-  #       run: |
-  #         aws deploy create-deployment \
-  #           --application-name ${{ secrets.CODEDEPLOY_APPLICATION }} \
-  #           --deployment-group-name ${{ secrets.CODEDEPLOY_GROUP }} \
-  #           --deployment-config-name CodeDeployDefault.AllAtOnce \
-  #           --s3-location bucket=${{ secrets.AWS_BE_BUCKET_NAME }},key=deployments/backend-${GITHUB_SHA}.zip,bundleType=zip \
-  #           --description "Deployment of commit ${GITHUB_SHA}" \
-  #           --ignore-application-stop-failures
+        env:
+          CODEDEPLOY_APPLICATION_API_SERVER: ${{ secrets.CODEDEPLOY_APPLICATION_API_SERVER }}
+          CODEDEPLOY_GROUP_API_SERVER: ${{ secrets.CODEDEPLOY_GROUP_API_SERVER }}
+          CODEDEPLOY_APPLICATION_BATCH_SERVER: ${{ secrets.CODEDEPLOY_APPLICATION_BATCH_SERVER }}
+          CODEDEPLOY_GROUP_BATCH_SERVER: ${{ secrets.CODEDEPLOY_GROUP_BATCH_SERVER }}
