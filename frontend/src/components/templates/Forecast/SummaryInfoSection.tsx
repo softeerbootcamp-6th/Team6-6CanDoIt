@@ -4,6 +4,8 @@ import ScrollIndicator from '../../molecules/Forecast/ScrollIndicator.tsx';
 import { summaryInfoSectionData } from '../../../constants/placeholderData.ts';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import { useSearchParams } from 'react-router-dom';
+import PendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 interface MountainCourseData {
     courseImageUrl: string;
@@ -22,12 +24,17 @@ export default function SummaryInfoSection() {
     const [searchParams] = useSearchParams();
     const selectedCourseId = Number(searchParams.get('courseid'));
 
-    const { data: summaryInfoSectionData } = useApiQuery<MountainCourseData>(
+    const {
+        data: summaryInfoSectionData,
+        isLoading,
+        isError,
+    } = useApiQuery<MountainCourseData>(
         `/card/mountain/course/${selectedCourseId}`,
         { dateTime: '2025-08-22T00:00:00' },
         {
             placeholderData: placeholderData,
-            retry: false,
+            retry: 3,
+            enabled: true,
         },
     );
 
@@ -44,6 +51,13 @@ export default function SummaryInfoSection() {
                 sunsetTime={sunset.slice(0, 5)}
             />
             <ScrollIndicator />
+            {isLoading && <PendingModal />}
+            {isError && (
+                <Modal onClose={() => window.location.reload()}>
+                    산 코스 데이터를 불러오는데 에러가 발생했습니다. 새로고침을
+                    통해 다시 시도해주세요.
+                </Modal>
+            )}
         </div>
     );
 }
