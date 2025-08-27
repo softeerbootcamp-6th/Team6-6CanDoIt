@@ -20,6 +20,7 @@ export default function MountainInfoPreview({
     return (
         <div css={wrapperStyles}>
             <div css={imgContainerStyles}>
+                <div css={gradientStyles}></div>
                 <img src={courseImageUrl} css={imgStyles} />
             </div>
 
@@ -48,10 +49,29 @@ const imgContainerStyles = css`
     flex-grow: 1;
     display: flex;
     justify-content: center;
+    align-items: center;
+    position: relative;
+`;
+
+const gradientStyles = css`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle,
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.1) 30%,
+        rgba(0, 0, 0, 0) 60%
+    );
+    z-index: 0; // 이미지 뒤로 보내기
 `;
 
 const imgStyles = css`
     width: 100%;
     height: 100%;
     object-fit: contain;
+    position: relative;
+    z-index: 1;
 `;

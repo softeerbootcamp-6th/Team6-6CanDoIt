@@ -4,6 +4,7 @@ import { LabelHeading } from '../../atoms/Heading/Heading';
 import { theme } from '../../../theme/theme';
 import Icon from '../../atoms/Icon/Icons';
 import CommonText from '../../atoms/Text/CommonText';
+import ReportPendingModal from '../../molecules/Modal/ReportPendingModal';
 
 interface RecentClimbData {
     id: number;
@@ -19,7 +20,7 @@ interface PropsState {
 }
 
 export default function RecentClimbSection({ onClick }: PropsState) {
-    const { data: recentClimbData } = useApiQuery<RecentClimbData[]>(
+    const { data: recentClimbData, isLoading } = useApiQuery<RecentClimbData[]>(
         `/card/interaction/history`,
         { pageSize: 5 },
         {
@@ -32,8 +33,6 @@ export default function RecentClimbSection({ onClick }: PropsState) {
         return dateStr.split('T')[0].replace(/-/g, '.');
     };
 
-    if (!recentClimbData) return <div>loading....</div>;
-
     return (
         <div>
             <LabelHeading HeadingTag='h2'>최근 본 등산일정</LabelHeading>
@@ -44,49 +43,54 @@ export default function RecentClimbSection({ onClick }: PropsState) {
 
                     return (
                         <>
-                            <div css={wrapperStyles} key={index}>
-                                <div css={headerStyles}>
-                                    <CommonText
-                                        TextTag='span'
-                                        fontSize='caption'
-                                        fontWeight='medium'
-                                        color='grey-80'
-                                    >
-                                        {formatDate(forecastDate)}
-                                    </CommonText>
-                                    <button
-                                        css={buttonStyles}
-                                        onClick={() =>
-                                            onClick(courseId, forecastDate)
-                                        }
-                                    >
-                                        <Icon
-                                            name='narrow-right'
-                                            width={2}
-                                            height={2}
-                                            color='grey-0'
-                                        />
-                                    </button>
+                            {isLoading ? (
+                                <ReportPendingModal />
+                            ) : (
+                                <div
+                                    css={wrapperStyles}
+                                    key={index}
+                                    onClick={() =>
+                                        onClick(courseId, forecastDate)
+                                    }
+                                >
+                                    <div css={headerStyles}>
+                                        <CommonText
+                                            TextTag='span'
+                                            fontSize='caption'
+                                            fontWeight='medium'
+                                            color='grey-80'
+                                        >
+                                            {formatDate(forecastDate)}
+                                        </CommonText>
+                                        <div css={narrowRightStyles}>
+                                            <Icon
+                                                name='narrow-right'
+                                                width={2}
+                                                height={2}
+                                                color='grey-0'
+                                            />
+                                        </div>
+                                    </div>
+                                    <div css={contentWrapper}>
+                                        <CommonText
+                                            TextTag='span'
+                                            fontSize='body'
+                                            fontWeight='bold'
+                                            color='grey-100'
+                                        >
+                                            {mountainName}
+                                        </CommonText>
+                                        <CommonText
+                                            TextTag='span'
+                                            fontSize='body'
+                                            fontWeight='bold'
+                                            color='grey-100'
+                                        >
+                                            {courseName}
+                                        </CommonText>
+                                    </div>
                                 </div>
-                                <div css={contentWrapper}>
-                                    <CommonText
-                                        TextTag='span'
-                                        fontSize='body'
-                                        fontWeight='bold'
-                                        color='grey-100'
-                                    >
-                                        {mountainName}
-                                    </CommonText>
-                                    <CommonText
-                                        TextTag='span'
-                                        fontSize='body'
-                                        fontWeight='bold'
-                                        color='grey-100'
-                                    >
-                                        {courseName}
-                                    </CommonText>
-                                </div>
-                            </div>
+                            )}
                         </>
                     );
                 })}
@@ -107,6 +111,12 @@ const wrapperStyles = css`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-10px) scale(1.1);
+        background-color: ${colors.grey[40]};
+    }
 `;
 
 const listStyles = css`
@@ -121,7 +131,7 @@ const contentWrapper = css`
     gap: 0.5rem;
 `;
 
-const buttonStyles = css`
+const narrowRightStyles = css`
     all: unset;
     display: flex;
     justify-content: center;

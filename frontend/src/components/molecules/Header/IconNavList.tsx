@@ -4,7 +4,6 @@ import IconLink from '../../atoms/Link/IconLink';
 export default function IconNavList() {
     return (
         <div css={wrapperStyles}>
-            <IconLink to='/myPage' name='bell-01' />
             <IconLink to='/login' name='user-circle' />
         </div>
     );

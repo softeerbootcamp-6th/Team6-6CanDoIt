@@ -9,6 +9,7 @@ import ReportPage from './pages/ReportPage/ReportPage';
 import Header from './components/organisms/Common/Header';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import MyPage from './pages/MyPage/MyPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ function App() {
                     <Route path='/register' element={<RegisterPage />}></Route>
                     <Route path='/report' element={<ReportPage />}></Route>
                     <Route path='/myPage' element={<MyPage />}></Route>
-                    {/* <Route path='*' element={<NotFound />}></Route> */}
+                    <Route path='*' element={<NotFoundPage />}></Route>
                 </Routes>
             </BrowserRouter>
         </QueryClientProvider>
