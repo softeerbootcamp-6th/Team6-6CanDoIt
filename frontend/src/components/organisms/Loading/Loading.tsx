@@ -2,7 +2,7 @@ import { DisplayHeading } from '../../atoms/Heading/Heading.tsx';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css, keyframes } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 interface PropsState {
     mountainTitle: string;
@@ -12,7 +12,19 @@ interface PropsState {
 export default function Loading(props: PropsState) {
     const { mountainTitle, mountainDescription } = props;
 
+    useLayoutEffect(() => {
+        if ('scrollRestoration' in window.history) {
+            const prev = window.history.scrollRestoration as 'auto' | 'manual';
+            window.history.scrollRestoration = 'manual';
+            return () => {
+                window.history.scrollRestoration = prev;
+            };
+        }
+        return undefined;
+    }, []);
+
     useEffect(() => {
+        window.scrollTo(0, 0);
         document.body.style.overflow = 'hidden';
         return () => {
             document.body.style.overflow = '';
@@ -25,7 +37,12 @@ export default function Loading(props: PropsState) {
             <div css={loadingProgressStyle} />
             <div css={overBackgroundStyle}>
                 <DisplayHeading HeadingTag='h1'>{mountainTitle}</DisplayHeading>
-                <CommonText TextTag='p' fontSize='body' fontWeight='medium'>
+                <CommonText
+                    TextTag='p'
+                    fontSize='body'
+                    fontWeight='medium'
+                    lineHeight={1.5}
+                >
                     {mountainDescription}
                 </CommonText>
             </div>
