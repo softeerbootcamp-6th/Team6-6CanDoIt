@@ -113,7 +113,7 @@ export default function MainSearchSection(props: PropsState) {
                 onSubmit={submitHandler}
             />
             {isModalOpen && (
-                <Modal onClose={() => setIsModalOpen(false)}>
+                <Modal onClose={() => window.location.reload()}>
                     {isMountainsError
                         ? '산 정보를 불러오는데 실패했습니다.'
                         : '코스 정보를 불러오는데 실패했습니다.'}
