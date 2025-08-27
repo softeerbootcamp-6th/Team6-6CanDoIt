@@ -15,29 +15,19 @@ import { theme } from '../../../theme/theme.ts';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { validateAccessToken } from '../../../utils/utils.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
+import { useNavigate } from 'react-router-dom';
+import type { CardData } from '../../../types/reportCardTypes';
+import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 
 type ReportPages = InfiniteData<CardData[]>;
-
-interface CardData {
-    reportId: number;
-    reportType: string;
-    createdAt: string;
-    nickname: string;
-    userImageUrl: string;
-    imageUrl: string;
-    content: string;
-    likeCount?: number;
-    isLiked?: boolean;
-    weatherKeywords?: string[];
-    rainKeywords?: string[];
-    etceteraKeywords?: string[];
-}
 
 export default function MyReportSection() {
     const title = '나의 제보 목록';
     const pageSize = 5;
     const [flippedCardId, setFlippedCardId] = useState<number | null>(null);
     const [validationError, setValidationError] = useState<string>('');
+    const navigate = useNavigate();
 
     const {
         data: cardsData,
@@ -52,6 +42,7 @@ export default function MyReportSection() {
         },
         {
             retry: false,
+            gcTime: 1000 * 60 * 1000,
         },
     );
     const flattenedData = cardsData?.pages.flat();
@@ -95,19 +86,116 @@ export default function MyReportSection() {
                     return { ...oldData, pages: newPages };
                 });
             },
-            onSuccess: () => {
-                console.log('Like action successful');
-            },
-            onError: (e) => {
-                console.error('Report submission failed:', e);
+            onError: (e: any) => {
                 if (previousDataRef.current) {
                     queryClient.setQueryData(key, previousDataRef.current);
                 }
+                if (e instanceof TypeError) {
+                    setValidationError('네트워크 연결을 확인해주세요.');
+                    return;
+                }
+                setValidationError('좋아요 요청에 실패했습니다.');
             },
         },
     );
 
+    const heartClickHandler = () => {
+        if (!validateAccessToken()) {
+            setValidationError('로그인이 필요합니다.');
+            return;
+        }
+        cardLikeMutation.mutate({});
+    };
+
     const currentTime = getCurrentTime();
+
+    const renderReportCards = () => {
+        if (!flattenedData || flattenedData.length === 0) {
+            return (
+                <ReportCardWrapper
+                    isEmptyCard={true}
+                    onClick={() => navigate('/report')}
+                >
+                    <span css={goToReportStyle}>제보하러 가기</span>
+                </ReportCardWrapper>
+            );
+        }
+
+        return flattenedData.map((card) => {
+            const isFlipped = flippedCardId === card.reportId;
+            const filterLabels = filterGatherer({
+                weatherKeywords: card.weatherKeywords,
+                rainKeywords: card.rainKeywords,
+                etceteraKeywords: card.etceteraKeywords,
+            });
+            const timeAgo = formatTimeDifference({
+                pastISO: card.createdAt,
+                nowDate: currentTime,
+            });
+
+            return (
+                <div
+                    key={card.reportId}
+                    css={[card3DStyle, isFlipped && card3DFlippedStyle]}
+                >
+                    <div css={cardFaceFrontStyle}>
+                        <FrontReportCard
+                            comment={card.content}
+                            timeAgo={timeAgo}
+                            filterLabels={filterLabels}
+                            onClick={() => setFlippedCardId(card.reportId)}
+                            imgSrc={card.imageUrl}
+                            userImageUrl={card.userImageUrl}
+                        />
+                    </div>
+                    <div css={cardFaceBackStyle}>
+                        <BackReportCard
+                            comment={card.content}
+                            timeAgo={timeAgo}
+                            userImageUrl={card.userImageUrl}
+                            likeCount={card.likeCount}
+                            filterLabels={filterLabels}
+                            onClick={() => setFlippedCardId(null)}
+                            isLiked={card.isLiked}
+                            onHeartClick={heartClickHandler}
+                        />
+                    </div>
+                </div>
+            );
+        });
+    };
+
+    const renderLoadMoreButton = () => {
+        if (!hasNextPage) return null;
+
+        return (
+            <div css={loadMoreContainerStyle}>
+                <button
+                    css={loadMoreButtonStyle(isFetchingNextPage)}
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                >
+                    <Icon {...loadMoreIconProps} />
+                </button>
+            </div>
+        );
+    };
+
+    const renderErrorModal = () => {
+        if (!validationError) return null;
+
+        if (validationError === '로그인이 필요합니다.') {
+            return (
+                <LoginRequiredModal onClose={() => setValidationError('')} />
+            );
+        }
+
+        return (
+            <Modal onClose={() => setValidationError('')}>
+                {validationError}
+            </Modal>
+        );
+    };
 
     return (
         <div css={containerStyle}>
@@ -115,75 +203,10 @@ export default function MyReportSection() {
                 <LabelHeading HeadingTag='h2'>{title}</LabelHeading>
             </div>
             <div css={reportCardContainerStyle(hasNextPage)}>
-                {flattenedData?.map((card) => {
-                    const isFlipped = flippedCardId === card.reportId;
-                    const filterLabels = filterGatherer({
-                        weatherKeywords: card.weatherKeywords,
-                        rainKeywords: card.rainKeywords,
-                        etceteraKeywords: card.etceteraKeywords,
-                    });
-                    const timeAgo = formatTimeDifference({
-                        pastISO: card.createdAt,
-                        nowDate: currentTime,
-                    });
-
-                    return (
-                        <div
-                            key={card.reportId}
-                            css={[card3DStyle, isFlipped && card3DFlippedStyle]}
-                        >
-                            <div css={cardFaceFrontStyle}>
-                                <FrontReportCard
-                                    comment={card.content}
-                                    timeAgo={timeAgo}
-                                    filterLabels={filterLabels}
-                                    onClick={() =>
-                                        setFlippedCardId(card.reportId)
-                                    }
-                                    imgSrc={card.imageUrl}
-                                    userImageUrl={card.userImageUrl}
-                                />
-                            </div>
-                            <div css={cardFaceBackStyle}>
-                                <BackReportCard
-                                    comment={card.content}
-                                    timeAgo={timeAgo}
-                                    userImageUrl={card.userImageUrl}
-                                    likeCount={card.likeCount}
-                                    filterLabels={filterLabels}
-                                    onClick={() => setFlippedCardId(null)}
-                                    isLiked={card.isLiked}
-                                    onHeartClick={() => {
-                                        if (!validateAccessToken()) {
-                                            setValidationError(
-                                                '로그인이 필요합니다.',
-                                            );
-                                            return;
-                                        }
-                                        cardLikeMutation.mutate({});
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    );
-                })}
-                <div css={loadMoreContainerStyle}>
-                    {hasNextPage && (
-                        <button
-                            css={loadMoreButtonStyle(isFetchingNextPage)}
-                            onClick={() => fetchNextPage()}
-                            disabled={isFetchingNextPage}
-                        >
-                            <Icon {...loadMoreIconProps} />
-                        </button>
-                    )}
-                </div>
+                {renderReportCards()}
+                {renderLoadMoreButton()}
             </div>
-            {validationError && (
-                <Modal onClose={() => setValidationError('')}>
-                    {validationError}
-                </Modal>
-            )}
+            {renderErrorModal()}
         </div>
     );
 }
@@ -194,6 +217,12 @@ const containerStyle = css`
     display: flex;
     flex-direction: column;
     overflow-x: auto;
+`;
+
+const goToReportStyle = css`
+    font-size: 2rem;
+    color: ${colors.grey[100]};
+    margin: auto;
 `;
 
 const reportCardContainerStyle = (hasNextPage: boolean) => css`
