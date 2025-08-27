@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { css } from '@emotion/react';
 import MainSearchSection from '../../components/templates/Main/MainSearchSection.tsx';
 import MountainCardSection from '../../components/templates/Main/MountainCardSection.tsx';
+import bg from '../../assets/bg.png';
 
 export default function MainPage() {
     const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +11,8 @@ export default function MainPage() {
     const backgroundClickHandler = () => setIsOpen(false);
 
     return (
-        <>
+        <div css={pageWrapperStyle}>
+            <img src={bg} alt='' css={backgroundImgStyle} />
             {isOpen && (
                 <div css={backgroundStyle} onClick={backgroundClickHandler} />
             )}
@@ -18,9 +20,28 @@ export default function MainPage() {
                 <MainSearchSection onFormValidChange={formValidChangeHandler} />
             </div>
             <MountainCardSection />
-        </>
+        </div>
     );
 }
+
+const backgroundImgStyle = css`
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+`;
+
+const pageWrapperStyle = css`
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+`;
 
 const backgroundStyle = css`
     position: fixed;

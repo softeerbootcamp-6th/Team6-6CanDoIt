@@ -11,6 +11,7 @@ export default function NotFoundPage() {
 
     return (
         <div css={wrppaerStyles}>
+            <img src={backgroundImg} alt='' css={backgroundImgStyle} />
             <HeadlineHeading HeadingTag='h1'>
                 지금 들어오신 페이지는 없는 페이지 입니다.
             </HeadlineHeading>
@@ -23,6 +24,17 @@ export default function NotFoundPage() {
 
 const { colors, typography } = theme;
 
+const backgroundImgStyle = css`
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+`;
+
 const wrppaerStyles = css`
     display: flex;
     flex-direction: column;
@@ -32,8 +44,6 @@ const wrppaerStyles = css`
     height: calc(100dvh - 5rem);
     gap: 4rem;
 
-    background: url(${backgroundImg}) no-repeat center center;
-    background-size: cover;
     padding-bottom: 5rem;
     box-sizing: border-box;
 `;
