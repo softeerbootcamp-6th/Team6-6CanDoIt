@@ -1,15 +1,16 @@
-import SearchBar from '../../organisms/Common/SearchBar';
-import { refactorMountainDataToOptions } from '../Main/utils.ts';
-import useApiQuery from '../../../hooks/useApiQuery';
-import type { MountainData } from '../../../types/mountainTypes';
+import { css } from '@emotion/react';
+
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
-interface Option {
-    id: number;
-    name: string;
-}
+import useApiQuery from '../../../hooks/useApiQuery';
+
+import { refactorMountainDataToOptions } from '../Main/utils.ts';
+import type { MountainData } from '../../../types/mountainTypes';
+import type { Option } from '../../../types/searchBarTypes';
+
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import SearchBar from '../../organisms/Common/SearchBar';
 
 export default function AlertSearchSection() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -53,7 +54,11 @@ export default function AlertSearchSection() {
     );
 
     return (
-        <>
+        <div
+            css={css`
+                margin-top: 1rem;
+            `}
+        >
             <SearchBar
                 searchBarTitle='어디 안전 정보를 확인해볼까요?'
                 searchBarMessage='의 안전 정보'
@@ -68,6 +73,6 @@ export default function AlertSearchSection() {
                     {errorMessage}
                 </Modal>
             )}
-        </>
+        </div>
     );
 }
