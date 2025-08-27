@@ -6,6 +6,7 @@ import useApiMutation from '../../../hooks/useApiMutation.ts';
 import { validateRegisterInput } from './utils.ts';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import PendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface SignUpRequest {
@@ -20,6 +21,7 @@ interface SignUpResponse {
 
 export default function RegisterFormSection() {
     const [modalMessage, setModalMessage] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
@@ -40,6 +42,8 @@ export default function RegisterFormSection() {
                 setModalMessage('회원가입 되셨습니다.');
             },
             onError: (error: Error) => setModalMessage(error.message),
+            onMutate: () => setIsLoading(true),
+            onSettled: () => setIsLoading(false),
         },
     );
 
@@ -155,6 +159,7 @@ export default function RegisterFormSection() {
                     <div css={preStyles}>{modalMessage}</div>
                 </Modal>
             )}
+            {isLoading && <PendingModal />}
         </div>
     );
 }
