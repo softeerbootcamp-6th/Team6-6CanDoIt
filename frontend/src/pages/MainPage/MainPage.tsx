@@ -53,5 +53,5 @@ const overBackgroundStyle = css`
 `;
 
 const centeredStyle = css`
-    transform: translate(0, 3rem) scale(1.1);
+    transform: translate(0, 2rem) scale(1.1);
 `;
