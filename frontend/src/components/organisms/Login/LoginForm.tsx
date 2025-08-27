@@ -8,9 +8,11 @@ import { iconButtonHandler } from '../Register/utils.ts';
 import useApiMutation from '../../../hooks/useApiMutation.ts';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import PendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 
 export default function LoginForm() {
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const idRef = useRef<null | HTMLInputElement>(null);
     const passwordRef = useRef<null | HTMLInputElement>(null);
@@ -29,6 +31,8 @@ export default function LoginForm() {
                 navigate('/');
             },
             onError: (error: Error) => setErrorMessage(error.message),
+            onMutate: () => setIsLoading(true),
+            onSettled: () => setIsLoading(false),
         },
     );
 
@@ -79,6 +83,8 @@ export default function LoginForm() {
                     {errorMessage}
                 </Modal>
             )}
+
+            {isLoading && <PendingModal />}
         </>
     );
 }

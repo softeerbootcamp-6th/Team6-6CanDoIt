@@ -1,30 +1,38 @@
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
-import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import { useState } from 'react';
-import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
-import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
-import Icon from '../../atoms/Icon/Icons.tsx';
+
 import useApiMutation from '../../../hooks/useApiMutation.ts';
+import useForecastCardData from '../../../hooks/useForecastCardData.ts';
+
+import Icon from '../../atoms/Icon/Icons.tsx';
+import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
+import LoginRequiredModal from '../../molecules/Button/LoginRequiredModal.tsx';
+import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
+import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
-    cardData: any;
     onClose: () => void;
-    scrollSelectedDate: string;
+    scrollSelectedTime: string;
     selectedCourseId: number;
 }
 
 export default function WeatherSummaryCardModal({
     onClose,
-    cardData,
-    scrollSelectedDate,
+    scrollSelectedTime,
     selectedCourseId,
 }: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>('');
-    const navigate = useNavigate();
+
+    const { frontCard, backCard, isLoading, isError } = useForecastCardData(
+        selectedCourseId,
+        scrollSelectedTime,
+    );
+
+    const cardData = { frontCard, backCard };
+
     const storeMountainCardMutation = useApiMutation<any>(
         `/card/interaction/history/${selectedCourseId}`,
         'PUT',
@@ -46,87 +54,84 @@ export default function WeatherSummaryCardModal({
                 }
             },
         },
-        { startDateTime: scrollSelectedDate },
+        { startDateTime: scrollSelectedTime },
     );
 
     return (
         <div css={overlayStyles}>
-            <WeatherSummaryCardHeader />
-
-            <div
-                css={modalStyles(isFront, cardData.frontCard.mountainImageUrl)}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setIsFront((prev) => !prev);
-                }}
-            >
-                <div className='front'>
-                    <FrontWeatherSummaryCard
-                        cardData={cardData.frontCard}
-                        onClose={onClose}
+            {isLoading ? (
+                <div css={loadingStyles} role='dialog' aria-modal='true'>
+                    <Icon
+                        name='clear-day'
+                        width={2}
+                        height={2}
+                        color='grey-100'
+                    />
+                    <Icon name='rain' width={2} height={2} color='grey-100' />
+                    <Icon name='snow' width={2} height={2} color='grey-100' />
+                    <Icon
+                        name='thunderstorm'
+                        width={2}
+                        height={2}
+                        color='grey-100'
                     />
                 </div>
-                <div className='back'>
-                    <BackWeatherSummaryCard cardData={cardData.backCard} />
-                </div>
-            </div>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    storeMountainCardMutation.mutate({});
-                }}
-                css={storeBtnStyles}
-            >
-                <Icon
-                    name='download-02'
-                    width={1.4}
-                    height={1.4}
-                    color='grey-100'
-                />
-            </button>
-            {errorMessage && (
-                <Modal
-                    onClose={() => {
-                        setErrorMessage('');
-                    }}
-                >
+            ) : (
+                <>
+                    <WeatherSummaryCardHeader />
                     <div
-                        css={css`
-                            display: flex;
-                            flex-direction: column;
-                            gap: 2rem;
-                            align-items: center;
-                        `}
+                        css={modalStyles(
+                            isFront,
+                            cardData.frontCard.mountainImageUrl,
+                        )}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsFront((prev) => !prev);
+                        }}
                     >
-                        로그인이 필요한 서비스입니다.
-                        <button
-                            css={btnStyles}
-                            onClick={() => navigate('/login')}
-                        >
-                            로그인으로 이동
-                        </button>
+                        <div className='front'>
+                            <FrontWeatherSummaryCard
+                                cardData={cardData.frontCard}
+                                onClose={onClose}
+                            />
+                        </div>
+                        <div className='back'>
+                            <BackWeatherSummaryCard
+                                cardData={cardData.backCard}
+                            />
+                        </div>
                     </div>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            storeMountainCardMutation.mutate({});
+                        }}
+                        css={storeBtnStyles}
+                    >
+                        <Icon
+                            name='download-02'
+                            width={1.4}
+                            height={1.4}
+                            color='grey-100'
+                        />
+                    </button>
+                </>
+            )}
+
+            {errorMessage && (
+                <LoginRequiredModal onClose={() => setErrorMessage('')} />
+            )}
+            {isError && (
+                <Modal onClose={() => window.location.reload()}>
+                    데이터 페칭중 오류가 발생했습니다. 새로고침을 통해 다시
+                    시도해주세요.
                 </Modal>
             )}
         </div>
     );
 }
 
-const { colors, typography } = theme;
-
-const btnStyles = css`
-    all: unset;
-    width: 10rem;
-    height: 2.5rem;
-    border-radius: 1rem;
-    background-color: ${colors.status.normal.excellent};
-    color: ${colors.grey[100]};
-    font-weight: ${typography.fontWeight.bold};
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-`;
+const { colors } = theme;
 
 const overlayStyles = css`
     position: fixed;
@@ -151,7 +156,6 @@ const modalStyles = (isFront: boolean, mountainImageUrl?: string) => css`
     transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
     transform: ${isFront ? 'rotateY(0deg)' : 'rotateY(180deg)'};
-
     .front,
     .back {
         position: absolute;
@@ -191,7 +195,7 @@ const storeBtnStyles = css`
     justify-content: center;
     align-items: center;
     top: 28%;
-    left: calc(50% + 14rem);
+    left: calc(50% + 13rem);
     width: 3rem;
     height: 3rem;
     border-radius: 100%;
@@ -199,4 +203,46 @@ const storeBtnStyles = css`
     padding: 0 3px 5px 0;
     box-sizing: border-box;
     cursor: pointer;
+    &:hover {
+        opacity: 0.8;
+    }
+`;
+
+const show2 = keyframes`
+  0%, 24.99% { opacity: 0; }
+  25%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const show3 = keyframes`
+  0%, 49.99% { opacity: 0; }
+  50%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const show4 = keyframes`
+  0%, 74.99% { opacity: 0; }
+  75%, 99% { opacity: 1; }
+  100% { opacity: 0; }
+`;
+
+const loadingStyles = css`
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 50;
+
+    & > :nth-of-type(2) {
+        animation: ${show2} 2s linear infinite;
+    }
+    & > :nth-of-type(3) {
+        animation: ${show3} 2s linear infinite;
+    }
+    & > :nth-of-type(4) {
+        animation: ${show4} 2s linear infinite;
+    }
 `;

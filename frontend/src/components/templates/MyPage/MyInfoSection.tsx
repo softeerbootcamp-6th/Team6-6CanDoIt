@@ -108,6 +108,13 @@ export default function MyInfoSection() {
         updateProfileImageMutation.mutate(formData);
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('accessToken');
+
+        window.location.reload();
+    };
+
     if (!myInfoData) return <div>loading!!</div>;
 
     const { nickname, loginId, imageUrl = dummyImg } = myInfoData;
@@ -115,7 +122,7 @@ export default function MyInfoSection() {
     return (
         <div css={wrapperStyles}>
             <div css={profileWrapper}>
-                <div css={imgWrappStyles}>
+                <div css={imgWrappStyles} onClick={handleFileClick}>
                     <img src={imageUrl} css={imgStyles}></img>
                 </div>
                 <div css={profileTextWrapper}>
@@ -137,6 +144,13 @@ export default function MyInfoSection() {
                                     onClick={handleSave}
                                 >
                                     변경
+                                </button>
+
+                                <button
+                                    css={changeButtonStyles}
+                                    onClick={() => setIsEditingNickName(false)}
+                                >
+                                    취소
                                 </button>
                             </form>
                         ) : (
@@ -168,8 +182,8 @@ export default function MyInfoSection() {
                     </CommonText>
                 </div>
             </div>
-            <button css={buttonStyles} onClick={handleFileClick}>
-                사진 변경
+            <button css={buttonStyles} onClick={handleLogout}>
+                로그아웃
             </button>
             <input
                 type='file'
@@ -213,14 +227,18 @@ const linkStyles = css`
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.medium};
     margin-left: 0.5rem;
-    font-style: normal;
     line-height: normal;
     text-decoration-line: underline;
     text-decoration-style: solid;
     text-decoration-skip-ink: auto;
     text-decoration-thickness: auto;
-    text-underline-offset: auto;
-    text-underline-position: from-font;
+    text-underline-offset: 4px;
+    cursor: pointer;
+
+    &:hover {
+        opacity: 0.7;
+        color: ${colors.grey[100]};
+    }
 `;
 
 const buttonStyles = css`
@@ -235,6 +253,10 @@ const buttonStyles = css`
     height: 3.5rem;
     width: 10rem;
     line-height: 150%;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
+    }
     color: ${colors.grey[20]};
 `;
 
@@ -247,6 +269,10 @@ const imgWrappStyles = css`
     align-items: center;
     justify-content: center;
     margin-right: 1rem;
+    cursor: pointer;
+    &:hover {
+        opacity: 0.7;
+    }
 `;
 
 const imgStyles = css`
@@ -265,10 +291,15 @@ const inputStyles = css`
 
 const changeButtonStyles = css`
     all: unset;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     font-size: ${typography.fontSize.caption};
     font-weight: ${typography.fontWeight.bold};
     color: ${colors.grey[60]};
     border-radius: 0.5rem;
     cursor: pointer;
+
+    &:hover {
+        opacity: 0.7;
+        color: ${colors.grey[100]};
+    }
 `;

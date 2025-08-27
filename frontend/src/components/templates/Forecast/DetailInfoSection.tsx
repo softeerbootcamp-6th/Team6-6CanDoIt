@@ -6,20 +6,16 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useForecastCardData } from '../../../hooks/useForecastCardData.ts';
 
-import Icon from '../../atoms/Icon/Icons.tsx';
 import DetailTitle from '../../../components/molecules/Forecast/DetailTitle.tsx';
 import TimeSeletor from '../../../components/organisms/Forecast/TimeSeletor.tsx';
 import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.tsx';
 import WeatherCardGroup from '../../organisms/Forecast/WeatherCardGroup.tsx';
 import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
 
-import { theme } from '../../../theme/theme.ts';
-import {
-    detailInfoSectionData,
-    summaryInfoSectionData,
-} from '../../../constants/placeholderData.ts';
+import { detailInfoSectionData } from '../../../constants/placeholderData.ts';
+import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
 interface CourseForcast {
     startCard: CardData;
@@ -51,6 +47,13 @@ interface CardData {
     title?: string;
 }
 
+interface SideBarProps {
+    backgroundType: Background;
+    title: string;
+    courseAltitude?: number;
+    data: CardData;
+}
+
 type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나쁨';
 type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
 
@@ -60,15 +63,12 @@ export default function DetailInfoSection() {
     const selectedMountainId = Number(searchParams.get('mountainid'));
     const selectedWeekdayId = Number(searchParams.get('weekdayid'));
 
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [isCard, setIsCard] = useState<boolean>(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+    const [isOpenCard, setIsOpenCard] = useState<boolean>(false);
     const [isToggleOn, setIsToggleOn] = useState<boolean>(false);
-    const [sidebarData, setSidebarData] = useState<{
-        backgroundType: Background;
-        title: string;
-        courseAltitude?: number;
-        data: CardData;
-    } | null>(null);
+
+    const [sidebarData, setSidebarData] = useState<SideBarProps | null>(null);
+
     const [scrollSelectedTime, setScrollSelectedTime] = useState<string>(
         getDayStartTime(selectedWeekdayId),
     );
@@ -77,33 +77,29 @@ export default function DetailInfoSection() {
         setScrollSelectedTime(getDayStartTime(selectedWeekdayId));
     }, [selectedWeekdayId]);
 
-    const { frontCard, backCard, refetch } = useForecastCardData(
-        selectedCourseId,
-        scrollSelectedTime,
-    );
-
-    const cardData = { frontCard, backCard };
-
-    const { data: courseForecastData = detailInfoSectionData } =
-        useApiQuery<CourseForcast>(
-            `/card/course/${selectedCourseId}/forecast`,
-            { startDateTime: scrollSelectedTime },
-            {
-                placeholderData: keepPreviousData,
-                enabled: true,
-            },
-        );
-
-    const { data: summaryInfoData = summaryInfoSectionData } = useApiQuery<any>(
-        `/card/mountain/course/${selectedCourseId}`,
-        { dateTime: scrollSelectedTime },
+    const {
+        data: courseForecastData = detailInfoSectionData,
+        isError: isCourseDataError,
+    } = useApiQuery<CourseForcast>(
+        `/card/course/${selectedCourseId}/forecast`,
+        { startDateTime: scrollSelectedTime },
         {
-            retry: false,
             placeholderData: keepPreviousData,
+            retry: 3,
+            enabled: true,
         },
     );
 
-    const { duration } = summaryInfoData;
+    const { data: duration = 0, isError: isDurationError } = useApiQuery<any>(
+        `/card/mountain/course/${selectedCourseId}`,
+        { dateTime: scrollSelectedTime },
+        {
+            placeholderData: keepPreviousData,
+            retry: 3,
+            enabled: true,
+            select: (data) => data.duration,
+        },
+    );
 
     const {
         startCard,
@@ -116,7 +112,7 @@ export default function DetailInfoSection() {
     } = courseForecastData;
 
     useEffect(() => {
-        setIsOpen(false);
+        setIsSidebarOpen(false);
     }, [scrollSelectedTime, isToggleOn]);
 
     const openSidebar = (
@@ -126,25 +122,14 @@ export default function DetailInfoSection() {
         data: CardData,
     ) => {
         setSidebarData({ backgroundType, title, courseAltitude, data });
-        setIsOpen(true);
-    };
-
-    const closeSidebar = () => {
-        setIsOpen(false);
-    };
-
-    const handleDownloadBtnClick = async () => {
-        await refetch();
-        setIsCard(true);
+        setIsSidebarOpen(true);
     };
 
     return (
         <>
             <div css={contentSectionStyles}>
-                <button css={storeBtnStyles} onClick={handleDownloadBtnClick}>
-                    <Icon {...downloadIconProps} />
-                </button>
                 <img src={cloudImage} css={animatedImageStyles} alt='cloud' />
+                <DownloadButton onClick={() => setIsOpenCard(true)} />
                 <DetailTitle
                     scrollSeletedTime={scrollSelectedTime}
                     recommendComment={
@@ -174,26 +159,31 @@ export default function DetailInfoSection() {
                     scrollSelectedTime={scrollSelectedTime}
                     onToggle={() => setIsToggleOn((prev) => !prev)}
                     isToggleOn={isToggleOn}
-                    time={Math.ceil(duration)}
+                    time={isDurationError ? Math.ceil(duration) : 3}
                     selectedMountainId={selectedMountainId}
                     onTimeSelect={(time) => setScrollSelectedTime(time)}
                 />
             </div>
-            {isOpen && (
+            {isSidebarOpen && (
                 <WeatherDetailSideBar
                     courseAltitude={sidebarData?.courseAltitude}
                     type={sidebarData?.title!}
-                    onClose={closeSidebar}
+                    onClose={() => setIsSidebarOpen(false)}
                     card={sidebarData}
                 />
             )}
-            {isCard && (
+            {isOpenCard && (
                 <WeatherCardModal
-                    cardData={cardData}
-                    onClose={() => setIsCard(false)}
-                    scrollSelectedDate={scrollSelectedTime}
+                    onClose={() => setIsOpenCard(false)}
+                    scrollSelectedTime={scrollSelectedTime}
                     selectedCourseId={selectedCourseId}
                 />
+            )}
+            {isCourseDataError && (
+                <Modal onClose={() => window.location.reload()}>
+                    couseData를 불러오는데 에러가 발생했습니다. 새로고침을 통해
+                    다시 시도해주세요.
+                </Modal>
             )}
         </>
     );
@@ -216,15 +206,6 @@ function getDayStartTime(dayOffset: number): string {
 
     return `${year}-${month}-${day}T${hour}:00:00`;
 }
-
-const downloadIconProps = {
-    name: 'download-02',
-    width: 1.4,
-    height: 1.4,
-    color: 'grey-100',
-};
-
-const { colors } = theme;
 
 const animatedImageStyles = css`
     position: absolute;
@@ -259,21 +240,4 @@ const contentSectionStyles = css`
     & h1 {
         text-align: center;
     }
-`;
-
-const storeBtnStyles = css`
-    all: unset;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 3rem;
-    right: 5%;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 100%;
-    background-color: ${colors.greyOpacityWhite[70]};
-    padding: 0 3px 5px 0;
-    box-sizing: border-box;
-    cursor: pointer;
 `;

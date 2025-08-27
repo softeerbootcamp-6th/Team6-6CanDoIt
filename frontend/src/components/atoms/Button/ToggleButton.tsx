@@ -39,9 +39,9 @@ const buttonWrapperStyles = (
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 0.3rem;
-    width: 3.2rem;
-    height: 1.9rem;
+    padding-left: 0.1rem;
+    width: 3rem;
+    height: 1.8rem;
 
     background-color: ${isOn ? onBgColor : offBgColor};
     border-radius: 1rem;
@@ -58,7 +58,7 @@ const circleStyles = (
     height: 1.6rem;
     border-radius: 100%;
     background-color: ${isOn ? onCircleColor : offCircleColor};
-    transform: ${isOn ? 'translateX(1.25rem)' : 'translateX(0)'};
+    transform: ${isOn ? 'translateX(1.3rem)' : 'translateX(0)'};
     transition:
         transform 0.3s ease,
         background-color 0.3s ease;
