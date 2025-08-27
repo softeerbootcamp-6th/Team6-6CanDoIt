@@ -13,13 +13,12 @@
 
 ---
 
-
-
-
 # 기술 스택
-| FE | BE | 배포환경 |
-| --- | --- | --- |
-| <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" /> <img src="https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat&logo=tanstackquery&logoColor=white" /> <img src="https://img.shields.io/badge/Emotion%20CSS-DB7093?style=flat&logo=emotion&logoColor=white" /> | <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" /> <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" /> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-1F6FEB?logo=testcontainers&logoColor=white) ![Bucket4j](https://img.shields.io/badge/Bucket4j-0F6EDE?logo=java&logoColor=white)| <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white" /> <img src="https://img.shields.io/badge/Amazon_S3-569A31?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/CloudFront-FF4F8B?style=flat&logo=amazoncloudwatch&logoColor=white" /> <img src="https://img.shields.io/badge/Route_53-8C4FFF?style=flat&logo=amazonroute53&logoColor=white" /> <img src="https://img.shields.io/badge/CodeDeploy-6DB33F?style=flat&logo=amazonaws&logoColor=white" /> |
+
+| FE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | BE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 배포환경                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black" /> <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white" /> <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" /> <img src="https://img.shields.io/badge/TanStack%20Query-FF4154?style=flat&logo=tanstackquery&logoColor=white" /> <img src="https://img.shields.io/badge/Emotion%20CSS-DB7093?style=flat&logo=emotion&logoColor=white" /> | <img src="https://img.shields.io/badge/Java-007396?style=flat&logo=openjdk&logoColor=white" /> <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white" /> ![Spring Batch](https://img.shields.io/badge/Spring%20Batch-6DB33F?logo=spring&logoColor=white) <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white) ![Testcontainers](https://img.shields.io/badge/Testcontainers-1F6FEB?logo=testcontainers&logoColor=white) ![Bucket4j](https://img.shields.io/badge/Bucket4j-0F6EDE?logo=java&logoColor=white) | <img src="https://img.shields.io/badge/Amazon_EC2-FF9900?style=flat&logo=amazonec2&logoColor=white" /> <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white" /> <img src="https://img.shields.io/badge/Amazon_S3-569A31?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/CloudFront-FF4F8B?style=flat&logo=amazoncloudwatch&logoColor=white" /> <img src="https://img.shields.io/badge/Route_53-8C4FFF?style=flat&logo=amazonroute53&logoColor=white" /> <img src="https://img.shields.io/badge/CodeDeploy-6DB33F?style=flat&logo=amazonaws&logoColor=white" /> |
+
 </br>
 
 <details>
@@ -51,43 +50,54 @@
   #### Java17
   - 객체 지향 프로그래밍과 안정성을 기반으로 엔터프라이즈급 대규모 백엔드 시스템을 구축하는 데 사용
 
-  #### Spring Boot
-  - 간편한 설정과 내장 WAS를 통해 독립적으로 실행 가능한 스프링 애플리케이션을 신속하게 개발
+#### Spring Boot
 
-  #### Spring Batch
-  - 대용량 데이터의 로깅, 트랜잭션 관리 등 배치 처리를 효율적이고 안정적으로 구현
+- 간편한 설정과 내장 WAS를 통해 독립적으로 실행 가능한 스프링 애플리케이션을 신속하게 개발
 
-  #### MySQL
-  - 안정성과 ACID를 보장하는 오픈 소스 관계형 데이터베이스로 정형화된 데이터를 관리
+#### Spring Batch
 
-  #### Redis
-  - 인메모리 데이터 구조를 활용하여 캐싱을 통한 빠른 데이터 접근 속도를 보장
+- 대용량 데이터의 로깅, 트랜잭션 관리 등 배치 처리를 효율적이고 안정적으로 구현
 
-  #### Testcontainers
-  - Docker 컨테이너를 통해 실제와 동일한 환경에서 통합 테스트를 진행하여 안정성을 향상
+#### MySQL
 
-  #### Bucket4j
-  - API 요청 속도를 제어하여 시스템 과부하를 방지하고 안정적인 서비스를 제공
+- 안정성과 ACID를 보장하는 오픈 소스 관계형 데이터베이스로 정형화된 데이터를 관리
 
-  #### AWS EC2
-  - 클라우드에서 확장 가능한 가상 서버를 제공하여 애플리케이션을 안정적으로 호스팅하고 운영
+#### Redis
 
-  #### AWS CodeDeploy
-  - EC2 인스턴스에 애플리케이션 배포를 자동화하여 수동 오류를 줄이고 중단 없는 배포를 지원
+- 인메모리 데이터 구조를 활용하여 캐싱을 통한 빠른 데이터 접근 속도를 보장
 
-  #### AWS S3
-  - CodeDeploy가 배포할 애플리케이션 버전(압축 파일)을 저장하는 리포지토리 역할을 수행
+#### Testcontainers
 
-  #### Github Action
-  - 코드 푸시 시 React 앱을 자동 빌드하고 S3에 업로드하며, CloudFront 캐시를 무효화해 자동 배포 CI/CD를 구현
+- Docker 컨테이너를 통해 실제와 동일한 환경에서 통합 테스트를 진행하여 안정성을 향상
+
+#### Bucket4j
+
+- API 요청 속도를 제어하여 시스템 과부하를 방지하고 안정적인 서비스를 제공
+
+#### AWS EC2
+
+- 클라우드에서 확장 가능한 가상 서버를 제공하여 애플리케이션을 안정적으로 호스팅하고 운영
+
+#### AWS CodeDeploy
+
+- EC2 인스턴스에 애플리케이션 배포를 자동화하여 수동 오류를 줄이고 중단 없는 배포를 지원
+
+#### AWS S3
+
+- CodeDeploy가 배포할 애플리케이션 버전(압축 파일)을 저장하는 리포지토리 역할을 수행
+
+#### Github Action
+
+- 코드 푸시 시 React 앱을 자동 빌드하고 S3에 업로드하며, CloudFront 캐시를 무효화해 자동 배포 CI/CD를 구현
 </details>
 
 ---
 
 # 개발 일정
+
 - **2025-07-30** ~ **2025-07-31** : 프로젝트 환경 논의 및 구성
 - **2025-08-01** ~ **2025-08-13** : 디렉토리 구조 논의(Front: Atomic 구조, Backend: Multi-module 구조) 및 최종결정
-- **2025-08-14** ~                : 개발 
+- **2025-08-14** ~ : 개발
 
 ---
 
@@ -116,17 +126,20 @@
   </tr>
   <tr>
     <td colspan="2" align="center">🖥 Frontend Developer</td>
-    <td colspan="2" align="center">🌐 Backend Engineer</td>
+    <td colspan="2" align="center">🌐 Backend Developer</td>
   </tr>
 </table>
 
 # 프로젝트 구조
+
 <img width="2689" height="1140" alt="6candoit_project_architecture" src="https://github.com/user-attachments/assets/75ce15cd-d6d3-47e0-9f32-a023951ceae8" />
 
 # 프로젝트 ERD
+
 <img width="100%" height="auto" alt="erd (1)" src="https://github.com/user-attachments/assets/c46c79e8-235d-4b72-b401-83d8eb085a02" />
 
 ## 프로젝트 핵심 도메인
+
 - 예보 도메인
   - 날씨 예보 데이터와 관련된 도메인
 - 등산로 도메인
@@ -135,4 +148,5 @@
   - 사용자 정보와 관련된 도메인
 - 제보 도메인
   - 등산 코스에 대해서 사용자가 생성, 제공하는 도메인
+
 ## [GitHub Wiki](https://github.com/softeerbootcamp-6th/Team6-6CanDoIt/wiki)
