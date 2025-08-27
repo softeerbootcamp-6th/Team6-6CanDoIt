@@ -135,7 +135,12 @@ public abstract class AbstractThrottlingManager {
     }
 
     private <T> void handleTaskException(RetryTaskWithBucket<T> task, Throwable ex) {
-        if (ex instanceof ThrottleException throttleException) {
+        Throwable cause = ex;
+        if (cause instanceof CompletionException && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+
+        if (cause instanceof ThrottleException throttleException) {
             if (throttleException.isRetryable()) {
                 log.warn("재시도 가능한 예외 발생. key: {}, attempt: {}, ex: {}", task.key(), task.attempt(), ex.getMessage());
                 scheduleRetry(task.withIncrementedAttempt());
