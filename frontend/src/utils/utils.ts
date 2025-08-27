@@ -160,7 +160,6 @@ export async function convertToWebp(
         type: 'image/webp',
     });
     const previewUrl = URL.createObjectURL(webpFile);
-    throw new Error('test error');
     return { imageFile: webpFile, previewUrl };
 }
 
