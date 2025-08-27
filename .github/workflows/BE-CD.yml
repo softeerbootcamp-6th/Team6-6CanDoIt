@@ -20,14 +20,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # 모든 브랜치와 태그의 전체 히스토리를 가져옴
           fetch-depth: 0
 
       - name: Find changed files
         id: changed-files
         uses: tj-actions/changed-files@v44
         with:
-          # 'dev' 브랜치의 마지막 성공적인 커밋 이후의 변경 사항을 가져옴
           since_last_remote_commit: 'true'
 
       - name: List all changed files
@@ -39,54 +37,37 @@ jobs:
         id: filter
         run: |
           changed_services=()
-
           # dependencies.json 파일을 통해서 각 모듈의 의존성을 조회함.
           services=$(jq -r 'keys | .[]' .github/dependencies.json)
 
-          for svc in $services; do\
+          for svc in $services; do
             dep_paths=$(jq -r --arg SVC "$svc" '.[$SVC] | .[]' .github/dependencies.json)
             
             for path in $dep_paths; do
+
               if grep -q "backend/$path" <<< "${{ steps.changed-files.outputs.all_changed_files }}"; then
+
                 if [[ ! " ${changed_services[@]} " =~ " ${svc} " ]]; then
                   changed_services+=("$svc")
                 fi
                 break
               fi
-            done
-          done
-
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-
-            for svc in "${!deps[@]}"; do
-              IFS=',' read -ra dep_paths <<< "${deps[$svc]}"
-
-              for path in "${dep_paths[@]}"; do
-                if [[ "$file" == "backend/$path"* ]]; then
-                  if [[ ! " ${changed_services[@]} " =~ " ${svc} " ]]; then
-                    changed_services+=("$svc")
-                  fi
-                  break 
-                fi
-              done
 
             done
 
           done
 
+          # 최종 결과 출력
           if [ ${#changed_services[@]} -eq 0 ]; then
             echo "No changes detected in backend services or their dependencies."
             echo "services=[]" >> $GITHUB_OUTPUT
-
           else
             json_array=$(printf '"%s",' "${changed_services[@]}")
             json_array="[${json_array%,}]"
             echo "Services to build: $json_array"
             echo "services=$json_array" >> $GITHUB_OUTPUT
-
           fi
 
-  # 빌드 Job, 변경된 서비스가 있을 경우에만 실행
   build:
     needs: determine-changes
     if: fromJson(needs.determine-changes.outputs.services)[0] != null
@@ -148,13 +129,14 @@ jobs:
         working-directory: ./backend
         run: |
           mkdir -p deploy/${{ matrix.svc }}
-          cp -r scripts/deploy/* deploy/${{ matrix.svc }}/
+          cp -r scripts/* deploy/${{ matrix.svc }}/
           cp appspec.yml deploy/${{ matrix.svc }}/
 
           cat > deploy/${{ matrix.svc }}/.env <<EOF
           export ARTIFACT_VERSION=${GITHUB_SHA}
           export S3_DEPLOY_BUCKET=${{ secrets.AWS_BE_BUCKET_NAME }}
           export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+          export DEPLOY_SERVICE=${{ matrix.svc }}
           EOF
 
           chmod 755 deploy/${{ matrix.svc }}/*.sh
@@ -168,8 +150,6 @@ jobs:
 
       - name: ${{ matrix.svc }}에 대한 CodeDeploy 배포 생성
         run: |
-          # 서비스를 기반으로 애플리케이션 및 그룹 이름을 동적으로 설정
-          # 참고: CODEDEPLOY_APPLICATION_API_SERVER 와 같은 시크릿이 필요합니다.
           APP_NAME_VAR="CODEDEPLOY_APPLICATION_${{ matrix.svc }}"
           GROUP_NAME_VAR="CODEDEPLOY_GROUP_${{ matrix.svc }}"
           
@@ -183,7 +163,6 @@ jobs:
             --s3-location bucket=${{ secrets.AWS_BE_BUCKET_NAME }},key=deployments/backend-${{ matrix.svc }}-${{ github.sha }}.zip,bundleType=zip \
             --description "${{ matrix.svc }} 서비스 배포 (커밋: ${{ github.sha }})" \
             --ignore-application-stop-failures
-
         env:
           CODEDEPLOY_APPLICATION_API_SERVER: ${{ secrets.CODEDEPLOY_APPLICATION_API_SERVER }}
           CODEDEPLOY_GROUP_API_SERVER: ${{ secrets.CODEDEPLOY_GROUP_API_SERVER }}
