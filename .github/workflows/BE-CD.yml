@@ -129,7 +129,7 @@ jobs:
         working-directory: ./backend
         run: |
           mkdir -p deploy/${{ matrix.svc }}
-          cp -r scripts/* deploy/${{ matrix.svc }}/
+          cp -r scripts/deploy/* deploy/${{ matrix.svc }}/
           cp appspec.yml deploy/${{ matrix.svc }}/
 
           cat > deploy/${{ matrix.svc }}/.env <<EOF
