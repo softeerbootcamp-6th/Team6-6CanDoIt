@@ -3,6 +3,7 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
 import { useEffect, useRef, useState } from 'react';
+import { convertToWebp } from '../../../utils/utils.ts';
 
 interface imageFile {
     imageFile: File;
@@ -14,11 +15,26 @@ export default function ImageInputField() {
     const [dragOverActive, setDragOverActive] = useState(false);
     const [image, setImage] = useState<imageFile | null>(null);
 
-    const handleFile = (file?: File) => {
+    const handleFile = async (file?: File) => {
         if (!file) return;
         if (!file.type.startsWith('image/')) return;
-        const previewUrl = URL.createObjectURL(file);
-        setImage({ imageFile: file, previewUrl });
+        try {
+            const next = await convertToWebp(file, 0.8);
+            setImage(next);
+            if (inputRef.current) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(next.imageFile);
+                inputRef.current.files = dataTransfer.files;
+            }
+        } catch (err) {
+            const previewUrl = URL.createObjectURL(file);
+            setImage({ imageFile: file, previewUrl });
+            if (inputRef.current) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                inputRef.current.files = dataTransfer.files;
+            }
+        }
     };
 
     const openPicker = () => inputRef.current?.click();
@@ -31,10 +47,13 @@ export default function ImageInputField() {
         e.preventDefault();
         setDragOverActive(false);
     };
-    const onDrop = (e: React.DragEvent) => {
+    const onDrop = async (e: React.DragEvent) => {
         e.preventDefault();
         setDragOverActive(false);
-        handleFile(e.dataTransfer.files?.[0]);
+        const file = e.dataTransfer.files?.[0];
+        if (file) {
+            await handleFile(file);
+        }
     };
 
     useEffect(() => {
@@ -72,7 +91,6 @@ export default function ImageInputField() {
                     css={previewStyle}
                 />
             )}
-
             <input
                 ref={inputRef}
                 type='file'
@@ -80,7 +98,7 @@ export default function ImageInputField() {
                 multiple={false}
                 name='image'
                 style={{ display: 'none' }}
-                onChange={(e) => handleFile(e.target.files?.[0])}
+                onChange={async (e) => await handleFile(e.target.files?.[0])}
             />
         </div>
     );

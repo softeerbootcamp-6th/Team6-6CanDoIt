@@ -1,17 +1,20 @@
-import SearchBar from '../../organisms/Common/SearchBar';
-import { refactorMountainDataToOptions } from '../Main/utils.ts';
-import useApiQuery from '../../../hooks/useApiQuery';
-import type { MountainData } from '../../../types/mountainTypes';
-import { useState } from 'react';
+import { css } from '@emotion/react';
+
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-interface Option {
-    id: number;
-    name: string;
-}
+import useApiQuery from '../../../hooks/useApiQuery';
+
+import { refactorMountainDataToOptions } from '../Main/utils.ts';
+import type { MountainData } from '../../../types/mountainTypes';
+import type { Option } from '../../../types/searchBarTypes';
+
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import SearchBar from '../../organisms/Common/SearchBar';
 
 export default function AlertSearchSection() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const mountainId = Number(searchParams.get('mountainid'));
 
     const [selectedMountainId, setSelectedMountainId] =
@@ -28,27 +31,48 @@ export default function AlertSearchSection() {
         setSearchParams(next);
     };
 
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
+    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
+        MountainData[]
+    >(
         '/card/mountain',
         {},
         {
             retry: false,
+            networkMode: 'always',
+            staleTime: 5 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
+    useEffect(() => {
+        if (isMountainsError) {
+            setErrorMessage('산 정보를 불러오는데 실패했습니다.');
+        }
+    }, [isMountainsError]);
 
     const mountainOptions: Option[] = refactorMountainDataToOptions(
         mountainsData ?? [],
     );
 
     return (
-        <SearchBar
-            searchBarTitle='어디 안전 정보를 확인해볼까요?'
-            searchBarMessage='의 안전 정보'
-            pageName='safety'
-            mountainOptions={mountainOptions}
-            selectedMountainId={selectedMountainId ?? 0}
-            mountainChangeHandler={mouuntainChangeHandler}
-            onSubmit={submitHandler}
-        />
+        <div
+            css={css`
+                margin-top: 1rem;
+            `}
+        >
+            <SearchBar
+                searchBarTitle='어디 안전 정보를 확인해볼까요?'
+                searchBarMessage='의 안전 정보'
+                pageName='safety'
+                mountainOptions={mountainOptions}
+                selectedMountainId={selectedMountainId ?? 0}
+                mountainChangeHandler={mouuntainChangeHandler}
+                onSubmit={submitHandler}
+            />
+            {errorMessage && (
+                <Modal onClose={() => setErrorMessage('')}>
+                    {errorMessage}
+                </Modal>
+            )}
+        </div>
     );
 }

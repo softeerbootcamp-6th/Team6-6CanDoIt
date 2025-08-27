@@ -2,7 +2,7 @@ import CommonText from '../../atoms/Text/CommonText.tsx';
 import FilterLabelButton from '../../atoms/Button/FilterLabelButton.tsx';
 import { css } from '@emotion/react';
 import { keywordToTitle } from './utils.ts';
-import type { Filter, Keyword } from '../../../types/FilterTypes';
+import type { Filter, Keyword } from '../../../types/filterTypes';
 
 interface PropsState {
     keyword: Keyword;

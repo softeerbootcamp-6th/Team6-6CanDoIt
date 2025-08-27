@@ -6,6 +6,7 @@ import useApiQuery from '../../../hooks/useApiQuery';
 import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation';
 import { useQueryClient } from '@tanstack/react-query';
+import { convertToWebp } from '../../../utils/utils.ts';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface UserData {
@@ -99,11 +100,14 @@ export default function MyInfoSection() {
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        const { imageFile } = await convertToWebp(file);
+
         const formData = new FormData();
-        formData.append('imageFile', file);
+        formData.append('imageFile', imageFile);
 
         updateProfileImageMutation.mutate(formData);
     };

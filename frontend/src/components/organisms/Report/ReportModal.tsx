@@ -1,6 +1,6 @@
 import BaseModal from './BaseModal.tsx';
 import ReportModalContent from '../../molecules/Modal/ReportModalContent.tsx';
-import type { FilterColumn } from '../../../types/FilterTypes';
+import type { FilterColumn } from '../../../types/filterTypes';
 
 interface PropsState {
     title: string;

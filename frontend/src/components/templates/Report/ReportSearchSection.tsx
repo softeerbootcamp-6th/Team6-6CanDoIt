@@ -1,6 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
 import { css } from '@emotion/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type {
     MountainCourse,
     MountainData,
@@ -13,23 +13,25 @@ import { useSearchParams } from 'react-router-dom';
 import FilterModal from '../../organisms/Report/FilterModal.tsx';
 import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
+import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import type { Option } from '../../../types/searchBarTypes';
 
-interface Option {
-    id: number;
-    name: string;
-}
+type SearchBarProps = Parameters<typeof SearchBar>[0];
+type ChipButtonProps = Parameters<typeof ChipButton>[0];
+type FilterModalProps = Parameters<typeof FilterModal>[0];
 
 export default function ReportSearchSection() {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [filterAnchor, setFilterAnchor] = useState<HTMLElement | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     const [searchParams, setSearchParams] = useSearchParams();
     const mountainId = Number(searchParams.get('mountainid'));
     const courseId = Number(searchParams.get('courseid'));
-
     const [selectedMountainId, setSelectedMountainId] =
         useState<number>(mountainId);
     const [selectedCourseId, setSelectedCourseId] = useState<number>(courseId);
-    const mouuntainChangeHandler = (id: number) => {
+
+    const mountainChangeHandler = (id: number) => {
         setSelectedMountainId(id);
         setSelectedCourseId(0);
     };
@@ -44,32 +46,57 @@ export default function ReportSearchSection() {
         next.set('courseid', String(selectedCourseId));
         setSearchParams(next);
     };
+    const filterClickHandler = (e: React.MouseEvent<HTMLElement>) => {
+        setFilterAnchor(e.currentTarget);
+        setIsFilterModalOpen(true);
+    };
 
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
+    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
+        MountainData[]
+    >(
         '/card/mountain',
         {},
         {
-            //placeholderData: MountainsData,
             retry: false,
+            networkMode: 'always',
+            staleTime: 5 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
-    const { data: coursesData } = useApiQuery<MountainCourse[]>(
+    const { data: coursesData, isError: isCoursesError } = useApiQuery<
+        MountainCourse[]
+    >(
         `/card/mountain/${selectedMountainId}/course`,
         {},
         {
-            //placeholderData: initCoursesData,
             enabled: selectedMountainId !== 0,
             retry: false,
+            networkMode: 'always',
+            staleTime: 1000 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
-    const { data: filterColumn } = useApiQuery(
+    const { data: filterColumn, isError: isFilterColumnError } = useApiQuery(
         '/card/interaction/keyword',
         {},
         {
             placeholderData: filterKeywords,
             retry: false,
+            networkMode: 'always',
+            staleTime: 1000 * 60 * 1000,
+            gcTime: 1000 * 60 * 1000,
         },
     );
+    useEffect(() => {
+        const errorMessage = isMountainsError
+            ? '산 정보를 불러오지 못했습니다.'
+            : isCoursesError
+              ? '코스 정보를 불러오지 못했습니다.'
+              : isFilterColumnError
+                ? '필터 정보를 불러오지 못했습니다.'
+                : '';
+        setErrorMessage(errorMessage);
+    }, [isMountainsError, isCoursesError, isFilterColumnError]);
 
     const mountainOptions: Option[] = refactorMountainDataToOptions(
         mountainsData ?? [],
@@ -78,10 +105,22 @@ export default function ReportSearchSection() {
         coursesData ?? [],
     );
 
-    const filterClickHandler = (e: React.MouseEvent<HTMLElement>) => {
-        setFilterAnchor(e.currentTarget);
-        setIsFilterModalOpen(true);
-    };
+    const searchBarProps = getSearchBarProps(
+        mountainOptions,
+        selectedMountainId ?? 0,
+        mountainChangeHandler,
+        courseOptions,
+        selectedCourseId ?? 0,
+        courseChangeHandler,
+        submitHandler,
+    );
+    const chipButtonProps = getChipButtonProps(true, filterClickHandler);
+    const filterModalProps = getFilterModalProps(
+        isFilterModalOpen,
+        () => setIsFilterModalOpen(false),
+        filterColumn ?? filterKeywords,
+        filterAnchor,
+    );
 
     return (
         <div css={searchWrapperStyle}>
@@ -90,39 +129,76 @@ export default function ReportSearchSection() {
             )}
 
             <div css={searchBarStyle}>
-                <SearchBar
-                    searchBarTitle='어디 날씨를 확인해볼까요?'
-                    searchBarMessage='의 실시간 제보'
-                    pageName='report'
-                    mountainOptions={mountainOptions}
-                    selectedMountainId={selectedMountainId ?? 0}
-                    mountainChangeHandler={mouuntainChangeHandler}
-                    courseOptions={courseOptions}
-                    selectedCourseId={selectedCourseId ?? 0}
-                    courseChangeHandler={courseChangeHandler}
-                    onSubmit={submitHandler}
-                />
+                <SearchBar {...searchBarProps} />
             </div>
-
+            {errorMessage && (
+                <Modal
+                    onClose={() => {
+                        setErrorMessage('');
+                    }}
+                >
+                    {errorMessage}
+                </Modal>
+            )}
             {mountainId && courseId && mountainId !== 0 && courseId !== 0 && (
                 <>
-                    <ChipButton
-                        onClick={filterClickHandler}
-                        text='필터'
-                        iconName='filter-lines'
-                    />
-                    <FilterModal
-                        isOpen={isFilterModalOpen}
-                        onClose={() => setIsFilterModalOpen(false)}
-                        title='필터'
-                        description='원하는 날씨 조건을 선택하세요'
-                        filterColumn={filterColumn ?? filterKeywords}
-                        anchorElement={filterAnchor}
-                    />
+                    <ChipButton {...chipButtonProps} />
+                    <FilterModal {...filterModalProps} />
                 </>
             )}
         </div>
     );
+}
+
+function getSearchBarProps(
+    mountainOptions: Option[],
+    selectedMountainId: number,
+    mouuntainChangeHandler: (id: number) => void,
+    courseOptions: Option[],
+    selectedCourseId: number,
+    courseChangeHandler: (id: number) => void,
+    submitHandler: (e: React.FormEvent) => void,
+): SearchBarProps {
+    return {
+        searchBarTitle: '어디 날씨를 확인해볼까요?',
+        searchBarMessage: '의 실시간 제보',
+        pageName: 'report',
+        mountainOptions,
+        selectedMountainId,
+        mountainChangeHandler: mouuntainChangeHandler,
+        courseOptions,
+        selectedCourseId,
+        courseChangeHandler,
+        onSubmit: submitHandler,
+    };
+}
+
+function getChipButtonProps(
+    show: boolean,
+    clickHandler: (e: React.MouseEvent<HTMLElement>) => void,
+): ChipButtonProps {
+    return {
+        hidden: !show,
+        text: '필터',
+        iconName: 'filter-lines',
+        onClick: clickHandler,
+    };
+}
+
+function getFilterModalProps(
+    isOpen: boolean,
+    onClose: () => void,
+    filterColumn: typeof filterKeywords,
+    anchorElement: HTMLElement | null,
+): FilterModalProps {
+    return {
+        isOpen,
+        onClose,
+        title: '필터',
+        description: '원하는 날씨 조건을 선택하세요',
+        filterColumn,
+        anchorElement,
+    };
 }
 
 const searchWrapperStyle = css`

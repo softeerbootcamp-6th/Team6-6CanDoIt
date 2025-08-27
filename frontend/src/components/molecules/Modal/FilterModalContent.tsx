@@ -1,7 +1,7 @@
 import LabelButtonsColumn from '../../organisms/Report/LabelButtonsColumn.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
-import type { FilterColumn, Keyword } from '../../../types/FilterTypes';
+import type { FilterColumn, Keyword } from '../../../types/filterTypes';
 
 interface PropsState {
     filterColumn: FilterColumn;
