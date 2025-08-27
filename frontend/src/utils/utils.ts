@@ -126,3 +126,58 @@ export const validateAccessToken = () => {
 
     return true;
 };
+
+export async function convertToWebp(
+    file: File,
+    quality = 0.8,
+): Promise<{ imageFile: File; previewUrl: string }> {
+    const bitmap = await createImageBitmap(file);
+
+    let blob: Blob;
+    if (typeof OffscreenCanvas !== 'undefined') {
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('2D context not available');
+        ctx.drawImage(bitmap, 0, 0);
+        blob = await canvas.convertToBlob({ type: 'image/webp', quality });
+    } else {
+        const canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('2D context not available');
+        ctx.drawImage(bitmap, 0, 0);
+        blob = await new Promise<Blob>((resolve, reject) =>
+            canvas.toBlob(
+                (b) => (b ? resolve(b) : reject(new Error('toBlob failed'))),
+                'image/webp',
+                quality,
+            ),
+        );
+    }
+
+    const webpFile = new File([blob], file.name.replace(/\.[^.]+$/, '.webp'), {
+        type: 'image/webp',
+    });
+    const previewUrl = URL.createObjectURL(webpFile);
+    return { imageFile: webpFile, previewUrl };
+}
+
+export const parseFilterFromUrl = (
+    searchParams: URLSearchParams,
+    key: string,
+): number[] => {
+    const paramValue = searchParams.get(key);
+    if (!paramValue) return [];
+
+    try {
+        return paramValue
+            .replace(/[\[\]]/g, '')
+            .split(',')
+            .filter((id) => id !== '')
+            .map((id) => Number(id));
+    } catch (e) {
+        console.error(`Failed to parse filter ${key}:`, e);
+        return [];
+    }
+};
