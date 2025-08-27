@@ -8,7 +8,7 @@ import type {
     FilterColumn,
     Keyword,
     SelectedColumn,
-} from '../../../types/FilterTypes';
+} from '../../../types/filterTypes';
 
 interface PropsState {
     filterColumn: FilterColumn;

@@ -7,7 +7,7 @@ import useForecastCardData from '../../../hooks/useForecastCardData.ts';
 
 import Icon from '../../atoms/Icon/Icons.tsx';
 import WeatherSummaryCardHeader from '../../molecules/Forecast/WeatherSummaryCardHeader.tsx';
-import LoginRequiredModal from '../../molecules/Button/LoginRequiredModal.tsx';
+import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
