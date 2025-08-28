@@ -7,10 +7,12 @@ import Modal from './RegisterModal.tsx';
 
 interface LoginRequiredModalProps {
     onClose: () => void;
+    text?: string;
 }
 
 export default function LoginRequiredModal({
     onClose,
+    text = '로그인이 필요한 서비스입니다.',
 }: LoginRequiredModalProps) {
     const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ export default function LoginRequiredModal({
                     align-items: center;
                 `}
             >
-                로그인이 필요한 서비스입니다.
+                {text}
                 <button css={btnStyles} onClick={() => navigate('/login')}>
                     로그인으로 이동
                 </button>

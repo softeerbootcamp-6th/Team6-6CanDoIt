@@ -11,6 +11,7 @@ import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 import FrontWeatherSummaryCard from './FrontWeatherSummaryCard.tsx';
 import BackWeatherSummaryCard from './BackWeatherSummaryCard.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import { validateAccessToken } from '../../../utils/utils.ts';
 
 interface Props {
     onClose: () => void;
@@ -25,6 +26,7 @@ export default function WeatherSummaryCardModal({
 }: Props) {
     const [isFront, setIsFront] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [isModal, setIsModal] = useState<boolean>(false);
 
     const { frontCard, backCard, isLoading, isError } = useForecastCardData(
         selectedCourseId,
@@ -104,7 +106,11 @@ export default function WeatherSummaryCardModal({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            storeMountainCardMutation.mutate({});
+                            if (false && validateAccessToken()) {
+                                storeMountainCardMutation.mutate({});
+                            } else {
+                                setIsModal(true);
+                            }
                         }}
                         css={storeBtnStyles}
                     >
@@ -126,6 +132,12 @@ export default function WeatherSummaryCardModal({
                     데이터 페칭중 오류가 발생했습니다. 새로고침을 통해 다시
                     시도해주세요.
                 </Modal>
+            )}
+            {isModal && (
+                <LoginRequiredModal
+                    text='로그인 유효시간이 지났습니다.'
+                    onClose={() => setIsModal(false)}
+                />
             )}
         </div>
     );

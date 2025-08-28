@@ -1,5 +1,4 @@
 import { css } from '@emotion/react';
-import { theme } from '../../../theme/theme.ts';
 
 interface PropsState {
     size?: string;
@@ -22,12 +21,9 @@ export default function CircleImage({
     );
 }
 
-const { colors } = theme;
-
 const reporterStyle = ({ size }: { size: string }) => css`
     width: ${size};
     height: ${size};
     border-radius: 50%;
-    background-color: ${colors.grey[80]};
     object-fit: cover;
 `;
