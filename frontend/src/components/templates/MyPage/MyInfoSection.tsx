@@ -6,8 +6,12 @@ import useApiQuery from '../../../hooks/useApiQuery';
 import { useRef, useState } from 'react';
 import useApiMutation from '../../../hooks/useApiMutation';
 import { useQueryClient } from '@tanstack/react-query';
-import { convertToWebp } from '../../../utils/utils.ts';
+import { convertToWebp, validateAccessToken } from '../../../utils/utils.ts';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+interface PropsState {
+    onValid: () => void;
+}
 
 interface UserData {
     nickname: string;
@@ -15,7 +19,7 @@ interface UserData {
     imageUrl?: string;
 }
 
-export default function MyInfoSection() {
+export default function MyInfoSection({ onValid }: PropsState) {
     const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
     const inputNickNameRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,6 +72,10 @@ export default function MyInfoSection() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputNickNameRef.current) return;
+        if (!validateAccessToken()) {
+            onValid();
+            return;
+        }
 
         try {
             const res = await fetch(
@@ -103,6 +111,10 @@ export default function MyInfoSection() {
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        if (!validateAccessToken()) {
+            onValid();
+            return;
+        }
 
         const { imageFile } = await convertToWebp(file);
 

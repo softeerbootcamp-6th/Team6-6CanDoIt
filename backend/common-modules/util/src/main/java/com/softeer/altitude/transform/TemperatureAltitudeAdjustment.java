@@ -16,6 +16,7 @@ public class TemperatureAltitudeAdjustment implements AltitudeAdjust {
         double altitudeDifference = mountainAltitude - courseAltitude;
         double totalCorrection = (altitudeDifference / ALTITUDE_INTERVAL) * TEMPERATURE_DECREASE_RATE;
 
-        return temperature + totalCorrection;
+        double value = temperature + totalCorrection;
+        return Math.round(value * 10.0) / 10.0;
     }
 }

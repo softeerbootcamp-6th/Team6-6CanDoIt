@@ -18,7 +18,7 @@ export default function WeatherCell({
 
     return (
         <div css={wrapperStyles(newFormatTime)}>
-            <SelectorText>{newFormatTime}</SelectorText>
+            <SelectorText>{time ? newFormatTime : ''}</SelectorText>
             <Icon
                 name={iconName}
                 width={1.5}
@@ -26,7 +26,9 @@ export default function WeatherCell({
                 color='grey-80'
                 opacity={0.8}
             />
-            <SelectorText>{`${temperature}°C`}</SelectorText>
+            <SelectorText>
+                {temperature === 0 ? '' : `${temperature}°C`}
+            </SelectorText>
         </div>
     );
 }

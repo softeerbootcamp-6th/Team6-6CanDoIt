@@ -13,6 +13,8 @@ public class WindSpeedAltitudeAdjustment implements AltitudeAdjust {
         }
 
         double ratio = courseAltitude / mountainAltitude;
-        return windSpeed * Math.pow(ratio, WIND_SHEAR_EXPONENT);
+
+        double value = windSpeed * Math.pow(ratio, WIND_SHEAR_EXPONENT);
+        return Math.round(value * 10.0) / 10.0;
     }
 }
