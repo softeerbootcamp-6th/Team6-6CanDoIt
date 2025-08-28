@@ -109,13 +109,13 @@
       <img width="200" height="auto" alt="박종성" src="https://github.com/user-attachments/assets/abeade16-80f8-44c2-924b-d730a99b85f4" />
     </td>
     <td>
-      <img width="200" height="auto" alt="시보성" src="https://github.com/user-attachments/assets/4c618167-3d66-41f4-bdf1-019d771b269d" />
+      <img width="200" height="auto" alt="시보성" src="https://github.com/user-attachments/assets/c022ebec-678b-42b2-98d2-9fac68d41119" />
     </td>
     <td>
       <img width="200" height="auto" alt="김명규" src="https://github.com/user-attachments/assets/7bc760fb-f612-41fc-91b4-7b0b9ec75fc2" />
     </td>
     <td>
-      <img width="200" height="auto" alt="image" src="https://github.com/user-attachments/assets/659cd341-b5ad-4323-9d92-d809cab81697" />
+      <img width="200" height="auto" alt="백승진" src="https://github.com/user-attachments/assets/659cd341-b5ad-4323-9d92-d809cab81697" />
     </td>
   </tr>
   <tr>
