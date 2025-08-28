@@ -5,6 +5,8 @@ import MyReportSection from '../../components/templates/MyPage/MyReportSection.t
 import MyLikeSection from '../../components/templates/MyPage/MyLikeSection.tsx';
 import { useState } from 'react';
 import WeatherSummaryCardModal from '../../components/templates/MyPage/WeatherSummaryCard.tsx';
+import { validateAccessToken } from '../../utils/utils.ts';
+import LoginRequiredModal from '../../components/molecules/Modal/LoginRequiredModal.tsx';
 
 export default function MyPage() {
     const [isCard, setIsCard] = useState<boolean>(false);
@@ -14,6 +16,9 @@ export default function MyPage() {
     const [selectedForecastDate, setSelectedForecastDate] = useState<
         string | null
     >(null);
+    const [isValidLogin, setIsValidLogin] = useState<boolean>(() =>
+        validateAccessToken(),
+    );
 
     const handleBtnClick = (courseId: number, forecastDate: string) => {
         setSelectedCourseId(courseId);
@@ -23,7 +28,7 @@ export default function MyPage() {
 
     return (
         <div css={wrapperStyles}>
-            <MyInfoSection />
+            <MyInfoSection onValid={() => setIsValidLogin(true)} />
             <RecentClimbSection
                 onClick={(courseId, forecastDate) =>
                     handleBtnClick(courseId, forecastDate)
@@ -37,6 +42,13 @@ export default function MyPage() {
                     onClose={() => setIsCard(false)}
                     courseId={selectedCourseId!}
                     forecastDate={selectedForecastDate!}
+                />
+            )}
+
+            {!isValidLogin && (
+                <LoginRequiredModal
+                    onClose={() => window.location.reload()}
+                    text='로그인 유효 기간이 지났습니다.'
                 />
             )}
         </div>
