@@ -56,13 +56,20 @@ export default function TimeSeletor({
 
         const nearestIndex = Math.round(scrollPos / (cellWidth + gap));
 
+        const thresholdIndex = (rawData?.length ?? 0) - time * 2 - 1;
+
+        let finalIndex = nearestIndex;
+
+        if (thresholdIndex >= 0 && nearestIndex > thresholdIndex) {
+            finalIndex = thresholdIndex;
+        }
+
         container.scrollTo({
-            left: nearestIndex * (cellWidth + gap),
+            left: finalIndex * (cellWidth + gap),
             behavior: 'smooth',
         });
 
-        const visibleIndex = Math.min(nearestIndex, (data?.length ?? 1) - 1);
-        const selectedTime = data?.[visibleIndex]?.dateTime;
+        const selectedTime = data?.[finalIndex]?.dateTime;
 
         if (selectedTime && onTimeSelect) {
             onTimeSelect(selectedTime);
@@ -77,7 +84,7 @@ export default function TimeSeletor({
 
     const currentTimeStr = `${year}-${month}-${day}T${hour}:00:00`;
 
-    const { data } = useApiQuery<any[]>(
+    const { data: rawData } = useApiQuery<any[]>(
         `/card/mountain/${selectedMountainId}/forecast`,
         { startDateTime: currentTimeStr },
         {
@@ -85,8 +92,18 @@ export default function TimeSeletor({
         },
     );
 
+    const data = useMemo(() => {
+        if (!rawData) return [];
+        const emptyItems: any[] = Array.from({ length: 14 }, () => ({
+            time: '',
+            temperature: 0,
+            iconName: '',
+        }));
+        return [...rawData, ...emptyItems];
+    }, [rawData]);
+
     const dynamicScrollSizeStyles = css`
-        width: ${time * 5.5 + 5}rem;
+        width: ${time * 2 * 5.5 + 5}rem;
     `;
 
     function getStartAndEndTimeHoursOnly(
@@ -115,7 +132,7 @@ export default function TimeSeletor({
     }
 
     const [startHourTime, endHourTime] = useMemo(
-        () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time),
+        () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time * 2),
         [scrollSelectedTime, time],
     );
 
@@ -143,7 +160,9 @@ export default function TimeSeletor({
             <div css={headerStyles}>
                 <div>
                     <SelectorTitleText>출발 시간 선택</SelectorTitleText>
-                    <span css={courseTimeStyles}>{`${time}시간 코스`}</span>
+                    <span
+                        css={courseTimeStyles}
+                    >{`왕복${time * 2}시간 코스`}</span>
                 </div>
                 <div>
                     <SelectorTitleText>고도 보정하기</SelectorTitleText>
@@ -171,6 +190,7 @@ export default function TimeSeletor({
                 <div
                     css={css`
                         height: 2.1rem;
+                        overflow: hidden;
                     `}
                 >
                     <div css={[scrollStyles, dynamicScrollSizeStyles]}>
