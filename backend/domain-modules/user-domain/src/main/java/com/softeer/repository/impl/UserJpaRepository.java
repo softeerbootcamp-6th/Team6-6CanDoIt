@@ -24,4 +24,8 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     @Modifying
     @Query("update UserEntity u set u.imageEntity.id = :imageId where u.id = :userId")
     void updateImage(@Param("userId") long userId, @Param("imageId") long imageId);
+
+    @Modifying
+    @Query(value = "INSERT INTO USER (nickname, login_id, password, image_id) VALUES (:nickname, :loginId, :password, :imageId)", nativeQuery = true)
+    void saveUser(@Param("nickname") String nickname, @Param("loginId") String loginId, @Param("password") String password, @Param("imageId") Long imageId);
 }
