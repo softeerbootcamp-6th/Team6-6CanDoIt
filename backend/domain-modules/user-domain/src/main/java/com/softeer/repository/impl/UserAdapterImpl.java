@@ -11,6 +11,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserAdapterImpl implements UserAdapter {
 
+    private final static long DEFAULT_IMAGE_ID = 159;
+
     private final UserJpaRepository userJpaRepository;
 
     @Override
@@ -25,7 +27,7 @@ public class UserAdapterImpl implements UserAdapter {
 
     @Override
     public void save(String nickname, String loginId, String password) {
-        userJpaRepository.save(UserEntity.from(nickname, loginId, password));
+        userJpaRepository.saveUser(nickname, loginId, password, DEFAULT_IMAGE_ID);
     }
 
     @Override
