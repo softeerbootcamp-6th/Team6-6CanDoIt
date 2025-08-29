@@ -27,7 +27,7 @@ public class UserAdapterImpl implements UserAdapter {
 
     @Override
     public void save(String nickname, String loginId, String password) {
-        userJpaRepository.saveUser(nickname, loginId, password, DEFAULT_IMAGE_ID);
+        userJpaRepository.save(UserEntity.from(nickname, loginId, password));
     }
 
     @Override
