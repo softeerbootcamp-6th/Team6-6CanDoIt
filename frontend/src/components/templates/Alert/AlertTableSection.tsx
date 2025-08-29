@@ -2,65 +2,64 @@ import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme';
 import CommonText from '../../atoms/Text/CommonText';
 import Table from '../../organisms/Alert/Table';
-import MapButton from '../../molecules/Button/MapButton';
 import CautionText from '../../atoms/Text/CautionText';
+import { useSearchParams } from 'react-router-dom';
 
-export default function AlertTableSection() {
-    return (
+interface Alert {
+    altitude: string;
+    caution: string;
+    date: string;
+    location: React.ReactNode; //
+}
+
+interface Mountain {
+    name: string;
+    id: number;
+    alerts: Alert[];
+}
+
+interface AlertTableSectionProps {
+    data: Mountain[];
+}
+
+export default function AlertTableSection({ data }: AlertTableSectionProps) {
+    const [searchParams] = useSearchParams();
+    const selectedMountainId = Number(searchParams.get('mountainid'));
+    const selectedData = getMountainById(data, selectedMountainId);
+
+    const tableData: Record<string, React.ReactNode>[] = selectedData
+        ? selectedData.alerts.map((alert, index) => ({
+              id: <span>{index + 1}</span>,
+              name: <span>{selectedData.name}</span>,
+              altitude: <span>{alert.altitude}</span>,
+              caution: <CautionText>{alert.caution}</CautionText>,
+              date: <span>{alert.date}</span>,
+              location: alert.location,
+          }))
+        : [];
+
+    return selectedMountainId ? (
         <div>
             <p css={pStyles}>
                 현재
-                <CommonText {...textProps}>설악산</CommonText>
+                <CommonText {...textProps}>{selectedData?.name}</CommonText>
                 에는 주의해야 할 정보가
-                <CommonText {...textProps}>3개</CommonText>
+                <CommonText {...textProps}>
+                    {selectedData?.alerts.length} 개가
+                </CommonText>
                 있어요.
             </p>
-            <Table columns={columns} data={updatedData} colWidths={colWidths} />
+            <Table columns={columns} data={tableData} colWidths={colWidths} />
         </div>
-    );
+    ) : null;
 }
-const data = [
-    {
-        번호: 1,
-        위치명: '북한산',
-        해발고도: '836m',
-        주의내용: '낙석주의',
-        발표일자: '2025-08-09',
-        위치: <MapButton />,
-    },
-    {
-        번호: 2,
-        위치명: '지리산',
-        해발고도: '1915m',
-        주의내용: '낙석주의',
-        발표일자: '2025-08-10',
-        위치: <MapButton />,
-    },
-    {
-        번호: 3,
-        위치명: '설악산',
-        해발고도: '1708m',
-        주의내용: '낙석주의',
-        발표일자: '2025-08-11',
-        위치: <MapButton />,
-    },
-    {
-        번호: 4,
-        위치명: '한라산',
-        해발고도: '1950m',
-        주의내용: '낙석주의',
-        발표일자: '2025-08-12',
-        위치: <MapButton />,
-    },
-];
+
+function getMountainById(data: Mountain[], id: number) {
+    return data.find((data) => data.id === id);
+}
 
 const colWidths = ['7%', '21%', '18%', '18%', '18%', '18%'];
 const columns = ['번호', '위치명', '해발고도', '주의내용', '발표일자', '위치'];
-
-const updatedData = data.map((item) => ({
-    ...item,
-    주의내용: <CautionText>{item.주의내용}</CautionText>,
-}));
 
 const { colors, typography } = theme;
 
