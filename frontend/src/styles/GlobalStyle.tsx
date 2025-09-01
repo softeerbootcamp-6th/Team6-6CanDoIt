@@ -36,6 +36,11 @@ export const GlobalStyle = () => {
                 body {
                     font-family: 'Pretendard', system-ui, sans-serif;
                     font-weight: 400;
+                    -ms-overflow-style: none;
+
+                    ::-webkit-scrollbar {
+                        display: none;
+                    }
                 }
             `}
         />

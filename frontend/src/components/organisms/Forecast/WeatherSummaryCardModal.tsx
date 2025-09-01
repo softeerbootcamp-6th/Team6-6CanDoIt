@@ -106,7 +106,7 @@ export default function WeatherSummaryCardModal({
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            if (false && validateAccessToken()) {
+                            if (validateAccessToken()) {
                                 storeMountainCardMutation.mutate({});
                             } else {
                                 setIsModal(true);
