@@ -27,6 +27,7 @@ import {
 import ReportPendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 import type { CardData } from '../../../types/reportCardTypes';
 import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
+import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
 
 type ReportType = 'WEATHER' | 'SAFE';
 type ReportPages = InfiniteData<CardData[]>;
@@ -254,8 +255,18 @@ export default function ReportCardSection() {
     if (!mountainId || !courseId || mountainId === 0 || courseId === 0)
         return null;
 
-    const renderReportCards = () =>
-        flattenedData?.map((card) => {
+    const renderReportCards = () => {
+        if (!flattenedData || flattenedData.length === 0) {
+            return (
+                <ReportCardWrapper
+                    onClick={() => setIsReportModalOpen(true)}
+                    isEmptyCard={true}
+                >
+                    <span css={goToReportStyle}>첫 제보 남기기</span>
+                </ReportCardWrapper>
+            );
+        }
+        return flattenedData?.map((card) => {
             const isFlipped = flippedCardId === card.reportId;
             const filterLabels = filterGatherer({
                 weatherKeywords: card.weatherKeywords,
@@ -297,6 +308,7 @@ export default function ReportCardSection() {
                 </div>
             );
         });
+    };
 
     const renderModals = () => (
         <>
@@ -366,6 +378,12 @@ const loadMoreIconProps = {
 };
 
 const { colors } = theme;
+
+const goToReportStyle = css`
+    font-size: 2rem;
+    color: ${colors.grey[100]};
+    margin: auto;
+`;
 
 const loadMoreContainerStyle = css`
     display: flex;
