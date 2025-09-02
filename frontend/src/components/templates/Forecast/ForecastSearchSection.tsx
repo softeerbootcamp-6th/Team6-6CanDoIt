@@ -1,6 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar';
 import { useSearchParams } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 import type {
     MountainCourse,
@@ -31,6 +31,8 @@ export default function ForecastSearchSection() {
     const [selectedCourseId, setSelectedCourseId] = useState<number>(courseId);
     const [selectedWeekdayId, setSelectedWeekdayId] =
         useState<number>(weekdayId);
+
+    const searchedMountainIdsRef = useRef<Set<number>>(new Set());
 
     const { data: mountainsData, isError: isMountainsError } = useApiQuery<
         MountainData[]
@@ -132,9 +134,16 @@ export default function ForecastSearchSection() {
         });
     }, [weekdayId, courseId]);
     useEffect(() => {
+        if (mountainId === 0) return;
+        if (searchedMountainIdsRef.current.has(mountainId)) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         const timer = setTimeout(() => {
             setIsLoading(false);
+            searchedMountainIdsRef.current.add(mountainId);
         }, 3000);
 
         return () => clearTimeout(timer);
