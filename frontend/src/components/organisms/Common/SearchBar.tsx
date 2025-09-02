@@ -79,7 +79,7 @@ export default function SearchBar(props: PropsState) {
             onSelectValue: courseChangeHandler,
         }),
         weekday: createDropdownProps({
-            title: '요일은?',
+            title: '날',
             initSelectorId: selectedWeekdayId,
             options: weekdayOptions,
             dropdownType: 'weekday',
