@@ -37,7 +37,14 @@ export default function ImageInputField() {
         }
     };
 
-    const openPicker = () => inputRef.current?.click();
+    const openPicker = () => {
+        if (inputRef.current) inputRef.current.value = '';
+        if (image) {
+            URL.revokeObjectURL(image.previewUrl);
+            setImage(null);
+        }
+        inputRef.current?.click();
+    };
 
     const onDragOver = (e: React.DragEvent) => {
         e.preventDefault();
