@@ -7,6 +7,7 @@ import type {
     Keyword,
     SelectedColumn,
 } from '../../../types/filterTypes';
+import { parseFilterFromUrl } from '../../../utils/utils.ts';
 
 interface PropsState {
     title: string;
@@ -28,24 +29,6 @@ export default function FilterModal(props: PropsState) {
     } = props;
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const parseFilterFromUrl = (
-        searchParams: URLSearchParams,
-        key: string,
-    ): number[] => {
-        const paramValue = searchParams.get(key);
-        if (!paramValue) return [];
-
-        try {
-            return paramValue
-                .replace(/[\[\]]/g, '')
-                .split(',')
-                .filter((id) => id !== '')
-                .map((id) => Number(id));
-        } catch (e) {
-            console.error(`Failed to parse filter ${key}:`, e);
-            return [];
-        }
-    };
 
     const [selectedKeywords, setSelectedKeywords] = useState<SelectedColumn>({
         weatherKeywords: parseFilterFromUrl(searchParams, 'weatherKeywords'),
