@@ -1,28 +1,13 @@
 import MountainCard from '../../organisms/Main/MountainCard.tsx';
 import { css } from '@emotion/react';
-import { useNavigate } from 'react-router-dom';
-import { refactorMountainsData } from './utils.ts';
-import type { MountainData } from '../../../types/mountainTypes';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useState } from 'react';
+import useMountainCardSection from './hooks/useMountainCardSection.ts';
 
 export default function MountainCardSection() {
-    const navigate = useNavigate();
-    const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
-
-    const { data: mountainsData } = useApiQuery<MountainData[]>(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-        },
-    );
+    const { data, cardClickHandler, hoveredCardId, setHoveredCardId } =
+        useMountainCardSection();
 
     const wheelHandler = (event: React.WheelEvent<HTMLDivElement>) => {
         event.currentTarget.scrollLeft += Number(event.deltaY);
-    };
-    const cardClickHandler = (mountainId: number) => {
-        navigate(`/forecast?mountainid=${mountainId}`);
     };
     const mounseEnterHandler = (mountainId: number) => {
         setHoveredCardId(mountainId);
@@ -30,8 +15,6 @@ export default function MountainCardSection() {
     const mouseLeaveHandler = () => {
         setHoveredCardId(null);
     };
-
-    const data = refactorMountainsData(mountainsData ?? []);
 
     return (
         <div

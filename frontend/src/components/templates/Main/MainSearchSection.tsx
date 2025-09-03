@@ -1,18 +1,6 @@
 import SearchBar from '../../organisms/Common/SearchBar.tsx';
-import type {
-    MountainCourse,
-    MountainData,
-} from '../../../types/mountainTypes';
-import {
-    refactorCoursesDataToOptions,
-    refactorMountainDataToOptions,
-    validate,
-} from './utils.ts';
-import { useNavigate } from 'react-router-dom';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useEffect, useState } from 'react';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
-import type { Option } from '../../../types/searchBarTypes';
+import useMainSearchSection from './hooks/useMainSearchSection.ts';
 
 interface PropsState {
     onFormValidChange: (isValid: boolean) => void;
@@ -21,79 +9,26 @@ interface PropsState {
 export default function MainSearchSection(props: PropsState) {
     const { onFormValidChange } = props;
 
-    const [selectedMountainId, setSelectedMountainId] = useState<number>(0);
-    const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
-    const [selectedWeekdayId, setSelectedWeekdayId] = useState<number>(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const mouuntainChangeHandler = (id: number) => {
-        setSelectedMountainId(id);
-        setSelectedCourseId(0);
-    };
-    const courseChangeHandler = (id: number) => {
-        setSelectedCourseId(id);
-    };
-    const weekdayChangeHandler = (id: number) => {
-        setSelectedWeekdayId(id);
-    };
-    const navigate = useNavigate();
+    const {
+        selectedMountainId,
+        selectedCourseId,
+        selectedWeekdayId,
+        mountainOptions,
+        courseOptions,
+        mountainChangeHandler,
+        courseChangeHandler,
+        weekdayChangeHandler,
+        isModalOpen,
+        isMountainsError,
+        isFormValidate,
+        navigateToForecast,
+    } = useMainSearchSection();
 
     const submitHandler = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const error = validate({
-            mountainId: selectedMountainId,
-            courseId: selectedCourseId,
-            weekdayId: selectedWeekdayId,
-        });
-        if (error) {
-            onFormValidChange(false);
-            return;
-        }
-        onFormValidChange(true);
-        navigate(
-            `/forecast?mountainid=${selectedMountainId}&courseid=${selectedCourseId}&weekdayid=${selectedWeekdayId}`,
-        );
+        const isValid = isFormValidate(e);
+        onFormValidChange(isValid);
+        if (isValid) navigateToForecast();
     };
-
-    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
-        MountainData[]
-    >(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-            networkMode: 'always',
-            staleTime: 5 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
-        },
-    );
-    const { data: coursesData, isError: isCoursesError } = useApiQuery<
-        MountainCourse[]
-    >(
-        `/card/mountain/${selectedMountainId}/course`,
-        {},
-        {
-            enabled: !!selectedMountainId,
-            retry: false,
-            networkMode: 'always',
-            staleTime: 1000 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
-        },
-    );
-
-    useEffect(() => {
-        if (isMountainsError || isCoursesError) {
-            setIsModalOpen(true);
-        }
-    }, [isMountainsError, isCoursesError]);
-
-    const mountainOptions: Option[] = refactorMountainDataToOptions(
-        mountainsData ?? [],
-    );
-    const courseOptions: Option[] = refactorCoursesDataToOptions(
-        coursesData ?? [],
-    );
 
     return (
         <>
@@ -103,7 +38,7 @@ export default function MainSearchSection(props: PropsState) {
                 pageName='main'
                 mountainOptions={mountainOptions}
                 selectedMountainId={selectedMountainId ?? 0}
-                mountainChangeHandler={mouuntainChangeHandler}
+                mountainChangeHandler={mountainChangeHandler}
                 courseOptions={courseOptions}
                 selectedCourseId={selectedCourseId ?? 0}
                 courseChangeHandler={courseChangeHandler}
