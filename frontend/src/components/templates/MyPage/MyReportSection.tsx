@@ -9,18 +9,14 @@ import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { css } from '@emotion/react';
 import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
-import { useRef, useState } from 'react';
-import useApiMutation from '../../../hooks/useApiMutation.ts';
+import { useEffect, useState } from 'react';
 import { theme } from '../../../theme/theme.ts';
-import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { validateAccessToken } from '../../../utils/utils.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
 import { useNavigate } from 'react-router-dom';
 import type { CardData } from '../../../types/reportCardTypes';
 import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
-
-type ReportPages = InfiniteData<CardData[]>;
+import useCardLikeMutation from '../../../hooks/useCardLikeMutation.ts';
 
 export default function MyReportSection() {
     const title = '나의 제보 목록';
@@ -47,65 +43,23 @@ export default function MyReportSection() {
     );
     const flattenedData = cardsData?.pages.flat();
 
-    const queryClient = useQueryClient();
     const key = [
         `/card/interaction/report/me`,
         {
             pageSize,
         },
-    ] as const;
-    const previousDataRef = useRef<ReportPages | undefined>(undefined);
-    const cardLikeMutation = useApiMutation(
-        `/card/interaction/report/like/${flippedCardId}`,
-        'POST',
-        {
-            onMutate: async () => {
-                await queryClient.cancelQueries({
-                    queryKey: key,
-                });
-                const previousData = queryClient.getQueryData(key);
-                previousDataRef.current = previousData as ReportPages;
-                queryClient.setQueryData(key, (oldData: ReportPages) => {
-                    if (!oldData) return oldData;
-                    const newPages = oldData.pages.map((page: CardData[]) => {
-                        return page.map((card: CardData) => {
-                            if (card.reportId !== flippedCardId) return card;
-                            const wasLiked = card.isLiked === true;
-                            const prev = card.likeCount ?? 0;
-                            const next = Math.max(
-                                0,
-                                prev + (wasLiked ? -1 : 1),
-                            );
-                            return {
-                                ...card,
-                                likeCount: next,
-                                isLiked: !wasLiked,
-                            };
-                        });
-                    });
-                    return { ...oldData, pages: newPages };
-                });
-            },
-            onError: (e: any) => {
-                if (previousDataRef.current) {
-                    queryClient.setQueryData(key, previousDataRef.current);
-                }
-                if (e instanceof TypeError) {
-                    setValidationError('네트워크 연결을 확인해주세요.');
-                    return;
-                }
-                setValidationError('좋아요 요청에 실패했습니다.');
-            },
-        },
-    );
+    ];
+    const { heartClickHandler, validationError: likeValidationError } =
+        useCardLikeMutation({
+            reportId: flippedCardId,
+            queryKey: key,
+        });
 
-    const heartClickHandler = () => {
-        if (!validateAccessToken()) {
-            setValidationError('로그인이 필요합니다.');
-            return;
+    useEffect(() => {
+        if (likeValidationError) {
+            setValidationError(likeValidationError);
         }
-        cardLikeMutation.mutate({});
-    };
+    }, [likeValidationError]);
 
     const currentTime = getCurrentTime();
 
