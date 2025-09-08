@@ -18,8 +18,8 @@ export default function ForecastPage() {
             const currentPage = Math.round(scrollY / pageHeight);
 
             const offsetInPage = scrollY % pageHeight;
-            const downThreshold = pageHeight * 0.3;
-            const upThreshold = pageHeight * 0.4;
+            const downThreshold = 1;
+            const upThreshold = pageHeight - 1;
 
             let targetPage = currentPage;
 
