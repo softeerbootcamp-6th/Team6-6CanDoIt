@@ -1,10 +1,7 @@
 import { css } from '@emotion/react';
 import bgImage from '../../../assets/Bg-fixed.png';
 import cloudImage from '../../../assets/Bg-scroll.png';
-import { keepPreviousData } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-
-import useApiQuery from '../../../hooks/useApiQuery.ts';
 
 import DetailTitle from '../../../components/molecules/Forecast/DetailTitle.tsx';
 import TimeSeletor from '../../../components/organisms/Forecast/TimeSeletor.tsx';
@@ -12,21 +9,17 @@ import WeatherDetailSideBar from '../../organisms/Forecast/WeatherDetailSideBar.
 import WeatherCardGroup from '../../organisms/Forecast/WeatherCardGroup.tsx';
 import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.tsx';
 
-import { detailInfoSectionData } from '../../../constants/placeholderData.ts';
 import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import useCourseParams from '../../../hooks/useCourseParams.ts';
-import { getSelectedDayStartTime } from './helpers.ts';
-
-interface CourseForcast {
-    startCard: CardData;
-    arrivalCard: CardData;
-    adjustedArrivalCard: CardData;
-    descentCard: CardData;
-    courseAltitude: number;
-    recommendComment: string;
-    adjustedRecommendComment: string;
-}
+import {
+    getDisplayDuration,
+    getRecommendComment,
+    getSelectedDayStartTime,
+} from './helpers.ts';
+import useCourseForecast from '../../../hooks/useCourseForecast.ts';
+import useSummaryInfo from '../../../hooks/useSummaryInfoSection.ts';
+import ReportPendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 
 interface CardData {
     dateTime: string;
@@ -72,43 +65,18 @@ export default function DetailInfoSection() {
         getSelectedDayStartTime(selectedWeekdayId),
     );
 
-    useEffect(() => {
-        setScrollSelectedTime(getSelectedDayStartTime(selectedWeekdayId));
-    }, [selectedWeekdayId]);
-
     const {
-        data: courseForecastData = detailInfoSectionData,
+        data: courseForecastData,
         isError: isCourseDataError,
-    } = useApiQuery<CourseForcast>(
-        `/card/course/${selectedCourseId}/forecast`,
-        { startDateTime: scrollSelectedTime },
-        {
-            placeholderData: keepPreviousData,
-            retry: 3,
-            enabled: true,
-        },
-    );
-
-    const { data: duration = 0, isError: isDurationError } = useApiQuery<any>(
-        `/card/mountain/course/${selectedCourseId}`,
-        { dateTime: scrollSelectedTime },
-        {
-            placeholderData: keepPreviousData,
-            retry: 3,
-            enabled: true,
-            select: (data) => data.duration,
-        },
-    );
+        isLoading: isCourseDataLoading,
+    } = useCourseForecast(selectedCourseId, scrollSelectedTime);
 
     const {
-        startCard,
-        arrivalCard,
-        descentCard,
-        adjustedArrivalCard,
-        recommendComment,
-        adjustedRecommendComment,
-        courseAltitude,
-    } = courseForecastData;
+        data: summaryData,
+        isError: isDurationError,
+        isLoading: isDurationLoading,
+    } = useSummaryInfo(selectedCourseId, scrollSelectedTime);
+    const duration = summaryData?.duration;
 
     useEffect(() => {
         setIsSidebarOpen(false);
@@ -124,6 +92,42 @@ export default function DetailInfoSection() {
         setIsSidebarOpen(true);
     };
 
+    if (isDurationLoading || isCourseDataLoading)
+        return (
+            <div css={contentSectionStyles}>
+                <ReportPendingModal />
+            </div>
+        );
+
+    if (
+        !courseForecastData ||
+        !duration ||
+        isCourseDataError ||
+        isDurationError
+    )
+        return (
+            <div css={contentSectionStyles}>
+                <Modal onClose={() => window.location.reload()}>
+                    couseData를 불러오는데 에러가 발생했습니다. 확인버튼을
+                    누르면 새로고침이 진행됩니다.
+                </Modal>
+            </div>
+        );
+
+    const recommendComment = getRecommendComment(
+        isToggleOn,
+        courseForecastData,
+    );
+    const displayDuration = getDisplayDuration(duration);
+
+    const {
+        startCard,
+        arrivalCard,
+        descentCard,
+        adjustedArrivalCard,
+        courseAltitude,
+    } = courseForecastData;
+
     return (
         <>
             <div css={contentSectionStyles}>
@@ -131,9 +135,7 @@ export default function DetailInfoSection() {
                 <DownloadButton onClick={() => setIsOpenCard(true)} />
                 <DetailTitle
                     scrollSeletedTime={scrollSelectedTime}
-                    recommendComment={
-                        isToggleOn ? adjustedRecommendComment : recommendComment
-                    }
+                    recommendComment={recommendComment}
                 />
                 <WeatherCardGroup
                     weatherDataObjs={{
@@ -158,7 +160,7 @@ export default function DetailInfoSection() {
                     scrollSelectedTime={scrollSelectedTime}
                     onToggle={() => setIsToggleOn((prev) => !prev)}
                     isToggleOn={isToggleOn}
-                    time={isDurationError ? Math.ceil(duration) : 3}
+                    time={displayDuration}
                     selectedMountainId={selectedMountainId}
                     onTimeSelect={(time) => setScrollSelectedTime(time)}
                 />
@@ -177,12 +179,6 @@ export default function DetailInfoSection() {
                     scrollSelectedTime={scrollSelectedTime}
                     selectedCourseId={selectedCourseId}
                 />
-            )}
-            {isCourseDataError && (
-                <Modal onClose={() => window.location.reload()}>
-                    couseData를 불러오는데 에러가 발생했습니다. 새로고침을 통해
-                    다시 시도해주세요.
-                </Modal>
             )}
         </>
     );
