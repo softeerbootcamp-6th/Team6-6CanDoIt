@@ -1,44 +1,46 @@
 import { css } from '@emotion/react';
 import MountainInfoPreview from '../../molecules/Forecast/MountainInfoPreview.tsx';
 import ScrollIndicator from '../../molecules/Forecast/ScrollIndicator.tsx';
-import { summaryInfoSectionData } from '../../../constants/placeholderData.ts';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
-import { useSearchParams } from 'react-router-dom';
 import PendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 
-interface MountainCourseData {
-    courseImageUrl: string;
-    duration: number;
-    distance: number;
-    sunrise: string;
-    sunset: string;
-    hikingActivityStatus: HikingActivityStatus;
-}
+import useCourseParams from '../../../hooks/useCourseParams.ts';
+import useSummaryInfo from '../../../hooks/useSummaryInfoSection.ts';
 
-type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나쁨';
-
-const placeholderData = summaryInfoSectionData;
+import { getSelectedDayStartTime } from './helpers.ts';
 
 export default function SummaryInfoSection() {
-    const [searchParams] = useSearchParams();
-    const selectedCourseId = Number(searchParams.get('courseid'));
+    const { selectedCourseId, selectedWeekdayId } = useCourseParams();
 
     const {
         data: summaryInfoSectionData,
         isLoading,
         isError,
-    } = useApiQuery<MountainCourseData>(
-        `/card/mountain/course/${selectedCourseId}`,
-        { dateTime: '2025-08-22T00:00:00' },
-        {
-            placeholderData: placeholderData,
-            retry: 3,
-            enabled: true,
-        },
+    } = useSummaryInfo(
+        selectedCourseId,
+        getSelectedDayStartTime(selectedWeekdayId),
     );
 
-    const courseData = summaryInfoSectionData ?? placeholderData;
+    if (isLoading) {
+        return (
+            <div css={wrapperStyles}>
+                <PendingModal />
+            </div>
+        );
+    }
+
+    if (isError || !summaryInfoSectionData) {
+        return (
+            <div css={wrapperStyles}>
+                <Modal onClose={() => window.location.reload()}>
+                    산 코스 데이터를 불러오는데 에러가 발생했습니다. 확인 버튼을
+                    눌러 다시 시도해주세요.
+                </Modal>
+            </div>
+        );
+    }
+
+    const courseData = summaryInfoSectionData;
     const { duration, distance, courseImageUrl, sunrise, sunset } = courseData;
 
     return (
@@ -51,13 +53,6 @@ export default function SummaryInfoSection() {
                 sunsetTime={sunset.slice(0, 5)}
             />
             <ScrollIndicator />
-            {isLoading && <PendingModal />}
-            {isError && (
-                <Modal onClose={() => window.location.reload()}>
-                    산 코스 데이터를 불러오는데 에러가 발생했습니다. 새로고침을
-                    통해 다시 시도해주세요.
-                </Modal>
-            )}
         </div>
     );
 }
