@@ -44,85 +44,76 @@ export default function WeatherSummaryCardModal({
                 onClose();
             },
             onError: () => {
-                if (
-                    !(
-                        localStorage.getItem('accessToken') ||
-                        sessionStorage.getItem('accessToken')
-                    )
-                ) {
-                    setErrorMessage('로그인이 필요한 서비스입니다.');
-                } else {
-                    alert('잠시후 다시 시도해주세요.');
-                }
+                alert('잠시후 다시 시도해주세요.');
             },
         },
         { startDateTime: scrollSelectedTime },
     );
 
+    const handleStoreButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        const accessToken =
+            localStorage.getItem('accessToken') ??
+            sessionStorage.getItem('accessToken');
+        if (!accessToken) {
+            setErrorMessage('로그인이 필요한 서비스입니다.');
+            return;
+        }
+        if (validateAccessToken()) {
+            storeMountainCardMutation.mutate({});
+        } else {
+            setIsModal(true);
+        }
+    };
+
+    if (isLoading)
+        return (
+            <div css={loadingStyles} role='dialog' aria-modal='true'>
+                <Icon name='clear-day' width={2} height={2} color='grey-100' />
+                <Icon name='rain' width={2} height={2} color='grey-100' />
+                <Icon name='snow' width={2} height={2} color='grey-100' />
+                <Icon
+                    name='thunderstorm'
+                    width={2}
+                    height={2}
+                    color='grey-100'
+                />
+            </div>
+        );
+
     return (
         <div css={overlayStyles}>
-            {isLoading ? (
-                <div css={loadingStyles} role='dialog' aria-modal='true'>
-                    <Icon
-                        name='clear-day'
-                        width={2}
-                        height={2}
-                        color='grey-100'
-                    />
-                    <Icon name='rain' width={2} height={2} color='grey-100' />
-                    <Icon name='snow' width={2} height={2} color='grey-100' />
-                    <Icon
-                        name='thunderstorm'
-                        width={2}
-                        height={2}
-                        color='grey-100'
+            <WeatherSummaryCardHeader />
+            <div
+                css={modalStyles(isFront, cardData.frontCard.mountainImageUrl)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setIsFront((prev) => !prev);
+                }}
+            >
+                <div className='front'>
+                    <FrontWeatherSummaryCard
+                        cardData={cardData.frontCard}
+                        onClose={onClose}
                     />
                 </div>
-            ) : (
-                <>
-                    <WeatherSummaryCardHeader />
-                    <div
-                        css={modalStyles(
-                            isFront,
-                            cardData.frontCard.mountainImageUrl,
-                        )}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setIsFront((prev) => !prev);
-                        }}
-                    >
-                        <div className='front'>
-                            <FrontWeatherSummaryCard
-                                cardData={cardData.frontCard}
-                                onClose={onClose}
-                            />
-                        </div>
-                        <div className='back'>
-                            <BackWeatherSummaryCard
-                                cardData={cardData.backCard}
-                            />
-                        </div>
-                    </div>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (validateAccessToken()) {
-                                storeMountainCardMutation.mutate({});
-                            } else {
-                                setIsModal(true);
-                            }
-                        }}
-                        css={storeBtnStyles}
-                    >
-                        <Icon
-                            name='download-02'
-                            width={1.4}
-                            height={1.4}
-                            color='grey-100'
-                        />
-                    </button>
-                </>
-            )}
+                <div className='back'>
+                    <BackWeatherSummaryCard cardData={cardData.backCard} />
+                </div>
+            </div>
+            <button
+                onClick={(e) => {
+                    handleStoreButtonClick(e);
+                }}
+                css={storeBtnStyles}
+            >
+                <Icon
+                    name='download-02'
+                    width={1.4}
+                    height={1.4}
+                    color='grey-100'
+                />
+            </button>
 
             {errorMessage && (
                 <LoginRequiredModal onClose={() => setErrorMessage('')} />

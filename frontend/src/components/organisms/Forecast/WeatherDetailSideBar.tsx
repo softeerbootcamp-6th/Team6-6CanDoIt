@@ -51,7 +51,8 @@ export default function WeatherDetailSideBar({
     onClose,
     card,
 }: PropsState) {
-    if (!card) return <div>loading...</div>;
+    if (!card) return null;
+
     const {
         apparentTemperature,
         temperatureDescription,
