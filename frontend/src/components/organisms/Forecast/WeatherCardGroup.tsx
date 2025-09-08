@@ -53,14 +53,10 @@ export default function WeatherCardGroup({
         weatherDataObjs;
 
     const selectedArrivalCard = isToggleOn ? adjustedArrivalCard : arrivalCard;
-    startCard.title = '시작지점';
-    descentCard.title = '끝지점';
-    selectedArrivalCard.title = '최고점';
-
     const weatherDataList = [
-        startCard,
-        isToggleOn ? adjustedArrivalCard : arrivalCard,
-        descentCard,
+        { ...startCard, title: '시작지점' },
+        { ...selectedArrivalCard, title: '최고점' },
+        { ...descentCard, title: '끝지점' },
     ];
     return (
         <div css={weatherSummaryWrapperStyles}>
