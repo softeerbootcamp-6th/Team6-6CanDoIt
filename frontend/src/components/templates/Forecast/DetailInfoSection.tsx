@@ -3,7 +3,6 @@ import bgImage from '../../../assets/Bg-fixed.png';
 import cloudImage from '../../../assets/Bg-scroll.png';
 import { keepPreviousData } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import useApiQuery from '../../../hooks/useApiQuery.ts';
 
@@ -16,6 +15,7 @@ import WeatherCardModal from '../../organisms/Forecast/WeatherSummaryCardModal.t
 import { detailInfoSectionData } from '../../../constants/placeholderData.ts';
 import DownloadButton from '../../atoms/Button/DownLoadButton.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
+import useCourseParams from '../../../hooks/useCourseParams.ts';
 
 interface CourseForcast {
     startCard: CardData;
@@ -58,10 +58,8 @@ type HikingActivityStatus = '좋음' | '매우 좋음' | '나쁨' | '약간 나�
 type Background = 'sunny' | 'cloudy' | 'snow' | 'rain';
 
 export default function DetailInfoSection() {
-    const [searchParams] = useSearchParams();
-    const selectedCourseId = Number(searchParams.get('courseid'));
-    const selectedMountainId = Number(searchParams.get('mountainid'));
-    const selectedWeekdayId = Number(searchParams.get('weekdayid'));
+    const { selectedCourseId, selectedMountainId, selectedWeekdayId } =
+        useCourseParams();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
     const [isOpenCard, setIsOpenCard] = useState<boolean>(false);
