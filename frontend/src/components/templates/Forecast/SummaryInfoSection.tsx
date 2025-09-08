@@ -40,8 +40,7 @@ export default function SummaryInfoSection() {
         );
     }
 
-    const courseData = summaryInfoSectionData;
-    const { duration, distance, courseImageUrl, sunrise, sunset } = courseData;
+    const { duration, distance, courseImageUrl, sunrise, sunset } = summaryInfoSectionData;
 
     return (
         <div css={wrapperStyles}>
