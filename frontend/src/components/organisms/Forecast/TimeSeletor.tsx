@@ -1,15 +1,15 @@
-import WeatherCell from '../../molecules/Forecast/WeatherCell.tsx';
-import ToggleButton from '../../atoms/Button/ToggleButton.tsx';
 import { css } from '@emotion/react';
 import { theme } from '../../../theme/theme.ts';
-import CommonText from '../../atoms/Text/CommonText.tsx';
-import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
-import Icon from '../../atoms/Icon/Icons.tsx';
 import { useMemo } from 'react';
-import { convertToIconName } from '../../../utils/utils.ts';
 import { useDraggableScroll } from '../../../hooks/useDraggableScroll.ts';
 import { useForecastByTime } from '../../../hooks/useForecastByTime.ts';
+
+import { convertToIconName } from '../../../utils/utils.ts';
 import { formatHour12 } from '../../templates/Forecast/helpers.ts';
+
+import TimeSelectorHeader from '../../molecules/Forecast/TimeSeletorHeader.tsx';
+import WeatherCell from '../../molecules/Forecast/WeatherCell.tsx';
+import CommonText from '../../atoms/Text/CommonText.tsx';
 
 interface PropsState {
     onToggle: () => void;
@@ -19,8 +19,6 @@ interface PropsState {
     onTimeSelect?: (time: string) => void;
     scrollSelectedTime: string;
 }
-
-const { colors, typography } = theme;
 
 export default function TimeSeletor({
     onToggle,
@@ -69,34 +67,11 @@ export default function TimeSeletor({
 
     return (
         <div css={timeSeletorStyles}>
-            <div css={headerStyles}>
-                <div>
-                    <SelectorTitleText>출발 시간 선택</SelectorTitleText>
-                    <span
-                        css={courseTimeStyles}
-                    >{`왕복${time * 2}시간 코스`}</span>
-                </div>
-                <div>
-                    <SelectorTitleText>고도 보정하기</SelectorTitleText>
-                    <div css={tooltipWrapper}>
-                        <Icon
-                            name='info-circle'
-                            width={1.5}
-                            height={1.5}
-                            color='grey-100'
-                        />
-                        <span>
-                            {
-                                '코스의 정상 고도를 반영해,\n기온과 풍속을 알려드려요.'
-                            }
-                        </span>
-                    </div>
-                    <ToggleButton
-                        isOn={isToggleOn}
-                        onClick={() => onToggle()}
-                    />
-                </div>
-            </div>
+            <TimeSelectorHeader
+                time={time}
+                isToggleOn={isToggleOn}
+                onToggle={onToggle}
+            />
 
             <div css={contentWrapperStyles}>
                 <div
@@ -147,6 +122,8 @@ export default function TimeSeletor({
     );
 }
 
+const { colors } = theme;
+
 const timeSeletorStyles = css`
     display: flex;
     flex-direction: column;
@@ -160,35 +137,6 @@ const timeSeletorStyles = css`
     border: 1px solid ${colors.greyOpacityWhite[80]};
     background: ${colors.greyOpacityWhite[70]};
     backdrop-filter: blur(50px);
-`;
-
-const headerStyles = css`
-    display: flex;
-    justify-content: space-between;
-    padding: 0.625rem 1rem;
-    box-sizing: border-box;
-    height: 3.2rem;
-    width: 100%;
-    border-bottom: 1px solid ${colors.greyOpacityWhite[80]};
-    z-index: 20;
-
-    & > div {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-`;
-
-const courseTimeStyles = css`
-    font-size: ${typography.fontSize.caption};
-    font-weight: ${typography.fontWeight.medium};
-    line-height: 150%;
-    color: ${colors.grey[90]};
-    background-color: ${colors.greyOpacityWhite[80]};
-    padding: 0.1rem 0.4rem;
-    margin-left: 0.2rem;
-    border-radius: 0.375rem;
-    border: 1px solid ${colors.greyOpacityWhite[90]};
 `;
 
 const scrollStyles = css`
@@ -215,35 +163,4 @@ const contentWrapperStyles = css`
     display: flex;
     flex-direction: column;
     gap: 1rem;
-`;
-
-const tooltipWrapper = css`
-    position: relative;
-    display: inline-block;
-
-    & span {
-        visibility: hidden;
-        opacity: 0;
-        width: 12rem;
-        background-color: ${colors.grey[100]};
-        color: ${colors.grey[0]};
-        text-align: center;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        position: absolute;
-        z-index: 99;
-        bottom: 125%;
-        left: 50%;
-        transform: translateX(-50%);
-        transition: opacity 0.3s;
-        font-size: ${typography.fontSize.caption};
-        white-space: pre-wrap;
-        line-height: 1.4;
-    }
-
-    &:hover span,
-    &:focus span {
-        visibility: visible;
-        opacity: 1;
-    }
 `;
