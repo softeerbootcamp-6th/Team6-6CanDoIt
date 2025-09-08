@@ -5,9 +5,11 @@ import { theme } from '../../../theme/theme.ts';
 import CommonText from '../../atoms/Text/CommonText.tsx';
 import SelectorTitleText from '../../atoms/Text/SelectorTitle.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
-import { useState, useRef, useMemo, useEffect } from 'react';
-import useApiQuery from '../../../hooks/useApiQuery.ts';
+import { useMemo } from 'react';
 import { convertToIconName } from '../../../utils/utils.ts';
+import { useDraggableScroll } from '../../../hooks/useDraggableScroll.ts';
+import { useForecastByTime } from '../../../hooks/useForecastByTime.ts';
+import { formatHour12 } from '../../templates/Forecast/helpers.ts';
 
 interface PropsState {
     onToggle: () => void;
@@ -28,79 +30,9 @@ export default function TimeSeletor({
     onTimeSelect,
     scrollSelectedTime,
 }: PropsState) {
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [startX, setStartX] = useState(0);
-    const [scrollLeft, setScrollLeft] = useState(0);
-
-    const startDrag = (x: number) => {
-        setIsDragging(true);
-        setStartX(x);
-        setScrollLeft(scrollRef.current?.scrollLeft ?? 0);
-    };
-
-    const moveDrag = (x: number) => {
-        if (!isDragging || !scrollRef.current) return;
-        const walk = x - startX;
-        scrollRef.current.scrollLeft = scrollLeft - walk;
-    };
-
-    const endDrag = () => {
-        if (!scrollRef.current) return;
-        setIsDragging(false);
-
-        const container = scrollRef.current;
-        const cellWidth = container.children[0]?.clientWidth ?? 1;
-        const gap = 8;
-        const scrollPos = container.scrollLeft;
-
-        const nearestIndex = Math.round(scrollPos / (cellWidth + gap));
-
-        const thresholdIndex = (rawData?.length ?? 0) - time * 2 - 1;
-
-        let finalIndex = nearestIndex;
-
-        if (thresholdIndex >= 0 && nearestIndex > thresholdIndex) {
-            finalIndex = thresholdIndex;
-        }
-
-        container.scrollTo({
-            left: finalIndex * (cellWidth + gap),
-            behavior: 'smooth',
-        });
-
-        const selectedTime = data?.[finalIndex]?.dateTime;
-
-        if (selectedTime && onTimeSelect) {
-            onTimeSelect(selectedTime);
-        }
-    };
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const day = now.getDate().toString().padStart(2, '0');
-    const hour = now.getHours().toString().padStart(2, '0');
-
-    const currentTimeStr = `${year}-${month}-${day}T${hour}:00:00`;
-
-    const { data: rawData } = useApiQuery<any[]>(
-        `/card/mountain/${selectedMountainId}/forecast`,
-        { startDateTime: currentTimeStr },
-        {
-            retry: false,
-        },
-    );
-
-    const data = useMemo(() => {
-        if (!rawData) return [];
-        const emptyItems: any[] = Array.from({ length: 14 }, () => ({
-            time: '',
-            temperature: 0,
-            iconName: '',
-        }));
-        return [...rawData, ...emptyItems];
-    }, [rawData]);
+    const { forecastData, rawDataLength } = useForecastByTime({
+        mountainId: selectedMountainId,
+    });
 
     const dynamicScrollSizeStyles = css`
         width: ${time * 2 * 5.5 + 5}rem;
@@ -110,23 +42,15 @@ export default function TimeSeletor({
         scrollStartTimeStr: string,
         duration: number,
     ): [string, string] {
-        const seletedTime = scrollStartTimeStr;
-        const startDate = new Date(seletedTime);
-
-        const formatTime = (date: Date) => {
-            const hours = date.getHours();
-            const period = hours >= 12 ? 'PM' : 'AM';
-            const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-            return `${hour12}${period}`;
-        };
-
-        const startFormatted = formatTime(startDate);
+        const startDate = new Date(scrollStartTimeStr);
 
         const durationHours = Math.floor(duration);
         const endDate = new Date(
             startDate.getTime() + durationHours * 60 * 60 * 1000,
         );
-        const endFormatted = formatTime(endDate);
+
+        const startFormatted = formatHour12(startDate);
+        const endFormatted = formatHour12(endDate);
 
         return [startFormatted, endFormatted];
     }
@@ -135,25 +59,13 @@ export default function TimeSeletor({
         () => getStartAndEndTimeHoursOnly(scrollSelectedTime, time * 2),
         [scrollSelectedTime, time],
     );
-
-    useEffect(() => {
-        if (!scrollRef.current || !data) return;
-
-        const container = scrollRef.current;
-        const gap = 8; // cell 간 간격
-        const cellWidth = container.children[0]?.clientWidth ?? 1;
-
-        // scrollSelectedTime에 맞는 인덱스 찾기
-        const index = data.findIndex(
-            (item) => item.dateTime === scrollSelectedTime,
-        );
-        if (index === -1) return;
-
-        container.scrollTo({
-            left: index * (cellWidth + gap),
-            behavior: 'smooth',
-        });
-    }, [scrollSelectedTime, data]);
+    const { scrollRef, startDrag, moveDrag, endDrag } = useDraggableScroll({
+        data: forecastData,
+        scrollSelectedTime,
+        onTimeSelect,
+        timeWindow: time * 2,
+        rawDataLength: rawDataLength,
+    });
 
     return (
         <div css={timeSeletorStyles}>
@@ -218,7 +130,7 @@ export default function TimeSeletor({
                     onTouchMove={(e) => moveDrag(e.touches[0].pageX)}
                     onTouchEnd={endDrag}
                 >
-                    {data?.map((item, idx) => (
+                    {forecastData.map((item, idx) => (
                         <WeatherCell
                             key={idx}
                             time={item.dateTime}
