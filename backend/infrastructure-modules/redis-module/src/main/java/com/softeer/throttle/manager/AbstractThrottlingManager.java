@@ -167,7 +167,7 @@ public abstract class AbstractThrottlingManager {
                 newTps = Math.min(properties.maxTps(), oldTps + 1);
 
                 if (currentTps.compareAndSet(oldTps, newTps)) {
-                    successCount.addAndGet(-oldTps);
+                    successCount.set(0);
                     log.info("TPS 상향 조정: {} -> {} ({}회 연속 성공)", oldTps, newTps, successCounter);
                     // 상향 조절 시에는 락 없이 업데이트
                     updateBucketConfigurationAsync();
