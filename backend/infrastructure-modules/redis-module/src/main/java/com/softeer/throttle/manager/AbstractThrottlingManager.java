@@ -173,21 +173,21 @@ public abstract class AbstractThrottlingManager {
 
         if (success) {
             int successCounter = successCount.incrementAndGet();
-            if (successCounter >= oldTps && successCounter % oldTps == 0) {
-                successCount.set(0);
+            if (successCounter == oldTps) {
                 newTps = Math.min(properties.maxTps(), oldTps + 1);
 
                 if (currentTps.compareAndSet(oldTps, newTps)) {
+                    successCount.addAndGet(-oldTps);
                     log.info("TPS 상향 조정: {} -> {} ({}회 연속 성공)", oldTps, newTps, successCounter);
                     // 상향 조절 시에는 락 없이 업데이트
                     updateBucketConfigurationAsync();
                 }
             }
         } else {
-            successCount.set(0);
             newTps = Math.max(properties.minTps(), oldTps - properties.failStep());
 
             if (currentTps.compareAndSet(oldTps, newTps)) {
+                successCount.set(0);
                 log.info("TPS 하향 조정: {} -> {} (실패로 인한 조정)", oldTps, newTps);
                 // 하향 조절 시에는 락을 걸어 getBucket() 호출을 잠시 차단
                 updateBucketConfigurationWithLock();
