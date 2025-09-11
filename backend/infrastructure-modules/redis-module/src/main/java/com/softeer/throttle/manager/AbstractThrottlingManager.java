@@ -12,11 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
 @Slf4j
 public abstract class AbstractThrottlingManager {
+
+    private static final int DEFAULT_RETRY_CAPACITY = 5;
 
     protected final ThrottlingProperties properties;
 
@@ -28,8 +30,8 @@ public abstract class AbstractThrottlingManager {
     protected final AtomicInteger currentTps = new AtomicInteger();
     private final AtomicInteger successCount = new AtomicInteger();
 
-    private final ReentrantLock configurationLock = new ReentrantLock();
-    private final ReentrantLock asyncUpdateLock = new ReentrantLock();  // 상향 조절 전용 락
+    private final ReentrantReadWriteLock configurationLock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock asyncUpdateLock = new ReentrantReadWriteLock();  // 상향 조절 전용 락
 
     private final AtomicInteger lastUpdatedTps = new AtomicInteger();
 
@@ -41,24 +43,12 @@ public abstract class AbstractThrottlingManager {
         this.properties = properties;
         this.backoffStrategy = backoffStrategy;
 
-        // TPS 기반으로 재시도 스레드풀 크기 계산
-        int retryThreadPoolSize = calculateRetryThreadPoolSize();
-        this.retryExecutor = Executors.newScheduledThreadPool(retryThreadPoolSize, r -> {
+        this.retryExecutor = Executors.newScheduledThreadPool(DEFAULT_RETRY_CAPACITY, r -> {
             Thread t = new Thread(r, "throttling-retry-executor-" + System.nanoTime());
             t.setDaemon(true);
             return t;
         });
 
-        log.info("ThrottlingManager 초기화 완료. 재시도 스레드풀 크기: {}", retryThreadPoolSize);
-    }
-
-    private int calculateRetryThreadPoolSize() {
-        // TPS 기반 동적 스레드풀 크기 계산
-        int maxTps = properties.maxTps();
-        int retryThreads = Math.max(4, Math.min(20, maxTps / 10));
-
-        log.debug("재시도 스레드풀 크기 계산. maxTps: {}, retryThreads: {}", maxTps, retryThreads);
-        return retryThreads;
     }
 
     @PostConstruct
@@ -199,7 +189,7 @@ public abstract class AbstractThrottlingManager {
 
     private Bucket getBucket(String key) {
         if (bucket == null) {
-            configurationLock.lock();
+            configurationLock.writeLock().lock();
             try {
                 if (bucket == null) {
                     log.debug("버킷 초기 생성. key: {}, 초기 TPS: {}", key, properties.initialTps());
@@ -215,12 +205,12 @@ public abstract class AbstractThrottlingManager {
                     log.info("버킷 생성 완료. key: {}", key);
                 }
             } finally {
-                configurationLock.unlock();
+                configurationLock.writeLock().unlock();
             }
         } else {
             // 버킷이 이미 존재하는 경우, 하향 조절 중인지 확인
             // 하향 조절은 configurationLock.lock()을 사용하므로 tryLock으로 체크
-            if (!configurationLock.tryLock()) {
+            if (!configurationLock.readLock().tryLock()) {
                 // 락을 획득하지 못했다면 하향 조절 중일 가능성이 높음
                 // 잠시 대기 후 다시 시도
                 try {
@@ -231,7 +221,7 @@ public abstract class AbstractThrottlingManager {
                 return getBucket(key); // 재귀 호출
             } else {
                 // 락을 획득했다면 즉시 해제하고 버킷 반환
-                configurationLock.unlock();
+                configurationLock.readLock().unlock();
             }
         }
         return bucket;
@@ -245,7 +235,9 @@ public abstract class AbstractThrottlingManager {
             return;
         }
 
-        if (asyncUpdateLock.tryLock()) {
+        ReentrantReadWriteLock.WriteLock writeLock = asyncUpdateLock.writeLock();
+
+        if (writeLock.tryLock()) {
             try {
                 if (lastUpdatedTps.get() == currentTpsValue) {
                     return;
@@ -268,7 +260,7 @@ public abstract class AbstractThrottlingManager {
             } catch (Exception e) {
                 log.error("버킷 설정 업데이트 실패 (상향 조정). TPS: {}", currentTpsValue, e);
             } finally {
-                asyncUpdateLock.unlock();
+                if(writeLock.isHeldByCurrentThread()) writeLock.unlock();
             }
         } else {
             log.debug("다른 스레드가 버킷 설정 업데이트 중 (상향 조정 스킵). TPS: {}", currentTpsValue);
@@ -283,7 +275,9 @@ public abstract class AbstractThrottlingManager {
             return;
         }
 
-        configurationLock.lock();
+        ReentrantReadWriteLock.WriteLock writeLock = configurationLock.writeLock();
+
+        writeLock.lock();
         try {
             if (lastUpdatedTps.get() == currentTpsValue) {
                 return;
@@ -306,7 +300,7 @@ public abstract class AbstractThrottlingManager {
         } catch (Exception e) {
             log.error("버킷 설정 업데이트 실패 (하향 조정). TPS: {}", currentTpsValue, e);
         } finally {
-            configurationLock.unlock();
+            if(writeLock.isHeldByCurrentThread()) writeLock.unlock();
         }
     }
 }
