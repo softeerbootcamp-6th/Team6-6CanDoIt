@@ -21,7 +21,7 @@ export default function SummaryInfoSection() {
         getSelectedDayStartTime(selectedWeekdayId),
     );
 
-    if (isLoading) {
+    if (isLoading || !selectedCourseId || !selectedWeekdayId) {
         return (
             <div css={wrapperStyles}>
                 <PendingModal />
@@ -40,7 +40,8 @@ export default function SummaryInfoSection() {
         );
     }
 
-    const { duration, distance, courseImageUrl, sunrise, sunset } = summaryInfoSectionData;
+    const { duration, distance, courseImageUrl, sunrise, sunset } =
+        summaryInfoSectionData;
 
     return (
         <div css={wrapperStyles}>
