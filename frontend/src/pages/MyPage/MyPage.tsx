@@ -6,7 +6,7 @@ import MyInfoSection from '../../components/templates/MyPage/MyInfoSection';
 import RecentClimbSection from '../../components/templates/MyPage/RecentClimbSection.tsx';
 import MyReportSection from '../../components/templates/MyPage/MyReportSection.tsx';
 import MyLikeSection from '../../components/templates/MyPage/MyLikeSection.tsx';
-import WeatherSummaryCardModal from '../../components/templates/MyPage/WeatherSummaryCard.tsx';
+import WeatherSummaryCardModal from '../../components/organisms/Login/WeatherSummaryCard.tsx';
 import LoginRequiredModal from '../../components/molecules/Modal/LoginRequiredModal.tsx';
 import useWeatherCardModal from '../../hooks/useWeatherCardModal.ts';
 
