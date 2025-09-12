@@ -92,19 +92,19 @@ export default function DetailInfoSection() {
         setIsSidebarOpen(true);
     };
 
-    if (isDurationLoading || isCourseDataLoading)
+    if (
+        !courseForecastData ||
+        !duration ||
+        isDurationLoading ||
+        isCourseDataLoading
+    )
         return (
             <div css={contentSectionStyles}>
                 <ReportPendingModal />
             </div>
         );
 
-    if (
-        !courseForecastData ||
-        !duration ||
-        isCourseDataError ||
-        isDurationError
-    )
+    if (isCourseDataError || isDurationError)
         return (
             <div css={contentSectionStyles}>
                 <Modal onClose={() => window.location.reload()}>

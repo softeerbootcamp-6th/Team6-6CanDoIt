@@ -1,10 +1,13 @@
 import { css } from '@emotion/react';
 import useApiQuery from '../../../hooks/useApiQuery';
-import { LabelHeading } from '../../atoms/Heading/Heading';
 import { theme } from '../../../theme/theme';
+
+import ReportPendingModal from '../../molecules/Modal/ReportPendingModal';
+import { LabelHeading } from '../../atoms/Heading/Heading';
 import Icon from '../../atoms/Icon/Icons';
 import CommonText from '../../atoms/Text/CommonText';
-import ReportPendingModal from '../../molecules/Modal/ReportPendingModal';
+
+import { formatDate } from '../Forecast/helpers';
 
 interface RecentClimbData {
     id: number;
@@ -28,11 +31,6 @@ export default function RecentClimbSection({ onClick }: PropsState) {
         },
     );
 
-    const formatDate = (dateStr: string): string => {
-        if (!dateStr) return '';
-        return dateStr.split('T')[0].replace(/-/g, '.');
-    };
-
     return (
         <div>
             <LabelHeading HeadingTag='h2'>최근 본 등산일정</LabelHeading>
@@ -40,58 +38,51 @@ export default function RecentClimbSection({ onClick }: PropsState) {
                 {recentClimbData?.map((item, index) => {
                     const { forecastDate, mountainName, courseName, courseId } =
                         item;
+                    if (isLoading) return <ReportPendingModal />;
 
                     return (
-                        <>
-                            {isLoading ? (
-                                <ReportPendingModal />
-                            ) : (
-                                <div
-                                    css={wrapperStyles}
-                                    key={index}
-                                    onClick={() =>
-                                        onClick(courseId, forecastDate)
-                                    }
+                        <div
+                            css={wrapperStyles}
+                            key={index}
+                            onClick={() => onClick(courseId, forecastDate)}
+                        >
+                            <div css={headerStyles}>
+                                <CommonText
+                                    TextTag='span'
+                                    fontSize='caption'
+                                    fontWeight='medium'
+                                    color='grey-80'
                                 >
-                                    <div css={headerStyles}>
-                                        <CommonText
-                                            TextTag='span'
-                                            fontSize='caption'
-                                            fontWeight='medium'
-                                            color='grey-80'
-                                        >
-                                            {formatDate(forecastDate)}
-                                        </CommonText>
-                                        <div css={narrowRightStyles}>
-                                            <Icon
-                                                name='narrow-right'
-                                                width={2}
-                                                height={2}
-                                                color='grey-0'
-                                            />
-                                        </div>
-                                    </div>
-                                    <div css={contentWrapper}>
-                                        <CommonText
-                                            TextTag='span'
-                                            fontSize='body'
-                                            fontWeight='bold'
-                                            color='grey-100'
-                                        >
-                                            {mountainName}
-                                        </CommonText>
-                                        <CommonText
-                                            TextTag='span'
-                                            fontSize='body'
-                                            fontWeight='bold'
-                                            color='grey-100'
-                                        >
-                                            {courseName}
-                                        </CommonText>
-                                    </div>
+                                    {formatDate(forecastDate)}
+                                </CommonText>
+                                <div css={narrowRightStyles}>
+                                    <Icon
+                                        name='narrow-right'
+                                        width={2}
+                                        height={2}
+                                        color='grey-0'
+                                    />
                                 </div>
-                            )}
-                        </>
+                            </div>
+                            <div css={contentWrapper}>
+                                <CommonText
+                                    TextTag='span'
+                                    fontSize='body'
+                                    fontWeight='bold'
+                                    color='grey-100'
+                                >
+                                    {mountainName}
+                                </CommonText>
+                                <CommonText
+                                    TextTag='span'
+                                    fontSize='body'
+                                    fontWeight='bold'
+                                    color='grey-100'
+                                >
+                                    {courseName}
+                                </CommonText>
+                            </div>
+                        </div>
                     );
                 })}
             </div>

@@ -1,45 +1,42 @@
 import { css } from '@emotion/react';
+import { useState } from 'react';
+import { validateAccessToken } from '../../utils/utils.ts';
+
 import MyInfoSection from '../../components/templates/MyPage/MyInfoSection';
 import RecentClimbSection from '../../components/templates/MyPage/RecentClimbSection.tsx';
 import MyReportSection from '../../components/templates/MyPage/MyReportSection.tsx';
 import MyLikeSection from '../../components/templates/MyPage/MyLikeSection.tsx';
-import { useState } from 'react';
 import WeatherSummaryCardModal from '../../components/templates/MyPage/WeatherSummaryCard.tsx';
-import { validateAccessToken } from '../../utils/utils.ts';
 import LoginRequiredModal from '../../components/molecules/Modal/LoginRequiredModal.tsx';
+import useWeatherCardModal from '../../hooks/useWeatherCardModal.ts';
 
 export default function MyPage() {
-    const [isCard, setIsCard] = useState<boolean>(false);
-    const [selectedCourseId, setSelectedCourseId] = useState<number | null>(
-        null,
-    );
-    const [selectedForecastDate, setSelectedForecastDate] = useState<
-        string | null
-    >(null);
+    const {
+        isCardOpen,
+        selectedCourseId,
+        selectedForecastDate,
+        openCard,
+        closeCard,
+    } = useWeatherCardModal();
+
     const [isValidLogin, setIsValidLogin] = useState<boolean>(() =>
         validateAccessToken(),
     );
-
-    const handleBtnClick = (courseId: number, forecastDate: string) => {
-        setSelectedCourseId(courseId);
-        setSelectedForecastDate(forecastDate);
-        setIsCard(true);
-    };
 
     return (
         <div css={wrapperStyles}>
             <MyInfoSection onValid={() => setIsValidLogin(true)} />
             <RecentClimbSection
                 onClick={(courseId, forecastDate) =>
-                    handleBtnClick(courseId, forecastDate)
+                    openCard(courseId, forecastDate)
                 }
             />
 
             <MyReportSection />
             <MyLikeSection />
-            {isCard && (
+            {isCardOpen && (
                 <WeatherSummaryCardModal
-                    onClose={() => setIsCard(false)}
+                    onClose={closeCard}
                     courseId={selectedCourseId!}
                     forecastDate={selectedForecastDate!}
                 />
