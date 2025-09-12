@@ -92,6 +92,16 @@ export default function DetailInfoSection() {
         setIsSidebarOpen(true);
     };
 
+    if (isCourseDataError || isDurationError)
+        return (
+            <div css={contentSectionStyles}>
+                <Modal onClose={() => window.location.reload()}>
+                    couseData를 불러오는데 에러가 발생했습니다. 확인버튼을
+                    누르면 새로고침이 진행됩니다.
+                </Modal>
+            </div>
+        );
+
     if (
         !courseForecastData ||
         !duration ||
@@ -101,16 +111,6 @@ export default function DetailInfoSection() {
         return (
             <div css={contentSectionStyles}>
                 <ReportPendingModal />
-            </div>
-        );
-
-    if (isCourseDataError || isDurationError)
-        return (
-            <div css={contentSectionStyles}>
-                <Modal onClose={() => window.location.reload()}>
-                    couseData를 불러오는데 에러가 발생했습니다. 확인버튼을
-                    누르면 새로고침이 진행됩니다.
-                </Modal>
             </div>
         );
 
