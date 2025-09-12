@@ -3,11 +3,9 @@ import { theme } from '../../../theme/theme';
 import CommonText from '../../atoms/Text/CommonText';
 import dummyImg from '../../../assets/mainImg.png';
 import useApiQuery from '../../../hooks/useApiQuery';
-import { useRef, useState } from 'react';
-import useApiMutation from '../../../hooks/useApiMutation';
-import { useQueryClient } from '@tanstack/react-query';
-import { convertToWebp, validateAccessToken } from '../../../utils/utils.ts';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import useNicknameEditor from '../../../hooks/useNicknamEditor.ts';
+import useProfileImageUploader from '../../../hooks/useProfileImageUploader.ts';
+import PendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 
 interface PropsState {
     onValid: () => void;
@@ -20,11 +18,15 @@ interface UserData {
 }
 
 export default function MyInfoSection({ onValid }: PropsState) {
-    const [isEditingNickName, setIsEditingNickName] = useState<boolean>(false);
-    const inputNickNameRef = useRef<HTMLInputElement>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const {
+        isEditingNickName,
+        setIsEditingNickName,
+        inputNickNameRef,
+        handleSave,
+    } = useNicknameEditor(onValid);
 
-    const queryClient = useQueryClient();
+    const { fileInputRef, handleFileClick, handleFileChange } =
+        useProfileImageUploader(onValid);
 
     const { data: myInfoData } = useApiQuery<UserData>(
         `/user`,
@@ -35,95 +37,6 @@ export default function MyInfoSection({ onValid }: PropsState) {
         },
     );
 
-    const updateNicknameMutation = useApiMutation<
-        { nickname: string },
-        UserData
-    >('/user/nickname', 'PATCH', {
-        onSuccess: (_data, variables) => {
-            setIsEditingNickName(false);
-
-            queryClient.setQueryData<UserData>(['/user', {}], (old) =>
-                old ? { ...old, nickname: variables.nickname } : old,
-            );
-
-            queryClient.invalidateQueries({ queryKey: ['/user', {}] });
-        },
-        onError: () => alert('잠시 후 다시 시도해주세요'),
-    });
-
-    const updateProfileImageMutation = useApiMutation<FormData, any>(
-        '/user/image',
-        'PATCH',
-        {
-            onSuccess: (_data, variables) => {
-                const file = variables.get('imageFile') as File;
-                if (!file) return;
-
-                const imageUrl = URL.createObjectURL(file);
-
-                queryClient.setQueryData<UserData>(['/user', {}], (old) =>
-                    old ? { ...old, imageUrl } : old,
-                );
-            },
-            onError: (err: any) => alert(err.message || '업로드 실패'),
-        },
-    );
-
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!inputNickNameRef.current) return;
-        if (!validateAccessToken()) {
-            onValid();
-            return;
-        }
-
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/user/nickname?nickname=${encodeURIComponent(inputNickNameRef.current.value)}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('accessToken') ?? ''}`,
-                    },
-                },
-            );
-
-            if (!res.ok) {
-                const error = await res.json();
-                if (error.errorCode === 'USR-002')
-                    error.message =
-                        '한글로 이루어진 단어만 가능합니다. 공백이있는지 확인해주세요';
-                throw new Error(error.message || '닉네임 중복 검사 실패');
-            }
-
-            updateNicknameMutation.mutate({
-                nickname: inputNickNameRef.current.value,
-            });
-        } catch (err: any) {
-            alert(err.message);
-        }
-    };
-
-    const handleFileClick = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        if (!validateAccessToken()) {
-            onValid();
-            return;
-        }
-
-        const { imageFile } = await convertToWebp(file);
-
-        const formData = new FormData();
-        formData.append('imageFile', imageFile);
-
-        updateProfileImageMutation.mutate(formData);
-    };
-
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         sessionStorage.removeItem('accessToken');
@@ -131,7 +44,7 @@ export default function MyInfoSection({ onValid }: PropsState) {
         window.location.reload();
     };
 
-    if (!myInfoData) return <div>loading!!</div>;
+    if (!myInfoData) return <PendingModal />;
 
     const { nickname, loginId, imageUrl = dummyImg } = myInfoData;
 

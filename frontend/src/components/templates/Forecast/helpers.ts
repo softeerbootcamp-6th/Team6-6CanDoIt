@@ -45,6 +45,11 @@ export function formatHour12(date: Date) {
     return `${hour12}${period}`;
 }
 
+export function formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return dateStr.split('T')[0].replace(/-/g, '.');
+}
+
 interface CourseForecast {
     startCard: CardData;
     arrivalCard: CardData;
