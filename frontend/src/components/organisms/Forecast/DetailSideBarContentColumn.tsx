@@ -66,7 +66,7 @@ export default function DetailSideBarContentColumn({
     return (
         <div css={wrapperStyles}>
             {weatherDetailItems.map((item) => (
-                <DetailSideBarContent {...item} />
+                <DetailSideBarContent key={item.title} {...item} />
             ))}
         </div>
     );
