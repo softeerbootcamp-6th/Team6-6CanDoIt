@@ -37,12 +37,7 @@ export default function MountainCard(props: PropsState) {
             onClick={onClick}
             onMouseEnter={onMouseEnter}
         >
-            <img
-                src={mountainImageUrl}
-                loading='lazy'
-                alt={mountainName}
-                css={bgImageStyle}
-            />
+            <img src={mountainImageUrl} alt={mountainName} css={bgImageStyle} />
             <MountainCardHeader
                 weatherIconName={weatherIconName}
                 surfaceTemperature={surfaceTemperature}
