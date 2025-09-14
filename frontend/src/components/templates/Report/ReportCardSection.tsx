@@ -6,13 +6,13 @@ import ToggleButton from '../../atoms/Button/ToggleButton.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportModal from '../../organisms/Report/ReportModal.tsx';
-import { formatTimeDifference, filterGatherer } from './utils.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { theme } from '../../../theme/theme.ts';
 import ReportPendingModal from '../../molecules/Modal/ReportPendingModal.tsx';
 import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
 import useReportCardSection from './hooks/useReportCardSection.ts';
+import { filterGatherer, formatTimeDifference } from '../../../utils/utils.ts';
 
 export default function ReportCardSection() {
     const {

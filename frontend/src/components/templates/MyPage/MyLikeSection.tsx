@@ -1,22 +1,21 @@
 import { LabelHeading } from '../../atoms/Heading/Heading.tsx';
-import {
-    filterGatherer,
-    formatTimeDifference,
-    getCurrentTime,
-} from '../Report/utils.ts';
 import FrontReportCard from '../../organisms/Report/FrontReportCard.tsx';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { css } from '@emotion/react';
-import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
 import { useEffect, useState } from 'react';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import { theme } from '../../../theme/theme.ts';
-import type { CardData } from '../../../types/reportCardTypes';
 import { useNavigate } from 'react-router-dom';
 import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 import useCardLikeMutation from '../../../hooks/useCardLikeMutation.ts';
+import {
+    filterGatherer,
+    formatTimeDifference,
+    getCurrentTime,
+} from '../../../utils/utils.ts';
+import useMyLikeReportCardData from '../../../hooks/useMyLikeReportCardData.ts';
 
 export default function MyLikeSection() {
     const title = '좋아요한 제보 목록';
@@ -30,18 +29,7 @@ export default function MyLikeSection() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useApiInfiniteQuery<CardData>(
-        `/card/interaction/report/me/like`,
-        {
-            pageSize,
-            idField: 'reportId',
-        },
-        {
-            retry: false,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
+    } = useMyLikeReportCardData(pageSize);
     const flattenedData = cardsData?.pages.flat();
 
     const key = [

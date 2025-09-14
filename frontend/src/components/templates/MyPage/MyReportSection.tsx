@@ -1,22 +1,21 @@
 import { LabelHeading } from '../../atoms/Heading/Heading.tsx';
-import {
-    filterGatherer,
-    formatTimeDifference,
-    getCurrentTime,
-} from '../Report/utils.ts';
 import FrontReportCard from '../../organisms/Report/FrontReportCard.tsx';
 import BackReportCard from '../../organisms/Report/BackReportCard.tsx';
 import Icon from '../../atoms/Icon/Icons.tsx';
 import { css } from '@emotion/react';
-import useApiInfiniteQuery from '../../../hooks/useApiInfiniteQuery.ts';
 import { useEffect, useState } from 'react';
 import { theme } from '../../../theme/theme.ts';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import ReportCardWrapper from '../../organisms/Report/ReportCardWrapper.tsx';
 import { useNavigate } from 'react-router-dom';
-import type { CardData } from '../../../types/reportCardTypes';
 import LoginRequiredModal from '../../molecules/Modal/LoginRequiredModal.tsx';
 import useCardLikeMutation from '../../../hooks/useCardLikeMutation.ts';
+import {
+    filterGatherer,
+    formatTimeDifference,
+    getCurrentTime,
+} from '../../../utils/utils.ts';
+import useMyReportCardData from '../../../hooks/useMyReportCardData.ts';
 
 export default function MyReportSection() {
     const title = '나의 제보 목록';
@@ -30,18 +29,7 @@ export default function MyReportSection() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useApiInfiniteQuery<CardData>(
-        `/card/interaction/report/me`,
-        {
-            pageSize,
-            idField: 'reportId',
-        },
-        {
-            retry: false,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
+    } = useMyReportCardData(pageSize);
     const flattenedData = cardsData?.pages.flat();
 
     const key = [

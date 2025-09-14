@@ -2,19 +2,19 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
-import useApiQuery from '../../../../hooks/useApiQuery';
-import useApiMutation from '../../../../hooks/useApiMutation';
-import useApiInfiniteQuery from '../../../../hooks/useApiInfiniteQuery';
 import useCardLikeMutation from '../../../../hooks/useCardLikeMutation';
 
 import {
+    getCurrentTime,
     parseFilterFromUrl,
     validateAccessToken,
 } from '../../../../utils/utils';
 
-import { getCurrentTime, reportFormValidation } from '../utils';
+import { reportFormValidation } from '../helper.ts';
 
-import type { CardData } from '../../../../types/reportCardTypes';
+import useFilterColumn from '../../../../hooks/useFilterColumn.ts';
+import useReportCardData from '../../../../hooks/useReportCard.ts';
+import useReportMutation from '../../../../hooks/useReportMutation.ts';
 
 type ReportType = 'WEATHER' | 'SAFE';
 
@@ -50,17 +50,8 @@ export default function useReportCardSection() {
         reportType === 'WEATHER' ? '실시간 날씨 제보' : '실시간 안전 제보';
     const currentTime = getCurrentTime();
 
-    const { data: filterColumn, isError: isFilterColumnError } = useApiQuery(
-        '/card/interaction/keyword',
-        {},
-        {
-            retry: false,
-            networkMode: 'always',
-            staleTime: 24 * 60 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
+    const { data: filterColumn, isError: isFilterColumnError } =
+        useFilterColumn();
 
     const {
         data: cardsData,
@@ -68,25 +59,14 @@ export default function useReportCardSection() {
         hasNextPage,
         isFetchingNextPage,
         isError: isCardsError,
-    } = useApiInfiniteQuery<CardData>(
-        `/card/interaction/report/${courseId}`,
-        {
-            params: {
-                reportType,
-                weatherKeywordIds: weatherKeywords,
-                rainKeywordIds: rainKeywords,
-                etceteraKeywordIds: etceteraKeywords,
-            },
-            pageSize,
-            idField: 'reportId',
-        },
-        {
-            retry: false,
-            networkMode: 'always',
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
+    } = useReportCardData({
+        courseId,
+        reportType,
+        weatherKeywords,
+        rainKeywords,
+        etceteraKeywords,
+        pageSize,
+    });
 
     useEffect(() => {
         const errorMessage = isFilterColumnError ? '키워드' : '제보 카드';
@@ -97,36 +77,7 @@ export default function useReportCardSection() {
 
     const flattenedData = cardsData?.pages.flat();
 
-    const reportMutation = useApiMutation<FormData, any>(
-        `/card/interaction/report`,
-        'POST',
-        {
-            onSuccess: async () => {
-                await queryClient.invalidateQueries({
-                    queryKey: [
-                        `/card/interaction/report/${courseId}`,
-                        {
-                            reportType,
-                            weatherKeywordIds: weatherKeywords,
-                            rainKeywordIds: rainKeywords,
-                            etceteraKeywordIds: etceteraKeywords,
-                            pageSize,
-                        },
-                    ],
-                });
-                setIsReportModalOpen(false);
-                setFlippedCardId(null);
-            },
-            onError: (error: any) => {
-                setIsReportModalOpen(false);
-                error instanceof TypeError
-                    ? setValidationError('네트워크 오류가 발생했습니다.')
-                    : setValidationError('제보에 실패했습니다.');
-            },
-        },
-    );
-
-    const key = [
+    const invalidQueryKey = [
         `/card/interaction/report/${courseId}`,
         {
             reportType,
@@ -136,11 +87,26 @@ export default function useReportCardSection() {
             pageSize,
         },
     ];
+    const reportSuccessCallback = async () => {
+        await queryClient.invalidateQueries({ queryKey: invalidQueryKey });
+        setIsReportModalOpen(false);
+        setFlippedCardId(null);
+    };
+    const reportErrorCallback = (error: any) => {
+        setIsReportModalOpen(false);
+        error instanceof TypeError
+            ? setValidationError('네트워크 오류가 발생했습니다.')
+            : setValidationError('제보에 실패했습니다.');
+    };
+    const reportMutation = useReportMutation({
+        onSuccess: reportSuccessCallback,
+        onError: reportErrorCallback,
+    });
 
     const { heartClickHandler, validationError: likeValidationError } =
         useCardLikeMutation({
             reportId: flippedCardId,
-            queryKey: key,
+            queryKey: invalidQueryKey,
         });
 
     useEffect(() => {

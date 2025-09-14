@@ -2,15 +2,12 @@ import { css } from '@emotion/react';
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-
-import useApiQuery from '../../../hooks/useApiQuery';
-
-import { refactorMountainDataToOptions } from '../Main/utils.ts';
-import type { MountainData } from '../../../types/mountainTypes';
 import type { Option } from '../../../types/searchBarTypes';
 
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import SearchBar from '../../organisms/Common/SearchBar';
+import useMountainsData from '../../../hooks/useMountainsData.ts';
+import { refactorMountainDataToOptions } from '../../../utils/utils.ts';
 
 export default function AlertSearchSection() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -31,19 +28,8 @@ export default function AlertSearchSection() {
         setSearchParams(next);
     };
 
-    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
-        MountainData[]
-    >(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-            networkMode: 'always',
-            staleTime: 5 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
+    const { data: mountainsData, isError: isMountainsError } =
+        useMountainsData();
     useEffect(() => {
         if (isMountainsError) {
             setErrorMessage('산 정보를 불러오는데 실패했습니다.');
