@@ -1,7 +1,4 @@
-import type {
-    MountainCourse,
-    MountainData,
-} from '../../../types/mountainTypes';
+import type { MountainData } from '../../../types/mountainTypes';
 import { convertToIconName } from '../../../utils/utils.ts';
 
 export function refactorMountainsData(data: MountainData[]) {
@@ -16,28 +13,6 @@ export function refactorMountainsData(data: MountainData[]) {
         }),
         surfaceTemperature: mountain.weatherMetric.surfaceTemperature,
         summitTemperature: mountain.weatherMetric.topTemperature,
-    }));
-}
-
-interface Option {
-    id: number;
-    name: string;
-}
-export function refactorMountainDataToOptions(
-    mountainsData: MountainData[],
-): Option[] {
-    return mountainsData.map((mountain) => ({
-        id: mountain.mountainId,
-        name: mountain.mountainName,
-    }));
-}
-
-export function refactorCoursesDataToOptions(
-    coursesData: MountainCourse[],
-): Option[] {
-    return coursesData.map((course) => ({
-        id: course.courseId,
-        name: course.courseName,
     }));
 }
 
