@@ -10,7 +10,6 @@ import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
 } from '../../Main/utils.ts';
-import { filterKeywords } from '../../../../constants/placeholderData.ts';
 
 export default function useReportSearchSection() {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -52,7 +51,8 @@ export default function useReportSearchSection() {
             retry: false,
             networkMode: 'always',
             staleTime: 5 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
     const { data: coursesData, isError: isCoursesError } = useApiQuery<
@@ -64,19 +64,19 @@ export default function useReportSearchSection() {
             enabled: selectedMountainId !== 0,
             retry: false,
             networkMode: 'always',
-            staleTime: 1000 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            staleTime: 24 * 60 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
         },
     );
     const { data: filterColumn, isError: isFilterColumnError } = useApiQuery(
         '/card/interaction/keyword',
         {},
         {
-            placeholderData: filterKeywords,
+            placeholderData: (prev) => prev,
             retry: false,
             networkMode: 'always',
-            staleTime: 1000 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            staleTime: 24 * 60 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
         },
     );
     useEffect(() => {

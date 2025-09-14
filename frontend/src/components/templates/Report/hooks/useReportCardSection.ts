@@ -56,8 +56,9 @@ export default function useReportCardSection() {
         {
             retry: false,
             networkMode: 'always',
-            staleTime: 1000 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            staleTime: 24 * 60 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
 
@@ -82,6 +83,8 @@ export default function useReportCardSection() {
         {
             retry: false,
             networkMode: 'always',
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
 
