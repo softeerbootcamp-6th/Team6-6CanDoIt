@@ -5,7 +5,7 @@ import ChipButton from '../../molecules/Button/ChipButton.tsx';
 import Modal from '../../molecules/Modal/RegisterModal.tsx';
 import type { Option } from '../../../types/searchBarTypes';
 import useReportSearchSection from './hooks/useReportSearchSection.ts';
-import { filterKeywords } from '../../../constants/placeholderData.ts';
+import type { FilterColumn } from '../../../types/filterTypes';
 
 type SearchBarProps = Parameters<typeof SearchBar>[0];
 type ChipButtonProps = Parameters<typeof ChipButton>[0];
@@ -45,7 +45,7 @@ export default function ReportSearchSection() {
     const filterModalProps = getFilterModalProps(
         isFilterModalOpen,
         () => setIsFilterModalOpen(false),
-        filterColumn ?? filterKeywords,
+        filterColumn ?? [],
         filterAnchor,
     );
 
@@ -115,7 +115,7 @@ function getChipButtonProps(
 function getFilterModalProps(
     isOpen: boolean,
     onClose: () => void,
-    filterColumn: typeof filterKeywords,
+    filterColumn: FilterColumn,
     anchorElement: HTMLElement | null,
 ): FilterModalProps {
     return {

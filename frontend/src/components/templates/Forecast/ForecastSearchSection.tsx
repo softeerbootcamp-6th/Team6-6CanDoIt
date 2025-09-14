@@ -43,7 +43,8 @@ export default function ForecastSearchSection() {
             retry: false,
             networkMode: 'always',
             staleTime: 5 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
     const { data: coursesData, isError: isCoursesError } = useApiQuery<
@@ -55,8 +56,8 @@ export default function ForecastSearchSection() {
             enabled: selectedMountainId !== 0,
             retry: false,
             networkMode: 'always',
-            staleTime: 1000 * 60 * 1000,
-            gcTime: 1000 * 60 * 1000,
+            staleTime: 24 * 60 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
         },
     );
     useEffect(() => {

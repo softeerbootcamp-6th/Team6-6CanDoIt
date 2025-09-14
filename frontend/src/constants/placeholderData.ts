@@ -175,31 +175,10 @@ const userInfoData = {
     userId: 'qweasdasdsda',
 };
 
-const filterKeywords = {
-    weatherKeywords: [
-        { id: 0, description: '화창해요' },
-        { id: 1, description: '구름이 많아요' },
-        { id: 2, description: '더워요' },
-        { id: 3, description: '추워요' },
-    ],
-    rainKeywords: [
-        { id: 0, description: '부슬비가 내려요' },
-        { id: 1, description: '장대비가 쏟아져요' },
-        { id: 2, description: '천둥 번개가 쳐요' },
-        { id: 3, description: '폭우가 내려요' },
-    ],
-    etceteraKeywords: [
-        { id: 0, description: '안개가 껴요' },
-        { id: 1, description: '미세먼지가 많아요' },
-        { id: 2, description: '시야가 흐려요' },
-    ],
-};
-
 export {
     userInfoData,
     detailInfoSectionData,
     summaryInfoSectionData,
     backCard,
     frontCard,
-    filterKeywords,
 };

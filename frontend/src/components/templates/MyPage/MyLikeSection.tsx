@@ -38,7 +38,8 @@ export default function MyLikeSection() {
         },
         {
             retry: false,
-            gcTime: 1000 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
     const flattenedData = cardsData?.pages.flat();

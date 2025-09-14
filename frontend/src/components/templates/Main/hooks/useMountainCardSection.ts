@@ -13,6 +13,10 @@ export default function useMountainCardSection() {
         {},
         {
             retry: false,
+            networkMode: 'always',
+            staleTime: 5 * 60 * 1000,
+            gcTime: 24 * 60 * 60 * 1000,
+            placeholderData: (prev) => prev,
         },
     );
 
