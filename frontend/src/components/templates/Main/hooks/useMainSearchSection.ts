@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Option } from '../../../../types/searchBarTypes';
+import useMountainsData from '../../../../hooks/useMountainsData.ts';
+import useCoursesData from '../../../../hooks/useCoursesData.ts';
+import { validate } from '../helper.ts';
 import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
-    validate,
-} from '../utils.ts';
-import useApiQuery from '../../../../hooks/useApiQuery.ts';
-import type {
-    MountainCourse,
-    MountainData,
-} from '../../../../types/mountainTypes';
-import type { Option } from '../../../../types/searchBarTypes';
+} from '../../../../utils/utils.ts';
 
 export default function useMainSearchSection() {
     const [selectedMountainId, setSelectedMountainId] = useState<number>(0);
@@ -48,32 +45,10 @@ export default function useMainSearchSection() {
         );
     };
 
-    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
-        MountainData[]
-    >(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-            networkMode: 'always',
-            staleTime: 5 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
-    const { data: coursesData, isError: isCoursesError } = useApiQuery<
-        MountainCourse[]
-    >(
-        `/card/mountain/${selectedMountainId}/course`,
-        {},
-        {
-            enabled: selectedMountainId !== 0,
-            retry: false,
-            networkMode: 'always',
-            staleTime: 24 * 60 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-        },
-    );
+    const { data: mountainsData, isError: isMountainsError } =
+        useMountainsData();
+    const { data: coursesData, isError: isCoursesError } =
+        useCoursesData(selectedMountainId);
 
     useEffect(() => {
         if (isMountainsError || isCoursesError) {

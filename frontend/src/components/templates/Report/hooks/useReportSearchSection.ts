@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import useApiQuery from '../../../../hooks/useApiQuery.ts';
-import type {
-    MountainCourse,
-    MountainData,
-} from '../../../../types/mountainTypes';
 import type { Option } from '../../../../types/searchBarTypes';
 import {
     refactorCoursesDataToOptions,
     refactorMountainDataToOptions,
-} from '../../Main/utils.ts';
+} from '../../../../utils/utils.ts';
+import useMountainsData from '../../../../hooks/useMountainsData.ts';
+import useCoursesData from '../../../../hooks/useCoursesData.ts';
+import useFilterColumn from '../../../../hooks/useFilterColumn.ts';
 
 export default function useReportSearchSection() {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -42,43 +40,13 @@ export default function useReportSearchSection() {
         setIsFilterModalOpen(true);
     };
 
-    const { data: mountainsData, isError: isMountainsError } = useApiQuery<
-        MountainData[]
-    >(
-        '/card/mountain',
-        {},
-        {
-            retry: false,
-            networkMode: 'always',
-            staleTime: 5 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-            placeholderData: (prev) => prev,
-        },
-    );
-    const { data: coursesData, isError: isCoursesError } = useApiQuery<
-        MountainCourse[]
-    >(
-        `/card/mountain/${selectedMountainId}/course`,
-        {},
-        {
-            enabled: selectedMountainId !== 0,
-            retry: false,
-            networkMode: 'always',
-            staleTime: 24 * 60 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-        },
-    );
-    const { data: filterColumn, isError: isFilterColumnError } = useApiQuery(
-        '/card/interaction/keyword',
-        {},
-        {
-            placeholderData: (prev) => prev,
-            retry: false,
-            networkMode: 'always',
-            staleTime: 24 * 60 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-        },
-    );
+    const { data: mountainsData, isError: isMountainsError } =
+        useMountainsData();
+    const { data: coursesData, isError: isCoursesError } =
+        useCoursesData(selectedMountainId);
+    const { data: filterColumn, isError: isFilterColumnError } =
+        useFilterColumn();
+
     useEffect(() => {
         const errorMessage = isMountainsError
             ? '산 정보를 불러오지 못했습니다.'
